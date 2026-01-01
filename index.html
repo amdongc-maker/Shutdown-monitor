@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Shutdown & Resume Power Management</title>
-
 <style>
 body{font-family:Segoe UI,Arial;background:#f4f6f8;margin:0}
 header{background:#1f3a5f;color:#fff;padding:12px 20px;font-size:20px}
@@ -14,45 +13,41 @@ label{display:block;margin-top:10px;font-weight:600}
 select,input,textarea{width:100%;padding:8px;margin-top:4px}
 textarea{resize:vertical}
 button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
+.btn-login{background:#3498db;color:#fff}
 .btn-shutdown{background:#e74c3c;color:#fff}
 .btn-resume{background:#27ae60;color:#fff}
-.btn-refresh{background:#3498db;color:#fff}
 .footer{position:fixed;bottom:0;width:100%;background:#ecf0f1;padding:10px;text-align:center}
 #msg{margin-top:5px;font-weight:bold}
 </style>
 </head>
-
 <body>
 
 <header>Shutdown & Resume Power Management</header>
 
 <div class="container">
 
-<div class="card">
-<label>Select Installation</label>
-<select id="main_inst"></select>
-</div>
+<!-- Login Card -->
+<div class="card" id="loginCard">
+<h3>Operator Login</h3>
+<label>User Name</label>
+<input type="text" id="loginUser">
 
-<div class="card">
-<h3>Active Shutdown Feeders</h3>
-<table width="100%" border="1" cellpadding="6">
-<thead style="background:#eee">
-<tr>
-<th>Feeder</th>
-<th>Shutdown Time</th>
-<th>Type</th>
-<th>Information</th>
-</tr>
-</thead>
-<tbody id="shutdownList"></tbody>
-</table>
-</div>
+<label>Password</label>
+<input type="password" id="loginPass">
 
-<div class="card">
-<h3>Shutdown Entry</h3>
+<label>Operator Name</label>
+<input type="text" id="loginName">
 
 <label>Installation</label>
-<select id="sd_inst"></select>
+<select id="loginInst"></select>
+
+<br><br>
+<button class="btn-login" onclick="login()">Login</button>
+</div>
+
+<!-- Shutdown Card -->
+<div class="card" id="shutdownCard" style="display:none">
+<h3>Shutdown Entry</h3>
 
 <label>Feeder</label>
 <select id="sd_feeder"></select>
@@ -75,11 +70,9 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 <button class="btn-shutdown" onclick="submitShutdown()">Submit Shutdown</button>
 </div>
 
-<div class="card">
+<!-- Resume Card -->
+<div class="card" id="resumeCard" style="display:none">
 <h3>Resume Entry</h3>
-
-<label>Installation</label>
-<select id="rs_inst"></select>
 
 <label>Feeder</label>
 <select id="rs_feeder"></select>
@@ -103,13 +96,14 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 </div>
 
 <div class="footer">
-<button class="btn-refresh" onclick="loadActive()">Refresh</button>
 <div id="msg"></div>
 </div>
 
 <script>
-const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
+// Google WebApp URL
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec"; // Replace with your Apps Script WebApp URL
 
+// Installation-wise Feeders
 const INSTALLATION_FEEDERS={
 "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
@@ -119,86 +113,97 @@ const INSTALLATION_FEEDERS={
 "MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP - 44 FEEDER","ZUNDAL AG FEEDER"]
 };
 
-function init(){
-["main_inst","sd_inst","rs_inst"].forEach(id=>{
-let s=document.getElementById(id);
-s.innerHTML='<option value="">Select Installation</option>';
-Object.keys(INSTALLATION_FEEDERS).forEach(i=>s.innerHTML+=`<option>${i}</option>`);
-});
-bind("sd_inst","sd_feeder");
-bind("rs_inst","rs_feeder");
-main_inst.onchange=loadActive;
-}
-
-function bind(i,f){
-document.getElementById(i).onchange=function(){
-let x=document.getElementById(f);
-x.innerHTML='<option value="">Select Feeder</option>';
-(INSTALLATION_FEEDERS[this.value]||[]).forEach(a=>x.innerHTML+=`<option>${a}</option>`);
+// Sample Users: username=>{password,name,installation}
+const USERS={
+"operator1":{password:"1234",name:"Akash",installation:"LIMBODARA-GGS-1"},
+"operator2":{password:"5678",name:"Ravi",installation:"GAMIJ-GGS-1"},
+"operator3":{password:"abcd",name:"Meena",installation:"MOTERA-GGS"}
 };
+
+let loggedIn={};
+
+// Populate login installation
+const loginInst=document.getElementById("loginInst");
+loginInst.innerHTML='<option value="">Select Installation</option>';
+Object.keys(INSTALLATION_FEEDERS).forEach(i=>loginInst.innerHTML+=`<option>${i}</option>`);
+
+// Login function
+function login(){
+  const user=document.getElementById("loginUser").value.trim();
+  const pass=document.getElementById("loginPass").value.trim();
+  const name=document.getElementById("loginName").value.trim();
+  const inst=document.getElementById("loginInst").value;
+
+  if(!user||!pass||!name||!inst){
+    showMsg("All login fields are required");
+    return;
+  }
+
+  if(USERS[user] && USERS[user].password===pass){
+    loggedIn={user:user,name:name,installation:inst};
+    showMsg("Login successful: "+name);
+    document.getElementById("loginCard").style.display="none";
+    document.getElementById("shutdownCard").style.display="block";
+    document.getElementById("resumeCard").style.display="block";
+    populateFeeders();
+  } else {
+    showMsg("Invalid username or password");
+  }
 }
 
-function loadActive(){
-fetch(WEBAPP_URL+'?action=status&t='+Date.now())
-.then(r=>r.json())
-.then(d=>{
-shutdownList.innerHTML='';
-const rows=d.filter(x=>!main_inst.value||x.installation===main_inst.value);
-
-if(rows.length===0){
-shutdownList.innerHTML='<tr><td colspan="4">No Active Shutdown</td></tr>';
-return;
+// Populate feeders as per logged-in installation
+function populateFeeders(){
+  const sd=document.getElementById("sd_feeder");
+  const rs=document.getElementById("rs_feeder");
+  sd.innerHTML='<option value="">Select Feeder</option>';
+  rs.innerHTML='<option value="">Select Feeder</option>';
+  (INSTALLATION_FEEDERS[loggedIn.installation]||[]).forEach(f=>{
+    sd.innerHTML+=`<option>${f}</option>`;
+    rs.innerHTML+=`<option>${f}</option>`;
+  });
 }
 
-rows.forEach(x=>{
-shutdownList.innerHTML+=
-`<tr>
-<td>${x.feeder}</td>
-<td>${x.shutdownTime}</td>
-<td>${x.type}</td>
-<td>${x.information}</td>
-</tr>`;
-});
-});
-}
-
+// Submit Shutdown
 function submitShutdown(){
-if(!sd_inst.value||!sd_feeder.value||!sd_time.value){
-showMsg("All shutdown fields required");
-return;
-}
-fetch(WEBAPP_URL+'?'+new URLSearchParams({
-action:'shutdown',
-Installation:sd_inst.value,
-feeder:sd_feeder.value,
-ShutdownTime:sd_time.value.replace("T"," "),
-ShutdownType:sd_type.value,
-Information:sd_info.value
-}),{mode:'no-cors'});
-showMsg("Shutdown submitted successfully");
-setTimeout(loadActive,1500);
+  if(!sd_feeder.value||!sd_time.value){
+    showMsg("Feeder and Shutdown Time required");
+    return;
+  }
+  fetch(WEBAPP_URL+'?'+new URLSearchParams({
+    action:'shutdown',
+    Installation:loggedIn.installation,
+    feeder:sd_feeder.value,
+    ShutdownTime:sd_time.value.replace("T"," "),
+    ShutdownType:sd_type.value,
+    Information:sd_info.value,
+    ShutdownEntryBy:loggedIn.name
+  }),{mode:'no-cors'});
+  showMsg("Shutdown submitted successfully");
 }
 
+// Submit Resume
 function submitResume(){
-fetch(WEBAPP_URL+'?'+new URLSearchParams({
-action:'resume',
-feeder:rs_feeder.value,
-ResumeTime:rs_time.value.replace("T"," "),
-TotalProdLoss:rs_loss.value,
-DGDeployed:rs_dg.value,
-Remarks:rs_rem.value
-}),{mode:'no-cors'});
-showMsg("Resume submitted successfully");
-setTimeout(loadActive,1500);
+  if(!rs_feeder.value||!rs_time.value){
+    showMsg("Feeder and Resume Time required");
+    return;
+  }
+  fetch(WEBAPP_URL+'?'+new URLSearchParams({
+    action:'resume',
+    feeder:rs_feeder.value,
+    ResumeTime:rs_time.value.replace("T"," "),
+    TotalProdLoss:rs_loss.value,
+    DGDeployed:rs_dg.value,
+    Remarks:rs_rem.value,
+    ResumeEntryBy:loggedIn.name
+  }),{mode:'no-cors'});
+  showMsg("Resume submitted successfully");
 }
 
+// Show message
 function showMsg(t){
-msg.innerText=t;
-setTimeout(()=>msg.innerText="",2500);
+  msg.innerText=t;
+  setTimeout(()=>msg.innerText="",3000);
 }
-
-init();
-loadActive();
 </script>
 
 </body>
