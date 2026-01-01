@@ -138,89 +138,68 @@ x.innerHTML='<option value="">Select Feeder</option>';
 };
 }
 
-<script>
 function loadActive(){
-setTimeout(loadActive, 1000);
-  const inst = main_inst.value || "";
+fetch(WEBAPP_URL+'?action=status&t='+Date.now())
+.then(r=>r.json())
+.then(d=>{
+shutdownList.innerHTML='';
+const rows=d.filter(x=>!main_inst.value||x.installation===main_inst.value);
 
-  fetch(WEBAPP_URL + "?action=status&t=" + Date.now()) // 🔥 CACHE FIX
-    .then(r => r.json())
-    .then(data => {
-
-      shutdownList.innerHTML = "";
-
-      const rows = inst
-        ? data.filter(x => x.installation === inst)
-        : data;
-
-      if (rows.length === 0) {
-        shutdownList.innerHTML =
-          `<tr><td colspan="4">No Active Shutdown</td></tr>`;
-        return;
-      }
-
-      rows.forEach(x => {
-        shutdownList.innerHTML += `
-          <tr>
-            <td>${x.feeder}</td>
-            <td>${x.shutdownTime}</td>
-            <td>${x.type}</td>
-            <td>${x.information}</td>
-          </tr>`;
-      });
-    })
-    .catch(() => {
-      shutdownList.innerHTML =
-        `<tr><td colspan="4">Error loading data</td></tr>`;
-    });
+if(rows.length===0){
+shutdownList.innerHTML='<tr><td colspan="4">No Active Shutdown</td></tr>';
+return;
 }
-</script>
-function submitShutdown() {
 
-  if (!sd_inst.value || !sd_feeder.value || !sd_time.value) {
-    showMsg("All shutdown fields required");
-    return;
-  }
-
-  const params = new URLSearchParams({
-    action: "shutdown",
-    Installation: sd_inst.value,
-    feeder: sd_feeder.value,
-    ShutdownTime: sd_time.value.replace("T"," "),
-    ShutdownType: sd_type.value,
-    Information: sd_info.value
-  });
-
-  fetch(WEBAPP_URL + "?" + params.toString())
-    .then(r => r.json())
-    .then(res => {
-      showMsg(res.message);
-      loadActive();
-    })
-    .catch(err => showMsg("Error sending data"));
+rows.forEach(x=>{
+shutdownList.innerHTML+=
+`<tr>
+<td>${x.feeder}</td>
+<td>${x.shutdownTime}</td>
+<td>${x.type}</td>
+<td>${x.information}</td>
+</tr>`;
+});
+});
 }
-</script>
+
+function submitShutdown(){
+if(!sd_inst.value||!sd_feeder.value||!sd_time.value){
+showMsg("All shutdown fields required");
+return;
+}
+fetch(WEBAPP_URL+'?'+new URLSearchParams({
+action:'shutdown',
+Installation:sd_inst.value,
+feeder:sd_feeder.value,
+ShutdownTime:sd_time.value.replace("T"," "),
+ShutdownType:sd_type.value,
+Information:sd_info.value
+}),{mode:'no-cors'});
+showMsg("Shutdown submitted successfully");
+setTimeout(loadActive,1500);
+}
 
 function submitResume(){
-const t=rs_time.value?rs_time.value.replace("T"," "):"";
 fetch(WEBAPP_URL+'?'+new URLSearchParams({
-action:'resume',feeder:rs_feeder.value,ResumeTime:t,
-TotalProdLoss:rs_loss.value,DGDeployed:rs_dg.value,
-Remarks:rs_rem.value,ResumeEntryBy:'WEB'
+action:'resume',
+feeder:rs_feeder.value,
+ResumeTime:rs_time.value.replace("T"," "),
+TotalProdLoss:rs_loss.value,
+DGDeployed:rs_dg.value,
+Remarks:rs_rem.value
 }),{mode:'no-cors'});
-msg.innerText="Resume submitted successfully";
-setTimeout(loadActive,2000);
+showMsg("Resume submitted successfully");
+setTimeout(loadActive,1500);
 }
 
-init();loadActive();
+function showMsg(t){
+msg.innerText=t;
+setTimeout(()=>msg.innerText="",2500);
+}
+
+init();
+loadActive();
 </script>
 
 </body>
 </html>
-<script>
-function showMsg(txt){
-  const m = document.getElementById("msg");
-  m.innerText = txt;
-  setTimeout(()=>{ m.innerText = ""; }, 2500);
-}
-</script>
