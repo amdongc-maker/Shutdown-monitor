@@ -2,48 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Live Shutdown Feeders List</title>
+<title>Live Shutdown Feeders</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
-    margin: 0;
-    padding: 20px;
-  }
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-  }
-  th, td {
-    padding: 10px;
-    border: 1px solid #333;
-    text-align: center;
-  }
-  th {
-    background: #eee;
-  }
-  tr.shutdown {
-    background-color: #ffcccc;
-  }
-  tr:nth-child(even):not(.shutdown) {
-    background-color: #f9f9f9;
-  }
+  body { font-family: Arial; padding: 20px; background:#f4f6f8; }
+  h2 { text-align:center; }
+  table { width:100%; border-collapse: collapse; background: #fff; }
+  th, td { border: 1px solid #333; padding: 10px; text-align:center; }
+  th { background: #eee; }
+  tr.shutdown { background-color: #ffcccc; }
+  tr:nth-child(even):not(.shutdown) { background-color: #f9f9f9; }
 </style>
 </head>
 <body>
 
-<h2>Live Shutdown Feeders List</h2>
+<h2>Live Shutdown Feeders</h2>
 <table id="shutdownTable">
   <thead>
     <tr>
       <th>Feeder</th>
       <th>Shutdown Time</th>
-      <th>Shutdown Type</th>
+      <th>Type</th>
       <th>Information</th>
       <th>Installation</th>
     </tr>
@@ -56,23 +34,20 @@
 <script>
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyI1yrnfZPK84UkbbcOxk-3Y8WOtV1lz7V2wp4yOB3N_1VMJFLwF-ivll-p0dVig9cXfw/exec
 
-async function fetchShutdownData() {
+async function fetchShutdownFeeders() {
   try {
     const response = await fetch(SHEET_API_URL);
     const data = await response.json();
 
-    const tableBody = document.querySelector("#shutdownTable tbody");
-    tableBody.innerHTML = "";
+    const tbody = document.querySelector("#shutdownTable tbody");
+    tbody.innerHTML = "";
 
-    // Filter only feeders that are currently shutdown
-    const shutdownFeeders = data.filter(row => row.ResumeTime === "NA" || row.ResumeTime === "");
-
-    if (shutdownFeeders.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="5">No feeders currently shutdown.</td></tr>`;
+    if(data.length === 0){
+      tbody.innerHTML = `<tr><td colspan="5">No feeders currently shutdown.</td></tr>`;
       return;
     }
 
-    shutdownFeeders.forEach(row => {
+    data.forEach(row => {
       const tr = document.createElement("tr");
       tr.classList.add("shutdown");
       tr.innerHTML = `
@@ -82,17 +57,19 @@ async function fetchShutdownData() {
         <td>${row.Information}</td>
         <td>${row.Installation}</td>
       `;
-      tableBody.appendChild(tr);
+      tbody.appendChild(tr);
     });
-  } catch (err) {
+
+  } catch(err){
     console.error(err);
-    document.querySelector("#shutdownTable tbody").innerHTML = `<tr><td colspan="5">Error loading data</td></tr>`;
+    document.querySelector("#shutdownTable tbody").innerHTML =
+      `<tr><td colspan="5">Error fetching data</td></tr>`;
   }
 }
 
-// Fetch data every 30 seconds for live updates
-fetchShutdownData();
-setInterval(fetchShutdownData, 30000);
+// Update every 30 seconds
+fetchShutdownFeeders();
+setInterval(fetchShutdownFeeders, 30000);
 </script>
 
 </body>
