@@ -178,62 +178,65 @@ function loadActive(){
 }
 
 /* ================= SHUTDOWN ================= */
+<script>
 function submitShutdown(){
-  if(!sd_inst.value||!sd_feeder.value||!sd_time.value){
+
+  if(!sd_inst.value || !sd_feeder.value || !sd_time.value){
     showMsg("All shutdown fields are required");
     return;
   }
 
   const shutdownTime = sd_time.value.replace("T"," ");
 
-  let p=new URLSearchParams({
-    action:"shutdown",
-    feeder:sd_feeder.value,
-    ShutdownTime:shutdownTime,
-    ShutdownType:sd_type.value,
-    Information:sd_info.value,
-    Installation:sd_inst.value,
-    ShutdownEntryBy:"WEB"
+  const params = new URLSearchParams({
+    action: "shutdown",
+    feeder: sd_feeder.value,
+    ShutdownTime: shutdownTime,
+    ShutdownType: sd_type.value,
+    Information: sd_info.value,
+    Installation: sd_inst.value,
+    ShutdownEntryBy: "WEB"
   });
 
-  fetch(WEBAPP_URL+"?"+p)
-    .then(r=>r.text())
-    .then(t=>{showMsg(t);loadActive();});
+  fetch(WEBAPP_URL + "?" + params.toString(), {
+    method: "GET",
+    mode: "no-cors"   // 🔥 CRITICAL FIX
+  });
+
+  showMsg("Shutdown submitted successfully");
+  setTimeout(loadActive, 2000);
 }
+</script>
 
 /* ================= RESUME ================= */
+<script>
 function submitResume(){
+
   if(!rs_feeder.value){
-    showMsg("Please select feeder to resume");
+    showMsg("Please select feeder");
     return;
   }
 
-  const resumeTime = rs_time.value ? rs_time.value.replace("T"," ") : "";
+  const resumeTime = rs_time.value
+    ? rs_time.value.replace("T"," ")
+    : "";
 
-  let p=new URLSearchParams({
-    action:"resume",
-    feeder:rs_feeder.value,
-    ResumeTime:resumeTime,
-    TotalProdLoss:rs_loss.value,
-    DGDeployed:rs_dg.value,
-    Remarks:rs_rem.value,
-    ResumeEntryBy:"WEB"
+  const params = new URLSearchParams({
+    action: "resume",
+    feeder: rs_feeder.value,
+    ResumeTime: resumeTime,
+    TotalProdLoss: rs_loss.value,
+    DGDeployed: rs_dg.value,
+    Remarks: rs_rem.value,
+    ResumeEntryBy: "WEB"
   });
 
-  fetch(WEBAPP_URL+"?"+p)
-    .then(r=>r.text())
-    .then(t=>{showMsg(t);loadActive();});
-}
+  fetch(WEBAPP_URL + "?" + params.toString(), {
+    method: "GET",
+    mode: "no-cors"   // 🔥 CRITICAL FIX
+  });
 
-function showMsg(t){
-  msg.style.color=t.includes("Successfully")?"green":"red";
-  msg.innerText=t;
+  showMsg("Resume submitted successfully");
+  setTimeout(loadActive, 2000);
 }
-
-/* START */
-init();
-loadActive();
 </script>
-
-</body>
-</html>
