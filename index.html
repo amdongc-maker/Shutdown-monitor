@@ -149,16 +149,32 @@ shutdownList.innerHTML='';
 });
 }
 
-function submitShutdown(){
-const t=sd_time.value.replace("T"," ");
-fetch(WEBAPP_URL+'?'+new URLSearchParams({
-action:'shutdown',feeder:sd_feeder.value,ShutdownTime:t,
-ShutdownType:sd_type.value,Information:sd_info.value,
-Installation:sd_inst.value,ShutdownEntryBy:'WEB'
-}),{mode:'no-cors'});
-msg.innerText="Shutdown submitted successfully";
-setTimeout(loadActive,2000);
+<script>
+function submitShutdown() {
+
+  if (!sd_inst.value || !sd_feeder.value || !sd_time.value) {
+    showMsg("All shutdown fields required");
+    return;
+  }
+
+  const params = new URLSearchParams({
+    action: "shutdown",
+    Installation: sd_inst.value,
+    feeder: sd_feeder.value,
+    ShutdownTime: sd_time.value.replace("T"," "),
+    ShutdownType: sd_type.value,
+    Information: sd_info.value
+  });
+
+  fetch(WEBAPP_URL + "?" + params.toString())
+    .then(r => r.json())
+    .then(res => {
+      showMsg(res.message);
+      loadActive();
+    })
+    .catch(err => showMsg("Error sending data"));
 }
+</script>
 
 function submitResume(){
 const t=rs_time.value?rs_time.value.replace("T"," "):"";
@@ -176,3 +192,10 @@ init();loadActive();
 
 </body>
 </html>
+<script>
+function showMsg(txt){
+  const m = document.getElementById("msg");
+  m.innerText = txt;
+  setTimeout(()=>{ m.innerText = ""; }, 2500);
+}
+</script>
