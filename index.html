@@ -29,17 +29,17 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 <!-- Login Card -->
 <div class="card" id="loginCard">
 <h3>Operator Login</h3>
-<label>User Name</label>
-<input type="text" id="loginUser">
+<label>Username</label>
+<input type="text" id="loginUser" placeholder="Enter Username">
 
 <label>Password</label>
-<input type="password" id="loginPass">
+<input type="password" id="loginPass" placeholder="Enter Password">
 
 <label>Operator Name</label>
-<input type="text" id="loginName">
+<input type="text" id="loginName" placeholder="Enter your Name">
 
-<label>Installation</label>
-<select id="loginInst"></select>
+<label>Installation Name</label>
+<input type="text" id="loginInst" placeholder="Enter Installation Name">
 
 <br><br>
 <button class="btn-login" onclick="login()">Login</button>
@@ -103,7 +103,7 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 // Google WebApp URL
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec"; // Replace with your Apps Script WebApp URL
 
-// Installation-wise Feeders
+// Installation-wise feeders
 const INSTALLATION_FEEDERS={
 "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
@@ -113,34 +113,25 @@ const INSTALLATION_FEEDERS={
 "MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP - 44 FEEDER","ZUNDAL AG FEEDER"]
 };
 
-// Sample Users: username=>{password,name,installation}
-const USERS={
-"operator1":{password:"1234",name:"Akash",installation:"LIMBODARA-GGS-1"},
-"operator2":{password:"5678",name:"Ravi",installation:"GAMIJ-GGS-1"},
-"operator3":{password:"abcd",name:"Meena",installation:"MOTERA-GGS"}
-};
+// Single login credential
+const LOGIN_CREDENTIALS={username:"cpf", password:"1234"};
 
 let loggedIn={};
-
-// Populate login installation
-const loginInst=document.getElementById("loginInst");
-loginInst.innerHTML='<option value="">Select Installation</option>';
-Object.keys(INSTALLATION_FEEDERS).forEach(i=>loginInst.innerHTML+=`<option>${i}</option>`);
 
 // Login function
 function login(){
   const user=document.getElementById("loginUser").value.trim();
   const pass=document.getElementById("loginPass").value.trim();
   const name=document.getElementById("loginName").value.trim();
-  const inst=document.getElementById("loginInst").value;
+  const inst=document.getElementById("loginInst").value.trim();
 
   if(!user||!pass||!name||!inst){
     showMsg("All login fields are required");
     return;
   }
 
-  if(USERS[user] && USERS[user].password===pass){
-    loggedIn={user:user,name:name,installation:inst};
+  if(user===LOGIN_CREDENTIALS.username && pass===LOGIN_CREDENTIALS.password){
+    loggedIn={name:name, installation:inst};
     showMsg("Login successful: "+name);
     document.getElementById("loginCard").style.display="none";
     document.getElementById("shutdownCard").style.display="block";
@@ -151,7 +142,7 @@ function login(){
   }
 }
 
-// Populate feeders as per logged-in installation
+// Populate feeders based on installation
 function populateFeeders(){
   const sd=document.getElementById("sd_feeder");
   const rs=document.getElementById("rs_feeder");
