@@ -1,74 +1,217 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Live Shutdown Feeders</title>
+<title>Shutdown & Resume Power Management</title>
+
 <style>
-  body { font-family: Arial; padding: 20px; background:#f4f6f8; }
-  h2 { text-align:center; }
-  table { width:100%; border-collapse: collapse; background: #fff; }
-  th, td { border: 1px solid #333; padding: 10px; text-align:center; }
-  th { background: #eee; }
-  tr.shutdown { background-color: #ffcccc; }
-  tr:nth-child(even):not(.shutdown) { background-color: #f9f9f9; }
+body{font-family:Segoe UI,Arial;background:#f4f6f8;margin:0}
+header{background:#1f3a5f;color:#fff;padding:12px 20px;font-size:20px}
+.container{padding:20px}
+.card{background:#fff;padding:20px;border-radius:6px;margin-bottom:20px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+h3{margin-top:0;color:#1f3a5f}
+label{display:block;margin-top:10px;font-weight:600}
+select,input,textarea{width:100%;padding:8px;margin-top:4px}
+textarea{resize:vertical}
+button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
+.btn-login{background:#3498db;color:#fff}
+.btn-shutdown{background:#e74c3c;color:#fff}
+.btn-resume{background:#27ae60;color:#fff}
+.footer{position:fixed;bottom:0;width:100%;background:#ecf0f1;padding:10px;text-align:center}
+.hidden{display:none}
+#msg{margin-top:5px;font-weight:bold}
 </style>
 </head>
+
 <body>
 
-<h2>Live Shutdown Feeders</h2>
-<table id="shutdownTable">
-  <thead>
-    <tr>
-      <th>Feeder</th>
-      <th>Shutdown Time</th>
-      <th>Type</th>
-      <th>Information</th>
-      <th>Installation</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td colspan="5">Loading...</td></tr>
-  </tbody>
-</table>
+<header>Shutdown & Resume Power Management</header>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div class="card" id="loginBox">
+<h3>Operator Login</h3>
+
+<label>Username</label>
+<input id="loginUser">
+
+<label>Password</label>
+<input type="password" id="loginPass">
+
+<br><br>
+<button class="btn-login" onclick="login()">Login</button>
+</div>
+
+<!-- OPERATOR DETAILS -->
+<div class="card hidden" id="operatorBox">
+<h3>Operator Details</h3>
+
+<label>Operator Name</label>
+<input id="opName" disabled>
+
+<label>Installation</label>
+<input id="installation" disabled>
+</div>
+
+<!-- SHUTDOWN -->
+<div class="card hidden" id="shutdownBox">
+<h3>Shutdown Entry</h3>
+
+<label>Feeder</label>
+<select id="sd_feeder"></select>
+
+<label>Shutdown Time</label>
+<input type="datetime-local" id="sd_time">
+
+<label>Shutdown Type</label>
+<select id="sd_type">
+<option>PLAN PSD</option>
+<option>PARTIAL PLAN PSD</option>
+<option>UNPLAN PSD</option>
+<option>PARTIAL UNPLAN PSD</option>
+</select>
+
+<label>Information</label>
+<textarea id="sd_info"></textarea>
+
+<br><br>
+<button class="btn-shutdown" onclick="submitShutdown()">Submit Shutdown</button>
+</div>
+
+<!-- RESUME -->
+<div class="card hidden" id="resumeBox">
+<h3>Resume Entry</h3>
+
+<label>Feeder</label>
+<select id="rs_feeder"></select>
+
+<label>Resume Time</label>
+<input type="datetime-local" id="rs_time">
+
+<label>Production Loss</label>
+<input id="rs_loss">
+
+<label>DG Deployed</label>
+<input id="rs_dg">
+
+<label>Remarks</label>
+<textarea id="rs_rem"></textarea>
+
+<br><br>
+<button class="btn-resume" onclick="submitResume()">Submit Resume</button>
+</div>
+
+</div>
+
+<div class="footer"><div id="msg"></div></div>
 
 <script>
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwMxjYKM6dO10qr2lDc2wvnMBMeMpdeC4fxh5NzaM6mGCCXWdbiHU55KcpJxHzExba7SQ/exec
-async function fetchShutdownFeeders() {
-  try {
-    const response = await fetch(SHEET_API_URL);
-    const data = await response.json();
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
 
-    const tbody = document.querySelector("#shutdownTable tbody");
-    tbody.innerHTML = "";
+/* 🔐 USER MASTER (INSTALLATION WISE) */
+const USERS=[
+ {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
+ {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
+ {u:"124470",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
+ {u:"135597",p:"1234",n:"KUNAL RANJAN",i:"LIMBODARA-GGS-2"},
+ {u:"139938",p:"1234",n:"HAREKRISHNA",i:"LIMBODARA-GGS-2"},
+ {u:"125223",p:"1234",n:"SUKUMAR LAHA",i:"GAMIJ-GGS-1"},
+ {u:"139649",p:"1234",n:"RAVI KUMAR SHARMA",i:"GAMIJ-GGS-1"},
+ {u:"137217",p:"1234",n:"SONUKUMAR SINGH",i:"GAMIJ-GGS-1"},
+ {u:"121028",p:"1234",n:"ABHISHEK PATEL",i:"GAMIJ-GGS-2"},
+ {u:"133181",p:"1234",n:"KETUL PATEL",i:"GAMIJ-GGS-2"},
+ {u:"123310",p:"1234",n:"DHEERENDRA SINGH",i:"GAMIJ-GGS-3"},
+ {u:"133643",p:"1234",n:"ASHUTOSH KUMAR SINGH",i:"GAMIJ-GGS-3"},
+ {u:"135515",p:"1234",n:"ADITYA ARYA",i:"GAMIJ-GGS-3"},
+ {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
+];
 
-    if(data.length === 0){
-      tbody.innerHTML = `<tr><td colspan="5">No feeders currently shutdown.</td></tr>`;
-      return;
-    }
+/* INSTALLATION → FEEDERS */
+const FEEDERS={
+"LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER - GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FFEDER - GAMIJ - 2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR - GAMIJ-2"],
+"GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER - GAMIJ - 3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER GAMIJ - 3","HALDARWAS FEEDER GAMIJ - 4","KALPSAR FEEDER","SATRUNDA FEEDER - GAMIJ - 3","SATRUNDA FEEDER - GAMIJ - 4","SIHUNJ FEEDER,VANSOLI FEEDER"],
+"MOTERA-GGS":["TP - 44 FEEDER","ZUNDAL AG FEEDER"]
+};
 
-    data.forEach(row => {
-      const tr = document.createElement("tr");
-      tr.classList.add("shutdown");
-      tr.innerHTML = `
-        <td>${row.Feeder}</td>
-        <td>${row.ShutdownTime}</td>
-        <td>${row.Type}</td>
-        <td>${row.Information}</td>
-        <td>${row.Installation}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+let CURRENT_USER={};
 
-  } catch(err){
-    console.error(err);
-    document.querySelector("#shutdownTable tbody").innerHTML =
-      `<tr><td colspan="5">Error fetching data</td></tr>`;
-  }
+/* LOGIN */
+function login(){
+ const u=loginUser.value.trim();
+ const p=loginPass.value.trim();
+
+ const user=USERS.find(x=>x.u===u && x.p===p);
+ if(!user){ showMsg("Invalid Login"); return; }
+
+ CURRENT_USER=user;
+
+ opName.value=user.n;
+ installation.value=user.i;
+
+ loginBox.classList.add("hidden");
+ operatorBox.classList.remove("hidden");
+ shutdownBox.classList.remove("hidden");
+ resumeBox.classList.remove("hidden");
+
+ populateFeeders();
+ showMsg("Welcome "+user.n);
 }
 
-// Update every 30 seconds
-fetchShutdownFeeders();
-setInterval(fetchShutdownFeeders, 30000);
+/* LOAD FEEDERS */
+function populateFeeders(){
+ sd_feeder.innerHTML=rs_feeder.innerHTML='<option value="">Select Feeder</option>';
+ (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
+  sd_feeder.innerHTML+=`<option>${f}</option>`;
+  rs_feeder.innerHTML+=`<option>${f}</option>`;
+ });
+}
+
+/* SHUTDOWN */
+function submitShutdown(){
+ if(!sd_feeder.value||!sd_time.value){
+  showMsg("Feeder & Time required"); return;
+ }
+
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"shutdown",
+  feeder:sd_feeder.value,
+  ShutdownTime:sd_time.value.replace("T"," "),
+  ShutdownType:sd_type.value,
+  Information:sd_info.value,
+  ShutdownEntryBy:CURRENT_USER.n,
+  Installation:CURRENT_USER.i
+ }),{mode:"no-cors"});
+
+ showMsg("Shutdown submitted");
+}
+
+/* RESUME */
+function submitResume(){
+ if(!rs_feeder.value||!rs_time.value){
+  showMsg("Feeder & Time required"); return;
+ }
+
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"resume",
+  feeder:rs_feeder.value,
+  ResumeTime:rs_time.value.replace("T"," "),
+  ResumeEntryBy:CURRENT_USER.n,
+  TotalProdLoss:rs_loss.value,
+  DGDeployed:rs_dg.value,
+  Remarks:rs_rem.value
+ }),{mode:"no-cors"});
+
+ showMsg("Resume submitted");
+}
+
+function showMsg(t){
+ msg.innerText=t;
+ setTimeout(()=>msg.innerText="",3000);
+}
 </script>
 
 </body>
