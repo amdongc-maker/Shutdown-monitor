@@ -28,29 +28,26 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 
 <div class="container">
 
-<!-- INSTALLATION SELECT -->
 <div class="card">
-  <label>Select Installation</label>
-  <select id="main_inst"></select>
+<label>Select Installation</label>
+<select id="main_inst"></select>
 </div>
 
-<!-- ACTIVE SHUTDOWN LIST -->
 <div class="card">
 <h3>Active Shutdown Feeders</h3>
-<table width="100%" border="1" cellpadding="6" cellspacing="0">
+<table width="100%" border="1" cellpadding="6">
 <thead style="background:#eee">
 <tr>
-  <th>Feeder</th>
-  <th>Shutdown Time</th>
-  <th>Type</th>
-  <th>Information</th>
+<th>Feeder</th>
+<th>Shutdown Time</th>
+<th>Type</th>
+<th>Information</th>
 </tr>
 </thead>
 <tbody id="shutdownList"></tbody>
 </table>
 </div>
 
-<!-- SHUTDOWN ENTRY -->
 <div class="card">
 <h3>Shutdown Entry</h3>
 
@@ -65,10 +62,10 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 
 <label>Shutdown Type</label>
 <select id="sd_type">
-  <option>PLAN PSD</option>
-  <option>PARTIAL PLAN PSD</option>
-  <option>UNPLAN PSD</option>
-  <option>PARTIAL UNPLAN PSD</option>
+<option>PLAN PSD</option>
+<option>PARTIAL PLAN PSD</option>
+<option>UNPLAN PSD</option>
+<option>PARTIAL UNPLAN PSD</option>
 </select>
 
 <label>Information</label>
@@ -78,7 +75,6 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 <button class="btn-shutdown" onclick="submitShutdown()">Submit Shutdown</button>
 </div>
 
-<!-- RESUME ENTRY -->
 <div class="card">
 <h3>Resume Entry</h3>
 
@@ -107,136 +103,76 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 </div>
 
 <div class="footer">
-  <button class="btn-refresh" onclick="loadActive()">Refresh</button>
-  <div id="msg"></div>
+<button class="btn-refresh" onclick="loadActive()">Refresh</button>
+<div id="msg"></div>
 </div>
 
 <script>
-/* ================= CONFIG ================= */
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_ZkWYFls2Tr0lcKXhHD4i4vl6BGb9SBXJwwSgz25sTz9E_gwF_4xn-BToodhqcHGZeA/exec";
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycby_ZkWYFls2Tr0lcKXhHD4i4vl6BGb9SBXJwwSgz25sTz9E_gwF_4xn-BToodhqcHGZeA/exec";
 
-/* Installation-wise feeders */
-const INSTALLATION_FEEDERS = {
-  "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
-  "LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
-  "GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER - GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
-  "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FFEDER - GAMIJ - 2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR - GAMIJ-2"],
-  "GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER - GAMIJ - 3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER GAMIJ - 3","HALDARWAS FEEDER GAMIJ - 4","KALPSAR FEEDER","SATRUNDA FEEDER - GAMIJ - 3","SATRUNDA FEEDER - GAMIJ - 4","SIHUNJ FEEDER","VANSOLI FEEDER"],
-  "MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP - 44 FEEDER","ZUNDAL AG FEEDER"]
+const INSTALLATION_FEEDERS={
+"LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER - GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FFEDER - GAMIJ - 2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR - GAMIJ-2"],
+"GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER - GAMIJ - 3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER GAMIJ - 3","HALDARWAS FEEDER GAMIJ - 4","KALPSAR FEEDER","SATRUNDA FEEDER - GAMIJ - 3","SATRUNDA FEEDER - GAMIJ - 4","SIHUNJ FEEDER","VANSOLI FEEDER"],
+"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP - 44 FEEDER","ZUNDAL AG FEEDER"]
 };
 
-/* ================= INIT ================= */
 function init(){
-  const insts = Object.keys(INSTALLATION_FEEDERS);
-
-  ["main_inst","sd_inst","rs_inst"].forEach(id=>{
-    let s=document.getElementById(id);
-    s.innerHTML=`<option value="">Select Installation</option>`;
-    insts.forEach(i=>s.innerHTML+=`<option>${i}</option>`);
-  });
-
-  bindFeeder("sd_inst","sd_feeder");
-  bindFeeder("rs_inst","rs_feeder");
-
-  document.getElementById("main_inst").addEventListener("change",loadActive);
+["main_inst","sd_inst","rs_inst"].forEach(id=>{
+let s=document.getElementById(id);
+s.innerHTML='<option value="">Select Installation</option>';
+Object.keys(INSTALLATION_FEEDERS).forEach(i=>s.innerHTML+=`<option>${i}</option>`);
+});
+bind("sd_inst","sd_feeder");
+bind("rs_inst","rs_feeder");
+main_inst.onchange=loadActive;
 }
 
-/* ================= FEEDER ================= */
-function bindFeeder(instId, feederId){
-  document.getElementById(instId).addEventListener("change",function(){
-    const f=document.getElementById(feederId);
-    f.innerHTML=`<option value="">Select Feeder</option>`;
-    (INSTALLATION_FEEDERS[this.value]||[]).forEach(x=>{
-      f.innerHTML+=`<option>${x}</option>`;
-    });
-  });
+function bind(i,f){
+document.getElementById(i).onchange=function(){
+let x=document.getElementById(f);
+x.innerHTML='<option value="">Select Feeder</option>';
+(INSTALLATION_FEEDERS[this.value]||[]).forEach(a=>x.innerHTML+=`<option>${a}</option>`);
+};
 }
 
-/* ================= ACTIVE LIST ================= */
 function loadActive(){
-  const inst = main_inst.value;
-  fetch(WEBAPP_URL+"?action=status")
-    .then(r=>r.json())
-    .then(d=>{
-      shutdownList.innerHTML="";
-      const rows = inst ? d.filter(x=>x.installation===inst) : d;
-
-      if(rows.length===0){
-        shutdownList.innerHTML=`<tr><td colspan="4">No Active Shutdown</td></tr>`;
-      }else{
-        rows.forEach(x=>{
-          shutdownList.innerHTML+=`
-          <tr>
-            <td>${x.feeder}</td>
-            <td>${x.shutdownTime}</td>
-            <td>${x.type}</td>
-            <td>${x.information}</td>
-          </tr>`;
-        });
-      }
-    });
+fetch(WEBAPP_URL+'?action=status')
+.then(r=>r.json())
+.then(d=>{
+shutdownList.innerHTML='';
+(d.filter(x=>!main_inst.value||x.installation===main_inst.value))
+.forEach(x=>shutdownList.innerHTML+=
+`<tr><td>${x.feeder}</td><td>${x.shutdownTime}</td><td>${x.type}</td><td>${x.information}</td></tr>`);
+});
 }
 
-/* ================= SHUTDOWN ================= */
-<script>
 function submitShutdown(){
-
-  if(!sd_inst.value || !sd_feeder.value || !sd_time.value){
-    showMsg("All shutdown fields are required");
-    return;
-  }
-
-  const shutdownTime = sd_time.value.replace("T"," ");
-
-  const params = new URLSearchParams({
-    action: "shutdown",
-    feeder: sd_feeder.value,
-    ShutdownTime: shutdownTime,
-    ShutdownType: sd_type.value,
-    Information: sd_info.value,
-    Installation: sd_inst.value,
-    ShutdownEntryBy: "WEB"
-  });
-
-  fetch(WEBAPP_URL + "?" + params.toString(), {
-    method: "GET",
-    mode: "no-cors"   // 🔥 CRITICAL FIX
-  });
-
-  showMsg("Shutdown submitted successfully");
-  setTimeout(loadActive, 2000);
+const t=sd_time.value.replace("T"," ");
+fetch(WEBAPP_URL+'?'+new URLSearchParams({
+action:'shutdown',feeder:sd_feeder.value,ShutdownTime:t,
+ShutdownType:sd_type.value,Information:sd_info.value,
+Installation:sd_inst.value,ShutdownEntryBy:'WEB'
+}),{mode:'no-cors'});
+msg.innerText="Shutdown submitted successfully";
+setTimeout(loadActive,2000);
 }
-</script>
 
-/* ================= RESUME ================= */
-<script>
 function submitResume(){
-
-  if(!rs_feeder.value){
-    showMsg("Please select feeder");
-    return;
-  }
-
-  const resumeTime = rs_time.value
-    ? rs_time.value.replace("T"," ")
-    : "";
-
-  const params = new URLSearchParams({
-    action: "resume",
-    feeder: rs_feeder.value,
-    ResumeTime: resumeTime,
-    TotalProdLoss: rs_loss.value,
-    DGDeployed: rs_dg.value,
-    Remarks: rs_rem.value,
-    ResumeEntryBy: "WEB"
-  });
-
-  fetch(WEBAPP_URL + "?" + params.toString(), {
-    method: "GET",
-    mode: "no-cors"   // 🔥 CRITICAL FIX
-  });
-
-  showMsg("Resume submitted successfully");
-  setTimeout(loadActive, 2000);
+const t=rs_time.value?rs_time.value.replace("T"," "):"";
+fetch(WEBAPP_URL+'?'+new URLSearchParams({
+action:'resume',feeder:rs_feeder.value,ResumeTime:t,
+TotalProdLoss:rs_loss.value,DGDeployed:rs_dg.value,
+Remarks:rs_rem.value,ResumeEntryBy:'WEB'
+}),{mode:'no-cors'});
+msg.innerText="Resume submitted successfully";
+setTimeout(loadActive,2000);
 }
+
+init();loadActive();
 </script>
+
+</body>
+</html>
