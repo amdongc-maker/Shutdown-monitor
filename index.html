@@ -14,9 +14,11 @@ label{display:block;margin-top:10px;font-weight:600}
 select,input,textarea{width:100%;padding:8px;margin-top:4px}
 textarea{resize:vertical}
 button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
+.btn-login{background:#3498db;color:#fff}
 .btn-shutdown{background:#e74c3c;color:#fff}
 .btn-resume{background:#27ae60;color:#fff}
 .footer{position:fixed;bottom:0;width:100%;background:#ecf0f1;padding:10px;text-align:center}
+.hidden{display:none}
 #msg{margin-top:5px;font-weight:bold}
 </style>
 </head>
@@ -27,27 +29,33 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 
 <div class="container">
 
-<!-- OPERATOR / INSTALLATION -->
-<div class="card">
+<!-- LOGIN -->
+<div class="card" id="loginBox">
+<h3>Operator Login</h3>
+
+<label>Username</label>
+<input id="loginUser">
+
+<label>Password</label>
+<input type="password" id="loginPass">
+
+<br><br>
+<button class="btn-login" onclick="login()">Login</button>
+</div>
+
+<!-- OPERATOR DETAILS -->
+<div class="card hidden" id="operatorBox">
 <h3>Operator Details</h3>
 
 <label>Operator Name</label>
-<input id="opName" placeholder="Enter operator name">
+<input id="opName" disabled>
 
 <label>Installation</label>
-<select id="installation" onchange="populateFeeders()">
-<option value="">Select Installation</option>
-<option>LIMBODARA-GGS-1</option>
-<option>LIMBODARA-GGS-2</option>
-<option>GAMIJ-GGS-1</option>
-<option>GAMIJ-GGS-2</option>
-<option>GAMIJ-GGS-3</option>
-<option>MOTERA-GGS</option>
-</select>
+<input id="installation" disabled>
 </div>
 
 <!-- SHUTDOWN -->
-<div class="card">
+<div class="card hidden" id="shutdownBox">
 <h3>Shutdown Entry</h3>
 
 <label>Feeder</label>
@@ -72,7 +80,7 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 </div>
 
 <!-- RESUME -->
-<div class="card">
+<div class="card hidden" id="resumeBox">
 <h3>Resume Entry</h3>
 
 <label>Feeder</label>
@@ -101,21 +109,52 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 <script>
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
 
+/* 🔐 USER MASTER (INSTALLATION WISE) */
+const USERS=[
+ {u:"kuldeep",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
+ {u:"sandesh",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
+ {u:"sonu",p:"1234",n:"SONUKUMAR SINGH",i:"GAMIJ-GGS-1"},
+ {u:"abhishek",p:"1234",n:"ABHISHEK PATEL",i:"GAMIJ-GGS-2"},
+ {u:"mahesh",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
+];
+
 /* INSTALLATION → FEEDERS */
 const FEEDERS={
 "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER"],
 "GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER - GAMIJ-1"],
 "GAMIJ-GGS-2":["BADARPUR FEEDER","RAM FEEDER - GAMIJ-2"],
-"GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER"],
 "MOTERA-GGS":["TP - 44 FEEDER","ZUNDAL AG FEEDER"]
 };
 
+let CURRENT_USER={};
+
+/* LOGIN */
+function login(){
+ const u=loginUser.value.trim();
+ const p=loginPass.value.trim();
+
+ const user=USERS.find(x=>x.u===u && x.p===p);
+ if(!user){ showMsg("Invalid Login"); return; }
+
+ CURRENT_USER=user;
+
+ opName.value=user.n;
+ installation.value=user.i;
+
+ loginBox.classList.add("hidden");
+ operatorBox.classList.remove("hidden");
+ shutdownBox.classList.remove("hidden");
+ resumeBox.classList.remove("hidden");
+
+ populateFeeders();
+ showMsg("Welcome "+user.n);
+}
+
 /* LOAD FEEDERS */
 function populateFeeders(){
- const inst=installation.value;
  sd_feeder.innerHTML=rs_feeder.innerHTML='<option value="">Select Feeder</option>';
- (FEEDERS[inst]||[]).forEach(f=>{
+ (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
   sd_feeder.innerHTML+=`<option>${f}</option>`;
   rs_feeder.innerHTML+=`<option>${f}</option>`;
  });
@@ -123,9 +162,8 @@ function populateFeeders(){
 
 /* SHUTDOWN */
 function submitShutdown(){
- if(!installation.value||!sd_feeder.value||!sd_time.value||!opName.value){
-  showMsg("All required fields missing");
-  return;
+ if(!sd_feeder.value||!sd_time.value){
+  showMsg("Feeder & Time required"); return;
  }
 
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
@@ -134,34 +172,32 @@ function submitShutdown(){
   ShutdownTime:sd_time.value.replace("T"," "),
   ShutdownType:sd_type.value,
   Information:sd_info.value,
-  ShutdownEntryBy:opName.value,
-  Installation:installation.value
+  ShutdownEntryBy:CURRENT_USER.n,
+  Installation:CURRENT_USER.i
  }),{mode:"no-cors"});
 
- showMsg("Shutdown submitted successfully");
+ showMsg("Shutdown submitted");
 }
 
 /* RESUME */
 function submitResume(){
- if(!rs_feeder.value||!rs_time.value||!opName.value){
-  showMsg("All required fields missing");
-  return;
+ if(!rs_feeder.value||!rs_time.value){
+  showMsg("Feeder & Time required"); return;
  }
 
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"resume",
   feeder:rs_feeder.value,
   ResumeTime:rs_time.value.replace("T"," "),
-  ResumeEntryBy:opName.value,
+  ResumeEntryBy:CURRENT_USER.n,
   TotalProdLoss:rs_loss.value,
   DGDeployed:rs_dg.value,
   Remarks:rs_rem.value
  }),{mode:"no-cors"});
 
- showMsg("Resume submitted successfully");
+ showMsg("Resume submitted");
 }
 
-/* MESSAGE */
 function showMsg(t){
  msg.innerText=t;
  setTimeout(()=>msg.innerText="",3000);
