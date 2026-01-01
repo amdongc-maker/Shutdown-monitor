@@ -28,6 +28,12 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 
 <div class="container">
 
+<!-- INSTALLATION SELECT -->
+<div class="card">
+  <label>Select Installation</label>
+  <select id="main_inst"></select>
+</div>
+
 <!-- ACTIVE SHUTDOWN LIST -->
 <div class="card">
 <h3>Active Shutdown Feeders</h3>
@@ -35,7 +41,6 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 <thead style="background:#eee">
 <tr>
   <th>Feeder</th>
-  <th>Installation</th>
   <th>Shutdown Time</th>
   <th>Type</th>
   <th>Information</th>
@@ -110,7 +115,7 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 /* ================= CONFIG ================= */
 const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_ZkWYFls2Tr0lcKXhHD4i4vl6BGb9SBXJwwSgz25sTz9E_gwF_4xn-BToodhqcHGZeA/exec";
 
-/* Installation-wise Feeders */
+/* Installation-wise feeders */
 const INSTALLATION_FEEDERS = {
   "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
   "LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
@@ -121,10 +126,10 @@ const INSTALLATION_FEEDERS = {
 };
 
 /* ================= INIT ================= */
-function initInstallations(){
+function init(){
   const insts = Object.keys(INSTALLATION_FEEDERS);
 
-  ["sd_inst","rs_inst"].forEach(id=>{
+  ["main_inst","sd_inst","rs_inst"].forEach(id=>{
     let s=document.getElementById(id);
     s.innerHTML=`<option value="">Select Installation</option>`;
     insts.forEach(i=>s.innerHTML+=`<option>${i}</option>`);
@@ -132,33 +137,37 @@ function initInstallations(){
 
   bindFeeder("sd_inst","sd_feeder");
   bindFeeder("rs_inst","rs_feeder");
+
+  document.getElementById("main_inst").addEventListener("change",loadActive);
 }
 
-/* ================= FEEDER BIND ================= */
+/* ================= FEEDER ================= */
 function bindFeeder(instId, feederId){
   document.getElementById(instId).addEventListener("change",function(){
-    const fSel=document.getElementById(feederId);
-    fSel.innerHTML=`<option value="">Select Feeder</option>`;
-    (INSTALLATION_FEEDERS[this.value]||[]).forEach(f=>{
-      fSel.innerHTML+=`<option>${f}</option>`;
+    const f=document.getElementById(feederId);
+    f.innerHTML=`<option value="">Select Feeder</option>`;
+    (INSTALLATION_FEEDERS[this.value]||[]).forEach(x=>{
+      f.innerHTML+=`<option>${x}</option>`;
     });
   });
 }
 
-/* ================= STATUS ================= */
+/* ================= ACTIVE LIST ================= */
 function loadActive(){
+  const inst = main_inst.value;
   fetch(WEBAPP_URL+"?action=status")
     .then(r=>r.json())
     .then(d=>{
       shutdownList.innerHTML="";
-      if(d.length===0){
-        shutdownList.innerHTML=`<tr><td colspan="5">No Active Shutdown</td></tr>`;
+      const rows = inst ? d.filter(x=>x.installation===inst) : d;
+
+      if(rows.length===0){
+        shutdownList.innerHTML=`<tr><td colspan="4">No Active Shutdown</td></tr>`;
       }else{
-        d.forEach(x=>{
+        rows.forEach(x=>{
           shutdownList.innerHTML+=`
           <tr>
             <td>${x.feeder}</td>
-            <td>${x.installation}</td>
             <td>${x.shutdownTime}</td>
             <td>${x.type}</td>
             <td>${x.information}</td>
@@ -170,10 +179,17 @@ function loadActive(){
 
 /* ================= SHUTDOWN ================= */
 function submitShutdown(){
+  if(!sd_inst.value||!sd_feeder.value||!sd_time.value){
+    showMsg("All shutdown fields are required");
+    return;
+  }
+
+  const shutdownTime = sd_time.value.replace("T"," ");
+
   let p=new URLSearchParams({
     action:"shutdown",
     feeder:sd_feeder.value,
-    ShutdownTime:sd_time.value,
+    ShutdownTime:shutdownTime,
     ShutdownType:sd_type.value,
     Information:sd_info.value,
     Installation:sd_inst.value,
@@ -187,10 +203,17 @@ function submitShutdown(){
 
 /* ================= RESUME ================= */
 function submitResume(){
+  if(!rs_feeder.value){
+    showMsg("Please select feeder to resume");
+    return;
+  }
+
+  const resumeTime = rs_time.value ? rs_time.value.replace("T"," ") : "";
+
   let p=new URLSearchParams({
     action:"resume",
     feeder:rs_feeder.value,
-    ResumeTime:rs_time.value,
+    ResumeTime:resumeTime,
     TotalProdLoss:rs_loss.value,
     DGDeployed:rs_dg.value,
     Remarks:rs_rem.value,
@@ -208,7 +231,7 @@ function showMsg(t){
 }
 
 /* START */
-initInstallations();
+init();
 loadActive();
 </script>
 
