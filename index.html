@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Shutdown & Resume Power Management</title>
+
 <style>
 body{font-family:Segoe UI,Arial;background:#f4f6f8;margin:0}
 header{background:#1f3a5f;color:#fff;padding:12px 20px;font-size:20px}
@@ -20,32 +21,39 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 #msg{margin-top:5px;font-weight:bold}
 </style>
 </head>
+
 <body>
 
 <header>Shutdown & Resume Power Management</header>
 
 <div class="container">
 
-<!-- Login Card -->
+<!-- LOGIN -->
 <div class="card" id="loginCard">
 <h3>Operator Login</h3>
+
 <label>Username</label>
-<input type="text" id="loginUser" placeholder="ongc">
+<input id="loginUser">
 
 <label>Password</label>
-<input type="password" id="loginPass" placeholder="1234">
+<input type="password" id="loginPass">
 
-<label>Operator Name</label>
-<input type="text" id="loginName" placeholder="Bhavesh Parmar">
-
-<label>Installation Name</label>
-<input type="text" id="loginInst" placeholder="LIMBODARA-GGS-1">
+<label>Installation</label>
+<select id="loginInst">
+<option value="">Select Installation</option>
+<option>LIMBODARA-GGS-1</option>
+<option>LIMBODARA-GGS-2</option>
+<option>GAMIJ-GGS-1</option>
+<option>GAMIJ-GGS-2</option>
+<option>GAMIJ-GGS-3</option>
+<option>MOTERA-GGS</option>
+</select>
 
 <br><br>
 <button class="btn-login" onclick="login()">Login</button>
 </div>
 
-<!-- Shutdown Card -->
+<!-- SHUTDOWN -->
 <div class="card" id="shutdownCard" style="display:none">
 <h3>Shutdown Entry</h3>
 
@@ -70,7 +78,7 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 <button class="btn-shutdown" onclick="submitShutdown()">Submit Shutdown</button>
 </div>
 
-<!-- Resume Card -->
+<!-- RESUME -->
 <div class="card" id="resumeCard" style="display:none">
 <h3>Resume Entry</h3>
 
@@ -81,10 +89,10 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 <input type="datetime-local" id="rs_time">
 
 <label>Production Loss</label>
-<input type="number" id="rs_loss">
+<input id="rs_loss">
 
 <label>DG Deployed</label>
-<input type="number" id="rs_dg">
+<input id="rs_dg">
 
 <label>Remarks</label>
 <textarea id="rs_rem"></textarea>
@@ -95,105 +103,88 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 
 </div>
 
-<div class="footer">
-<div id="msg"></div>
-</div>
+<div class="footer"><div id="msg"></div></div>
 
 <script>
-// Google WebApp URL
-const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec"; // Replace with your Apps Script WebApp URL
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
 
-// Installation-wise feeders
+/* 🔐 OPERATOR MASTER (INSTALLATION WISE) */
+const OPERATORS=[
+ {u:"121318",p:"1234",n:"Bhavesh Parmar",i:"LIMBODARA-GGS-1"},
+ {u:"cpf2",p:"1234",n:"Sandesh Bhardwaj",i:"LIMBODARA-GGS-2"},
+ {u:"cpf3",p:"1234",n:"Sonu Singh",i:"GAMIJ-GGS-1"},
+ {u:"cpf4",p:"1234",n:"Abhishek Patel",i:"GAMIJ-GGS-2"},
+ {u:"cpf5",p:"1234",n:"Mahesh Gajjar",i:"MOTERA-GGS"}
+];
+
+/* FEEDERS */
 const INSTALLATION_FEEDERS={
-"LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
-"LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
-"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER - GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
-"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FFEDER - GAMIJ - 2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR - GAMIJ-2"],
-"GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER - GAMIJ - 3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER GAMIJ - 3","HALDARWAS FEEDER GAMIJ - 4","KALPSAR FEEDER","SATRUNDA FEEDER - GAMIJ - 3","SATRUNDA FEEDER - GAMIJ - 4","SIHUNJ FEEDER","VANSOLI FEEDER"],
-"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP - 44 FEEDER","ZUNDAL AG FEEDER"]
+"LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER - GAMIJ-1"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER","RAM FEEDER - GAMIJ-2"],
+"MOTERA-GGS":["TP - 44 FEEDER","ZUNDAL AG FEEDER"]
 };
 
-// Single login credential
-const LOGIN_CREDENTIALS={username:"cpf", password:"1234"};
+let user={};
 
-let loggedIn={};
-
-// Login function
+/* LOGIN */
 function login(){
-  const user=document.getElementById("loginUser").value.trim();
-  const pass=document.getElementById("loginPass").value.trim();
-  const name=document.getElementById("loginName").value.trim();
-  const inst=document.getElementById("loginInst").value.trim();
+ const u=loginUser.value.trim();
+ const p=loginPass.value.trim();
+ const i=loginInst.value.trim();
 
-  if(!user||!pass||!name||!inst){
-    showMsg("All login fields are required");
-    return;
-  }
+ const found=OPERATORS.find(x=>x.u===u && x.p===p && x.i===i);
+ if(!found){ showMsg("Invalid login / installation"); return; }
 
-  if(user===LOGIN_CREDENTIALS.username && pass===LOGIN_CREDENTIALS.password){
-    loggedIn={name:name, installation:inst};
-    showMsg("Login successful: "+name);
-    document.getElementById("loginCard").style.display="none";
-    document.getElementById("shutdownCard").style.display="block";
-    document.getElementById("resumeCard").style.display="block";
-    populateFeeders();
-  } else {
-    showMsg("Invalid username or password");
-  }
+ user=found;
+ loginCard.style.display="none";
+ shutdownCard.style.display="block";
+ resumeCard.style.display="block";
+ populateFeeders();
+ showMsg("Welcome "+user.n);
 }
 
-// Populate feeders based on installation
+/* FEEDERS */
 function populateFeeders(){
-  const sd=document.getElementById("sd_feeder");
-  const rs=document.getElementById("rs_feeder");
-  sd.innerHTML='<option value="">Select Feeder</option>';
-  rs.innerHTML='<option value="">Select Feeder</option>';
-  (INSTALLATION_FEEDERS[loggedIn.installation]||[]).forEach(f=>{
-    sd.innerHTML+=`<option>${f}</option>`;
-    rs.innerHTML+=`<option>${f}</option>`;
-  });
+ sd_feeder.innerHTML=rs_feeder.innerHTML='<option value="">Select Feeder</option>';
+ (INSTALLATION_FEEDERS[user.i]||[]).forEach(f=>{
+  sd_feeder.innerHTML+=`<option>${f}</option>`;
+  rs_feeder.innerHTML+=`<option>${f}</option>`;
+ });
 }
 
-// Submit Shutdown
+/* SHUTDOWN */
 function submitShutdown(){
-  if(!sd_feeder.value||!sd_time.value){
-    showMsg("Feeder and Shutdown Time required");
-    return;
-  }
-  fetch(WEBAPP_URL+'?'+new URLSearchParams({
-    action:'shutdown',
-    Installation:loggedIn.installation,
-    feeder:sd_feeder.value,
-    ShutdownTime:sd_time.value.replace("T"," "),
-    ShutdownType:sd_type.value,
-    Information:sd_info.value,
-    ShutdownEntryBy:loggedIn.name
-  }),{mode:'no-cors'});
-  showMsg("Shutdown submitted successfully");
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"shutdown",
+  feeder:sd_feeder.value,
+  ShutdownTime:sd_time.value.replace("T"," "),
+  ShutdownType:sd_type.value,
+  Information:sd_info.value,
+  ShutdownEntryBy:user.n,
+  Installation:user.i
+ }),{mode:"no-cors"});
+ showMsg("Shutdown submitted");
 }
 
-// Submit Resume
+/* RESUME */
 function submitResume(){
-  if(!rs_feeder.value||!rs_time.value){
-    showMsg("Feeder and Resume Time required");
-    return;
-  }
-  fetch(WEBAPP_URL+'?'+new URLSearchParams({
-    action:'resume',
-    feeder:rs_feeder.value,
-    ResumeTime:rs_time.value.replace("T"," "),
-    TotalProdLoss:rs_loss.value,
-    DGDeployed:rs_dg.value,
-    Remarks:rs_rem.value,
-    ResumeEntryBy:loggedIn.name
-  }),{mode:'no-cors'});
-  showMsg("Resume submitted successfully");
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"resume",
+  feeder:rs_feeder.value,
+  ResumeTime:rs_time.value.replace("T"," "),
+  ResumeEntryBy:user.n,
+  TotalProdLoss:rs_loss.value,
+  DGDeployed:rs_dg.value,
+  Remarks:rs_rem.value
+ }),{mode:"no-cors"});
+ showMsg("Resume submitted");
 }
 
-// Show message
 function showMsg(t){
-  msg.innerText=t;
-  setTimeout(()=>msg.innerText="",3000);
+ msg.innerText=t;
+ setTimeout(()=>msg.innerText="",3000);
 }
 </script>
 
