@@ -29,13 +29,11 @@ header{
   margin:auto;
 }
 
-/* ===== SCREENS (NO BORDERS) ===== */
+/* ===== SCREENS ===== */
 .card{
   background:transparent;
   padding:0;
   margin-bottom:20px;
-  box-shadow:none;
-  border-radius:0;
 }
 
 /* ===== TITLES ===== */
@@ -43,14 +41,6 @@ h2,h3{
   margin:12px 0;
   color:#1f3a5f;
   text-align:center;
-}
-
-/* ===== LABELS ===== */
-label{
-  margin-top:14px;
-  font-weight:600;
-  color:#444;
-  font-size:14px;
 }
 
 /* ===== INPUTS ===== */
@@ -61,12 +51,6 @@ input,select,textarea{
   border-radius:10px;
   border:1px solid #dcdfe4;
   font-size:15px;
-  background:#fff;
-}
-
-input:focus,select:focus,textarea:focus{
-  outline:none;
-  border-color:#1f3a5f;
 }
 
 /* ===== BUTTONS ===== */
@@ -81,38 +65,55 @@ button{
   cursor:pointer;
 }
 
-/* ===== BUTTON COLORS ===== */
 .btn-login{background:#1f3a5f;color:#fff}
 .btn-shutdown{background:#e74c3c;color:#fff}
 .btn-resume{background:#27ae60;color:#fff}
 .btn-back{background:#7f8c8d;color:#fff}
 
-/* ===== ACTIVE SHUTDOWN LIST ===== */
+.hidden{display:none}
+
+/* ===== ACTIVE SHUTDOWN PRO CARD ===== */
 .shutdown-item{
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:10px;
-  box-shadow:0 3px 10px rgba(0,0,0,.08);
+  background:#ffffff;
+  border-radius:16px;
+  padding:18px 20px;
+  margin-bottom:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.shutdown-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
   font-size:14px;
 }
 
-/* ===== MESSAGE ===== */
+.shutdown-label{
+  color:#6b7280;
+  font-weight:600;
+}
+
+.shutdown-value{
+  color:#111827;
+  font-weight:700;
+  text-align:right;
+}
+
+.install-badge{
+  padding:4px 12px;
+  border-radius:999px;
+  background:#e5f0ff;
+  color:#1f3a5f;
+  font-size:12px;
+  font-weight:700;
+}
+
 #msg{
   text-align:center;
   margin-top:10px;
   font-weight:600;
   color:#1f3a5f;
-}
-
-/* ===== HIDE ===== */
-.hidden{display:none}
-
-/* ===== MOBILE APP FEEL ===== */
-@media (min-width:600px){
-  .container{
-    margin-top:20px;
-  }
 }
 </style>
 </head>
@@ -126,17 +127,15 @@ button{
 <!-- LOGIN -->
 <div class="card" id="loginBox">
 <h3>USER LOGIN</h3>
-<label>Username</label>
-<input id="loginUser">
-<label>Password</label>
-<input type="password" id="loginPass"><br><br>
+<input id="loginUser" placeholder="Username">
+<input type="password" id="loginPass" placeholder="Password">
 <button class="btn-login" onclick="login()">Login</button>
 </div>
 
-<!-- MAIN DASHBOARD -->
+<!-- MAIN -->
 <div class="card hidden" id="mainBox">
 <h2>ACTIVE SHUTDOWN FEEDERS</h2>
-<div id="activeShutdowns">Loading...</div><br>
+<div id="activeShutdowns">Loading...</div>
 <button class="btn-shutdown" onclick="openShutdown()">Shutdown</button>
 <button class="btn-resume" onclick="openResume()">Resume</button>
 </div>
@@ -144,19 +143,15 @@ button{
 <!-- SHUTDOWN -->
 <div class="card hidden" id="shutdownBox">
 <h3>Shutdown Entry</h3>
-<label>Feeder</label>
 <select id="sd_feeder"></select>
-<label>Shutdown Time</label>
 <input type="datetime-local" id="sd_time">
-<label>Shutdown Type</label>
 <select id="sd_type">
 <option>PLAN PSD</option>
 <option>PARTIAL PLAN PSD</option>
 <option>UNPLAN PSD</option>
 <option>PARTIAL UNPLAN PSD</option>
 </select>
-<label>Information</label>
-<textarea id="sd_info"></textarea><br>
+<textarea id="sd_info" placeholder="Information"></textarea>
 <button class="btn-shutdown" onclick="submitShutdown()">Submit</button>
 <button class="btn-back" onclick="backToMain()">Back</button>
 </div>
@@ -164,16 +159,11 @@ button{
 <!-- RESUME -->
 <div class="card hidden" id="resumeBox">
 <h3>Resume Entry</h3>
-<label>Feeder</label>
 <select id="rs_feeder"></select>
-<label>Resume Time</label>
 <input type="datetime-local" id="rs_time">
-<label>Production Loss</label>
-<input id="rs_loss">
-<label>DG Deployed</label>
-<input id="rs_dg">
-<label>Remarks</label>
-<textarea id="rs_rem"></textarea><br>
+<input id="rs_loss" placeholder="Production Loss">
+<input id="rs_dg" placeholder="DG Deployed">
+<textarea id="rs_rem" placeholder="Remarks"></textarea>
 <button class="btn-resume" onclick="submitResume()">Submit</button>
 <button class="btn-back" onclick="backToMain()">Back</button>
 </div>
@@ -182,11 +172,9 @@ button{
 </div>
 
 <script>
-/* ================= CONFIG ================= */
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
 const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
 
-/* USERS */
 const USERS=[
  {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
  {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
@@ -209,9 +197,8 @@ const USERS=[
  {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
 ];
 
-/* FEEDERS */
 const FEEDERS={
-"LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+ "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
 "GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
 "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
@@ -233,37 +220,16 @@ const FEEDERS={
 
 let CURRENT_USER={};
 
-/* ================= LOGIN ================= */
 function login(){
- const u=loginUser.value.trim();
- const p=loginPass.value.trim();
- const user=USERS.find(x=>x.u===u && x.p===p);
+ const user=USERS.find(x=>x.u===loginUser.value && x.p===loginPass.value);
  if(!user){showMsg("Invalid Login");return;}
  CURRENT_USER=user;
  loginBox.classList.add("hidden");
  mainBox.classList.remove("hidden");
  populateFeeders();
  loadActiveShutdowns();
- showMsg("Welcome "+user.n);
 }
 
-/* ================= NAV ================= */
-function openShutdown(){
- mainBox.classList.add("hidden");
- shutdownBox.classList.remove("hidden");
-}
-function openResume(){
- mainBox.classList.add("hidden");
- resumeBox.classList.remove("hidden");
-}
-function backToMain(){
- shutdownBox.classList.add("hidden");
- resumeBox.classList.add("hidden");
- mainBox.classList.remove("hidden");
- loadActiveShutdowns();
-}
-
-/* ================= FEEDERS ================= */
 function populateFeeders(){
  sd_feeder.innerHTML=rs_feeder.innerHTML="";
  (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
@@ -272,7 +238,6 @@ function populateFeeders(){
  });
 }
 
-/* ================= ACTIVE SHUTDOWN ================= */
 function loadActiveShutdowns(){
  fetch(CSV_URL+"&t="+Date.now())
  .then(r=>r.text())
@@ -280,55 +245,31 @@ function loadActiveShutdowns(){
   const rows=t.split("\n").map(r=>r.split(","));
   const h=rows.shift().map(x=>x.toUpperCase());
   const idx={
-   feeder:h.findIndex(x=>x.includes("FEEDER")),
-   sd:h.findIndex(x=>x.includes("SHUTDOWN")),
-   rs:h.findIndex(x=>x.includes("RESUME")),
-   inst:h.findIndex(x=>x.includes("INSTALL"))
+   feeder:h.indexOf("FEEDER"),
+   type:h.indexOf("SHUTDOWN TYPE"),
+   sd:h.indexOf("SHUTDOWN TIME"),
+   rs:h.indexOf("RESUME TIME"),
+   inst:h.indexOf("INSTALLATION")
   };
   activeShutdowns.innerHTML="";
-  let found=false;
   rows.forEach(r=>{
-  const isAdmin = CURRENT_USER.admin === true;
-
-if(
-   (!r[idx.rs] || r[idx.rs].trim()==="NA") &&
-   ( isAdmin || r[idx.inst]?.trim() === CURRENT_USER.i )
-){
-
-    found=true;
- activeShutdowns.innerHTML+=`
- <div class="shutdown-item">
-
-  <div class="shutdown-row">
-   <span class="shutdown-label">FEEDER</span>
-   <span class="shutdown-value">${r[idx.feeder]}</span>
-  </div>
-
-  <div class="shutdown-row">
-   <span class="shutdown-label">SHUTDOWN TYPE</span>
-   <span class="shutdown-value">${r[typeIdx] || "NA"}</span>
-  </div>
-
-  <div class="shutdown-row">
-   <span class="shutdown-label">SHUTDOWN TIME</span>
-   <span class="shutdown-value">${r[idx.sd]}</span>
-  </div>
-
-  <div class="shutdown-row">
-   <span class="shutdown-label">INSTALLATION</span>
-   <span class="install-badge">${r[idx.inst]}</span>
-  </div>
-
- </div>`;
-
+   if(!r[idx.rs]||r[idx.rs]==="NA"){
+    activeShutdowns.innerHTML+=`
+    <div class="shutdown-item">
+     <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[idx.feeder]}</span></div>
+     <div class="shutdown-row"><span class="shutdown-label">SHUTDOWN TYPE</span><span class="shutdown-value">${r[idx.type]}</span></div>
+     <div class="shutdown-row"><span class="shutdown-label">SHUTDOWN TIME</span><span class="shutdown-value">${r[idx.sd]}</span></div>
+     <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[idx.inst]}</span></div>
+    </div>`;
    }
   });
-  if(!found) activeShutdowns.innerHTML="<i>No Active Shutdown</i>";
  });
 }
-setInterval(loadActiveShutdowns,30000);
 
-/* ================= SUBMIT ================= */
+function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
+function openResume(){mainBox.classList.add("hidden");resumeBox.classList.remove("hidden")}
+function backToMain(){shutdownBox.classList.add("hidden");resumeBox.classList.add("hidden");mainBox.classList.remove("hidden");loadActiveShutdowns()}
+
 function submitShutdown(){
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"shutdown",
@@ -337,7 +278,7 @@ function submitShutdown(){
   ShutdownType:sd_type.value,
   Information:sd_info.value,
   ShutdownEntryBy:CURRENT_USER.n,
-  Installation: CURRENT_USER.admin ? "ADMIN" : CURRENT_USER.i
+  Installation:CURRENT_USER.i
  }),{mode:"no-cors"});
  showMsg("Shutdown Submitted");
  backToMain();
@@ -357,11 +298,8 @@ function submitResume(){
  backToMain();
 }
 
-/* ================= MSG ================= */
-function showMsg(t){
- msg.innerText=t;
- setTimeout(()=>msg.innerText="",3000);
-}
+function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000)}
+setInterval(loadActiveShutdowns,30000);
 </script>
 
 </body>
