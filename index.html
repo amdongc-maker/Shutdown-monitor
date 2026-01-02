@@ -188,6 +188,11 @@ const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJh
 
 /* USERS */
 const USERS=[
+ {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
+ {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
+ {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"ALL",admin:true},
+ {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"ALL",admin:true},
+ {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"ALL",admin:true},
  {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
  {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
  {u:"124470",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
@@ -201,12 +206,7 @@ const USERS=[
  {u:"123310",p:"1234",n:"DHEERENDRA SINGH",i:"GAMIJ-GGS-3"},
  {u:"133643",p:"1234",n:"ASHUTOSH KUMAR SINGH",i:"GAMIJ-GGS-3"},
  {u:"135515",p:"1234",n:"ADITYA ARYA",i:"GAMIJ-GGS-3"},
- {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"},
- {u:"95606",p:"1234",n:"SUDHIR SINGH",i:"ST(ELECTRICAL)"},
- {u:"95843",p:"1234",n:"DIPAK MEDAK",i:"ST(ELECTRICAL)"},
- {u:"82653",p:"1234",n:"SHANTILAL RATHWA",i:"FMP(E)"},
- {u:"82051",p:"1234",n:"HEMENDRA KUMAR",i:"SAM4"},
-
+ {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
 ];
 
 /* FEEDERS */
@@ -279,8 +279,13 @@ function loadActiveShutdowns(){
   activeShutdowns.innerHTML="";
   let found=false;
   rows.forEach(r=>{
-   if(r[idx.inst]?.trim()===CURRENT_USER.i &&
-      (!r[idx.rs]||r[idx.rs].trim()==="NA")){
+  const isAdmin = CURRENT_USER.admin === true;
+
+if(
+   (!r[idx.rs] || r[idx.rs].trim()==="NA") &&
+   ( isAdmin || r[idx.inst]?.trim() === CURRENT_USER.i )
+){
+
     found=true;
     activeShutdowns.innerHTML+=`
      <div class="shutdown-item">
