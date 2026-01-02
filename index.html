@@ -244,12 +244,13 @@ function loadActiveShutdowns(){
  .then(t=>{
   const rows=t.split("\n").map(r=>r.split(","));
   const h=rows.shift().map(x=>x.toUpperCase());
-  const idx={
-   feeder:h.indexOf("FEEDER"),
-   type:h.indexOf("SHUTDOWN TYPE"),
-   sd:h.indexOf("SHUTDOWN TIME"),
-   rs:h.indexOf("RESUME TIME"),
-   inst:h.indexOf("INSTALLATION")
+ const idx={
+ feeder: h.findIndex(x => x.includes("FEEDER")),
+ type: h.findIndex(x => x.includes("TYPE")),
+ sd: h.findIndex(x => x.includes("SHUTDOWN")),
+ rs: h.findIndex(x => x.includes("RESUME")),
+ inst: h.findIndex(x => x.includes("INSTALL"))
+};
   };
   activeShutdowns.innerHTML="";
   rows.forEach(r=>{
