@@ -298,10 +298,10 @@ if(
     found=true;
     activeShutdowns.innerHTML+=`
  <div class="shutdown-item">
-  <b>Feeder :</b> ${r[idx.feeder]}<br>
-  <b>Shutdown Type :</b> ${r[h.findIndex(x=>x.includes("TYPE"))] || "NA"}<br>
-  <b>Shutdown Time :</b> ${r[idx.sd]}<br>
-  <b>Installation :</b> ${r[idx.inst]}
+  <strong>FEEDER        :</strong> ${r[idx.feeder]}<br>
+  <strong>SHUTDOWN TYPE :</strong> ${r[h.findIndex(x=>x.includes("TYPE"))] || "NA"}<br>
+  <strong>SHUTDOWN TIME :</strong> ${r[idx.sd]}<br>
+  <strong>INSTALLATIONn :</strong> ${r[idx.inst]}
  </div>`;
    }
   });
