@@ -125,7 +125,7 @@ button{
 
 <!-- LOGIN -->
 <div class="card" id="loginBox">
-<h3>Operator Login</h3>
+<h3>USER LOGIN</h3>
 <label>Username</label>
 <input id="loginUser">
 <label>Password</label>
@@ -297,10 +297,12 @@ if(
 
     found=true;
     activeShutdowns.innerHTML+=`
-     <div class="shutdown-item">
-      <b>${r[idx.feeder]}</b><br>
-      Shutdown @ ${r[idx.sd]}
-     </div>`;
+ <div class="shutdown-item">
+  <b>Feeder :</b> ${r[idx.feeder]}<br>
+  <b>Shutdown Type :</b> ${r[h.findIndex(x=>x.includes("TYPE"))] || "NA"}<br>
+  <b>Shutdown Time :</b> ${r[idx.sd]}<br>
+  <b>Installation :</b> ${r[idx.inst]}
+ </div>`;
    }
   });
   if(!found) activeShutdowns.innerHTML="<i>No Active Shutdown</i>";
