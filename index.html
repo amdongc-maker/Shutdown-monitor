@@ -296,13 +296,31 @@ if(
 ){
 
     found=true;
-    activeShutdowns.innerHTML+=`
+ activeShutdowns.innerHTML+=`
  <div class="shutdown-item">
-  <strong>FEEDER        :</strong> ${r[idx.feeder]}<br>
-  <strong>SHUTDOWN TYPE :</strong> ${r[h.findIndex(x=>x.includes("TYPE"))] || "NA"}<br>
-  <strong>SHUTDOWN TIME :</strong> ${r[idx.sd]}<br>
-  <strong>INSTALLATIONn :</strong> ${r[idx.inst]}
+
+  <div class="shutdown-row">
+   <span class="shutdown-label">FEEDER</span>
+   <span class="shutdown-value">${r[idx.feeder]}</span>
+  </div>
+
+  <div class="shutdown-row">
+   <span class="shutdown-label">SHUTDOWN TYPE</span>
+   <span class="shutdown-value">${r[typeIdx] || "NA"}</span>
+  </div>
+
+  <div class="shutdown-row">
+   <span class="shutdown-label">SHUTDOWN TIME</span>
+   <span class="shutdown-value">${r[idx.sd]}</span>
+  </div>
+
+  <div class="shutdown-row">
+   <span class="shutdown-label">INSTALLATION</span>
+   <span class="install-badge">${r[idx.inst]}</span>
+  </div>
+
  </div>`;
+
    }
   });
   if(!found) activeShutdowns.innerHTML="<i>No Active Shutdown</i>";
