@@ -5,22 +5,115 @@
 <title>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</title>
 
 <style>
-body{font-family:Segoe UI,Arial;background:#f4f6f8;margin:0}
-header{background:#1f3a5f;color:#fff;padding:12px 20px;font-size:20px}
-.container{padding:20px}
-.card{background:#fff;padding:20px;border-radius:6px;margin-bottom:20px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
-h3{margin-top:0;color:#1f3a5f}
-label{display:block;margin-top:10px;font-weight:600}
-select,input,textarea{width:100%;padding:8px;margin-top:4px}
-textarea{resize:vertical}
-button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer;margin-right:10px}
-.btn-login{background:#3498db;color:#fff}
+/* ===== APP BASE ===== */
+body{
+  font-family: "Segoe UI", Roboto, Arial;
+  background:#f1f3f6;
+  margin:0;
+}
+
+/* ===== HEADER ===== */
+header{
+  background:#1f3a5f;
+  color:#fff;
+  padding:14px 18px;
+  font-size:18px;
+  font-weight:600;
+  text-align:center;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container{
+  padding:16px;
+  max-width:480px;
+  margin:auto;
+}
+
+/* ===== SCREENS (NO BORDERS) ===== */
+.card{
+  background:transparent;
+  padding:0;
+  margin-bottom:20px;
+  box-shadow:none;
+  border-radius:0;
+}
+
+/* ===== TITLES ===== */
+h2,h3{
+  margin:12px 0;
+  color:#1f3a5f;
+  text-align:center;
+}
+
+/* ===== LABELS ===== */
+label{
+  margin-top:14px;
+  font-weight:600;
+  color:#444;
+  font-size:14px;
+}
+
+/* ===== INPUTS ===== */
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #dcdfe4;
+  font-size:15px;
+  background:#fff;
+}
+
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:#1f3a5f;
+}
+
+/* ===== BUTTONS ===== */
+button{
+  width:100%;
+  padding:14px;
+  margin-top:14px;
+  font-size:16px;
+  font-weight:600;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+}
+
+/* ===== BUTTON COLORS ===== */
+.btn-login{background:#1f3a5f;color:#fff}
 .btn-shutdown{background:#e74c3c;color:#fff}
 .btn-resume{background:#27ae60;color:#fff}
 .btn-back{background:#7f8c8d;color:#fff}
+
+/* ===== ACTIVE SHUTDOWN LIST ===== */
+.shutdown-item{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:10px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+  font-size:14px;
+}
+
+/* ===== MESSAGE ===== */
+#msg{
+  text-align:center;
+  margin-top:10px;
+  font-weight:600;
+  color:#1f3a5f;
+}
+
+/* ===== HIDE ===== */
 .hidden{display:none}
-#msg{font-weight:bold;margin-top:10px}
-.shutdown-item{padding:8px;border-bottom:1px solid #ddd}
+
+/* ===== MOBILE APP FEEL ===== */
+@media (min-width:600px){
+  .container{
+    margin-top:20px;
+  }
+}
 </style>
 </head>
 
