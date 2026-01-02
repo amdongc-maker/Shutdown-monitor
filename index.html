@@ -238,20 +238,58 @@ function populateFeeders(){
  });
 }
 
+<script>
 function loadActiveShutdowns(){
  fetch(CSV_URL+"&t="+Date.now())
  .then(r=>r.text())
  .then(t=>{
   const rows=t.split("\n").map(r=>r.split(","));
   const h=rows.shift().map(x=>x.toUpperCase());
- const idx={
- feeder: h.findIndex(x => x.includes("FEEDER")),
- type: h.findIndex(x => x.includes("TYPE")),
- sd: h.findIndex(x => x.includes("SHUTDOWN")),
- rs: h.findIndex(x => x.includes("RESUME")),
- inst: h.findIndex(x => x.includes("INSTALL"))
-};
+
+  const idx={
+    feeder: h.findIndex(x => x.includes("FEEDER")),
+    type:   h.findIndex(x => x.includes("TYPE")),
+    sd:     h.findIndex(x => x.includes("SHUTDOWN")),
+    rs:     h.findIndex(x => x.includes("RESUME")),
+    inst:   h.findIndex(x => x.includes("INSTALL"))
   };
+
+  activeShutdowns.innerHTML="";
+
+  rows.forEach(r=>{
+    if(!r[idx.rs] || r[idx.rs]==="NA"){
+      activeShutdowns.innerHTML+=`
+      <div class="shutdown-item">
+        <div class="shutdown-row">
+          <span class="shutdown-label">FEEDER</span>
+          <span class="shutdown-value">${r[idx.feeder] || "-"}</span>
+        </div>
+
+        <div class="shutdown-row">
+          <span class="shutdown-label">SHUTDOWN TYPE</span>
+          <span class="shutdown-value">${r[idx.type] || "-"}</span>
+        </div>
+
+        <div class="shutdown-row">
+          <span class="shutdown-label">SHUTDOWN TIME</span>
+          <span class="shutdown-value">${r[idx.sd] || "-"}</span>
+        </div>
+
+        <div class="shutdown-row">
+          <span class="shutdown-label">INSTALLATION</span>
+          <span class="install-badge">${r[idx.inst] || "-"}</span>
+        </div>
+      </div>`;
+    }
+  });
+ })
+ .catch(err=>{
+  activeShutdowns.innerHTML="Error loading data";
+  console.error(err);
+ });
+}
+</script>
+
   activeShutdowns.innerHTML="";
   rows.forEach(r=>{
    if(!r[idx.rs]||r[idx.rs]==="NA"){
