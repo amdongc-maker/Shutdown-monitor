@@ -13,13 +13,22 @@ h3{margin-top:0;color:#1f3a5f}
 label{display:block;margin-top:10px;font-weight:600}
 select,input,textarea{width:100%;padding:8px;margin-top:4px}
 textarea{resize:vertical}
-button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
+button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer;margin-right:5px}
 .btn-login{background:#3498db;color:#fff}
 .btn-shutdown{background:#e74c3c;color:#fff}
 .btn-resume{background:#27ae60;color:#fff}
 .footer{position:fixed;bottom:0;width:100%;background:#ecf0f1;padding:10px;text-align:center}
 .hidden{display:none}
 #msg{margin-top:5px;font-weight:bold}
+
+.shutdown-item{
+ background:#ffe6e6;
+ color:#b30000;
+ padding:8px;
+ margin-bottom:6px;
+ border-left:5px solid #e74c3c;
+ font-weight:600;
+}
 </style>
 </head>
 
@@ -52,6 +61,15 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 
 <label>Installation</label>
 <input id="installation" disabled>
+</div>
+
+<!-- DASHBOARD -->
+<div class="card hidden" id="dashboardBox">
+<h3>Active Shutdown Feeders</h3>
+<div id="activeShutdowns"></div>
+<br>
+<button class="btn-shutdown" onclick="openShutdown()">Shutdown Entry</button>
+<button class="btn-resume" onclick="openResume()">Resume Entry</button>
 </div>
 
 <!-- SHUTDOWN -->
@@ -108,8 +126,9 @@ button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer}
 
 <script>
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
+const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
 
-/* 🔐 USER MASTER (INSTALLATION WISE) */
+/* USERS */
 const USERS=[
  {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
  {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
@@ -127,7 +146,7 @@ const USERS=[
  {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
 ];
 
-/* INSTALLATION → FEEDERS */
+/* FEEDERS */
 const FEEDERS={
 "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER - LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER - LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
@@ -138,36 +157,80 @@ const FEEDERS={
 };
 
 let CURRENT_USER={};
+let ACTIVE_SHUTDOWN_FEEDERS=[];
 
 /* LOGIN */
 function login(){
  const u=loginUser.value.trim();
  const p=loginPass.value.trim();
-
  const user=USERS.find(x=>x.u===u && x.p===p);
  if(!user){ showMsg("Invalid Login"); return; }
 
  CURRENT_USER=user;
-
  opName.value=user.n;
  installation.value=user.i;
 
  loginBox.classList.add("hidden");
  operatorBox.classList.remove("hidden");
- shutdownBox.classList.remove("hidden");
- resumeBox.classList.remove("hidden");
+ dashboardBox.classList.remove("hidden");
 
  populateFeeders();
+ loadActiveShutdowns();
+ setInterval(loadActiveShutdowns,30000);
+
  showMsg("Welcome "+user.n);
 }
 
-/* LOAD FEEDERS */
+/* FEEDERS */
 function populateFeeders(){
  sd_feeder.innerHTML=rs_feeder.innerHTML='<option value="">Select Feeder</option>';
  (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
   sd_feeder.innerHTML+=`<option>${f}</option>`;
   rs_feeder.innerHTML+=`<option>${f}</option>`;
  });
+}
+
+/* DASHBOARD */
+function loadActiveShutdowns(){
+ fetch(CSV_URL)
+ .then(r=>r.text())
+ .then(t=>{
+  const rows=t.split("\n").map(r=>r.split(","));
+  const header=rows.shift();
+
+  const f=header.indexOf("Feeder");
+  const sd=header.indexOf("Shutdown Time");
+  const rs=header.indexOf("Resume Time");
+  const i=header.indexOf("Installation");
+
+  activeShutdowns.innerHTML="";
+  ACTIVE_SHUTDOWN_FEEDERS=[];
+
+  rows.forEach(r=>{
+   if(r[i]===CURRENT_USER.i && r[sd] && !r[rs]){
+    ACTIVE_SHUTDOWN_FEEDERS.push(r[f]);
+    activeShutdowns.innerHTML+=`
+    <div class="shutdown-item">
+     ${r[f]}<br>Shutdown @ ${r[sd]}
+    </div>`;
+   }
+  });
+
+  if(ACTIVE_SHUTDOWN_FEEDERS.length===0){
+   activeShutdowns.innerHTML="<i>No Active Shutdown</i>";
+  }
+ });
+}
+
+/* OPEN FORMS */
+function openShutdown(){
+ shutdownBox.classList.remove("hidden");
+ resumeBox.classList.add("hidden");
+}
+
+function openResume(){
+ resumeBox.classList.remove("hidden");
+ shutdownBox.classList.add("hidden");
 }
 
 /* SHUTDOWN */
@@ -187,12 +250,18 @@ function submitShutdown(){
  }),{mode:"no-cors"});
 
  showMsg("Shutdown submitted");
+ setTimeout(loadActiveShutdowns,2000);
 }
 
 /* RESUME */
 function submitResume(){
- if(!rs_feeder.value||!rs_time.value){
-  showMsg("Feeder & Time required"); return;
+ if(!ACTIVE_SHUTDOWN_FEEDERS.includes(rs_feeder.value)){
+  showMsg("Selected feeder is not in Shutdown");
+  return;
+ }
+
+ if(!rs_time.value){
+  showMsg("Resume time required"); return;
  }
 
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
@@ -206,8 +275,10 @@ function submitResume(){
  }),{mode:"no-cors"});
 
  showMsg("Resume submitted");
+ setTimeout(loadActiveShutdowns,2000);
 }
 
+/* MESSAGE */
 function showMsg(t){
  msg.innerText=t;
  setTimeout(()=>msg.innerText="",3000);
