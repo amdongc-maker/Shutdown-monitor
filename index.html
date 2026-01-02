@@ -238,7 +238,6 @@ function populateFeeders(){
  });
 }
 
-<script>
 function loadActiveShutdowns(){
  fetch(CSV_URL+"&t="+Date.now())
  .then(r=>r.text())
@@ -247,11 +246,11 @@ function loadActiveShutdowns(){
   const h=rows.shift().map(x=>x.toUpperCase());
 
   const idx={
-    feeder: h.findIndex(x => x.includes("FEEDER")),
-    type:   h.findIndex(x => x.includes("TYPE")),
-    sd:     h.findIndex(x => x.includes("SHUTDOWN")),
-    rs:     h.findIndex(x => x.includes("RESUME")),
-    inst:   h.findIndex(x => x.includes("INSTALL"))
+    feeder: h.findIndex(x=>x.includes("FEEDER")),
+    type:   h.findIndex(x=>x.includes("TYPE")),
+    sd:     h.findIndex(x=>x.includes("SHUTDOWN")),
+    rs:     h.findIndex(x=>x.includes("RESUME")),
+    inst:   h.findIndex(x=>x.includes("INSTALL"))
   };
 
   activeShutdowns.innerHTML="";
@@ -262,52 +261,35 @@ function loadActiveShutdowns(){
       <div class="shutdown-item">
         <div class="shutdown-row">
           <span class="shutdown-label">FEEDER</span>
-          <span class="shutdown-value">${r[idx.feeder] || "-"}</span>
+          <span class="shutdown-value">${r[idx.feeder]||"-"}</span>
         </div>
-
         <div class="shutdown-row">
           <span class="shutdown-label">SHUTDOWN TYPE</span>
-          <span class="shutdown-value">${r[idx.type] || "-"}</span>
+          <span class="shutdown-value">${r[idx.type]||"-"}</span>
         </div>
-
         <div class="shutdown-row">
           <span class="shutdown-label">SHUTDOWN TIME</span>
-          <span class="shutdown-value">${r[idx.sd] || "-"}</span>
+          <span class="shutdown-value">${r[idx.sd]||"-"}</span>
         </div>
-
         <div class="shutdown-row">
           <span class="shutdown-label">INSTALLATION</span>
-          <span class="install-badge">${r[idx.inst] || "-"}</span>
+          <span class="install-badge">${r[idx.inst]||"-"}</span>
         </div>
       </div>`;
     }
   });
  })
- .catch(err=>{
-  activeShutdowns.innerHTML="Error loading data";
-  console.error(err);
- });
-}
-</script>
-
-  activeShutdowns.innerHTML="";
-  rows.forEach(r=>{
-   if(!r[idx.rs]||r[idx.rs]==="NA"){
-    activeShutdowns.innerHTML+=`
-    <div class="shutdown-item">
-     <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[idx.feeder]}</span></div>
-     <div class="shutdown-row"><span class="shutdown-label">SHUTDOWN TYPE</span><span class="shutdown-value">${r[idx.type]}</span></div>
-     <div class="shutdown-row"><span class="shutdown-label">SHUTDOWN TIME</span><span class="shutdown-value">${r[idx.sd]}</span></div>
-     <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[idx.inst]}</span></div>
-    </div>`;
-   }
-  });
- });
+ .catch(()=>activeShutdowns.innerHTML="Error loading data");
 }
 
 function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
 function openResume(){mainBox.classList.add("hidden");resumeBox.classList.remove("hidden")}
-function backToMain(){shutdownBox.classList.add("hidden");resumeBox.classList.add("hidden");mainBox.classList.remove("hidden");loadActiveShutdowns()}
+function backToMain(){
+ shutdownBox.classList.add("hidden");
+ resumeBox.classList.add("hidden");
+ mainBox.classList.remove("hidden");
+ loadActiveShutdowns();
+}
 
 function submitShutdown(){
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
@@ -337,9 +319,10 @@ function submitResume(){
  backToMain();
 }
 
-function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000)}
+function showMsg(t){
+ msg.innerText=t;
+ setTimeout(()=>msg.innerText="",3000);
+}
+
 setInterval(loadActiveShutdowns,30000);
 </script>
-
-</body>
-</html>
