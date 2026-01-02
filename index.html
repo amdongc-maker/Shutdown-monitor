@@ -190,32 +190,29 @@ function populateFeeders(){
  });
 }
 
-/* DASHBOARD */
+/* ✅ FIXED ACTIVE SHUTDOWN LOADER */
 function loadActiveShutdowns(){
  fetch(CSV_URL)
  .then(r=>r.text())
  .then(t=>{
-
   const rows=t.split("\n").map(r=>r.split(","));
-  const header=rows.shift().map(h=>h.trim());
+  const header=rows.shift().map(h=>h.trim().toLowerCase());
 
-  // 🔥 FLEXIBLE HEADER FIND
-  const f = header.findIndex(h=>h.toLowerCase().includes("feeder"));
-  const sd = header.findIndex(h=>h.toLowerCase().includes("shutdown"));
-  const rs = header.findIndex(h=>h.toLowerCase().includes("resume"));
-  const i = header.findIndex(h=>h.toLowerCase().includes("installation"));
+  const f=header.findIndex(h=>h.includes("feeder"));
+  const sd=header.findIndex(h=>h.includes("shutdown"));
+  const rs=header.findIndex(h=>h.includes("resume"));
+  const i=header.findIndex(h=>h.includes("installation"));
 
   activeShutdowns.innerHTML="";
   ACTIVE_SHUTDOWN_FEEDERS=[];
 
   rows.forEach(r=>{
    if(
-     r[i]?.trim()===CURRENT_USER.i &&
-     r[sd]?.trim()!=="" &&
-     (!r[rs] || r[rs].trim()==="")
+    r[i]?.trim()===CURRENT_USER.i &&
+    r[sd]?.trim()!=="" &&
+    (!r[rs] || r[rs].trim()==="")
    ){
     ACTIVE_SHUTDOWN_FEEDERS.push(r[f]);
-
     activeShutdowns.innerHTML+=`
      <div class="shutdown-item">
       ${r[f]}<br>
@@ -235,7 +232,6 @@ function openShutdown(){
  shutdownBox.classList.remove("hidden");
  resumeBox.classList.add("hidden");
 }
-
 function openResume(){
  resumeBox.classList.remove("hidden");
  shutdownBox.classList.add("hidden");
@@ -246,7 +242,6 @@ function submitShutdown(){
  if(!sd_feeder.value||!sd_time.value){
   showMsg("Feeder & Time required"); return;
  }
-
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"shutdown",
   feeder:sd_feeder.value,
@@ -256,7 +251,6 @@ function submitShutdown(){
   ShutdownEntryBy:CURRENT_USER.n,
   Installation:CURRENT_USER.i
  }),{mode:"no-cors"});
-
  showMsg("Shutdown submitted");
  setTimeout(loadActiveShutdowns,2000);
 }
@@ -267,11 +261,9 @@ function submitResume(){
   showMsg("Selected feeder is not in Shutdown");
   return;
  }
-
  if(!rs_time.value){
   showMsg("Resume time required"); return;
  }
-
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"resume",
   feeder:rs_feeder.value,
@@ -281,7 +273,6 @@ function submitResume(){
   DGDeployed:rs_dg.value,
   Remarks:rs_rem.value
  }),{mode:"no-cors"});
-
  showMsg("Resume submitted");
  setTimeout(loadActiveShutdowns,2000);
 }
