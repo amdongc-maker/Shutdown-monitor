@@ -254,9 +254,44 @@ function loadActiveShutdowns(){
   };
 
   activeShutdowns.innerHTML="";
+let activeCount = 0;
 
-  rows.forEach(r=>{
-    if(!r[idx.rs] || r[idx.rs]==="NA"){
+rows.forEach(r=>{
+  if(!r[idx.rs] || r[idx.rs]==="NA"){
+    activeCount++;
+
+    activeShutdowns.innerHTML+=`
+    <div class="shutdown-item">
+      <div class="shutdown-row">
+        <span class="shutdown-label">FEEDER</span>
+        <span class="shutdown-value">${r[idx.feeder] || "-"}</span>
+      </div>
+      <div class="shutdown-row">
+        <span class="shutdown-label">SHUTDOWN TYPE</span>
+        <span class="shutdown-value">${r[idx.type] || "-"}</span>
+      </div>
+      <div class="shutdown-row">
+        <span class="shutdown-label">SHUTDOWN TIME</span>
+        <span class="shutdown-value">${r[idx.sd] || "-"}</span>
+      </div>
+      <div class="shutdown-row">
+        <span class="shutdown-label">INSTALLATION</span>
+        <span class="install-badge">${r[idx.inst] || "-"}</span>
+      </div>
+    </div>`;
+  }
+});
+
+/* ✅ NO ACTIVE SHUTDOWN MESSAGE */
+if(activeCount === 0){
+  activeShutdowns.innerHTML = `
+  <div class="shutdown-item" style="text-align:center">
+    <div style="font-size:16px;font-weight:700;color:#27ae60">
+      ✅ All FEEDERS ARE HEALTHY
+    </div>
+  </div>`;
+}
+
       activeShutdowns.innerHTML+=`
       <div class="shutdown-item">
         <div class="shutdown-row">
