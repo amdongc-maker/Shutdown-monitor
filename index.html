@@ -418,51 +418,17 @@ function submitShutdown(){
 }
 
 function submitResume(){
- function validateResume(){
+ if(!validateResume()) return;
 
-  // 1️⃣ feeder must be selected
-  if(!rs_feeder.value){
-    showMsg("❌ Please select Feeder");
-    return false;
-  }
-
-  // 2️⃣ feeder must be ACTIVE shutdown
-  if(!ACTIVE_SHUTDOWNS[rs_feeder.value]){
-    showMsg("❌ Selected feeder is not in shutdown");
-    return false;
-  }
-
-  // 3️⃣ resume time required
-  if(!rs_time.value){
-    showMsg("❌ Please select Resume Date & Time");
-    return false;
-  }
-
-  // 4️⃣ resume time must be AFTER shutdown time
-  const sdTime = new Date(ACTIVE_SHUTDOWNS[rs_feeder.value].replace(" ","T"));
-  const rsTime = new Date(rs_time.value);
-
-  if(rsTime <= sdTime){
-    showMsg("❌ Resume time must be after Shutdown time");
-    return false;
-  }
-
-  // 5️⃣ other mandatory fields
-  if(!rs_loss.value.trim()){
-    showMsg("❌ Please enter Production Loss");
-    return false;
-  }
-  if(!rs_dg.value.trim()){
-    showMsg("❌ Please enter DG Deployed");
-    return false;
-  }
-  if(!rs_rem.value.trim()){
-    showMsg("❌ Please enter Remarks");
-    return false;
-  }
-
-  return true;
-}
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"resume",
+  feeder:rs_feeder.value,
+  ResumeTime:rs_time.value.replace("T"," "),
+  ResumeEntryBy:CURRENT_USER.n,
+  TotalProdLoss:rs_loss.value,
+  DGDeployed:rs_dg.value,
+  Remarks:rs_rem.value
+ }),{mode:"no-cors"});
 
  showMsg("✅ Resume Submitted Successfully");
  backToMain();
