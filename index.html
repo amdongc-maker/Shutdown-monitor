@@ -5,14 +5,11 @@
 <title>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</title>
 
 <style>
-/* ===== APP BASE ===== */
 body{
-  font-family: "Segoe UI", Roboto, Arial;
+  font-family:"Segoe UI",Roboto,Arial;
   background:#f1f3f6;
   margin:0;
 }
-
-/* ===== HEADER ===== */
 header{
   background:#1f3a5f;
   color:#fff;
@@ -21,29 +18,17 @@ header{
   font-weight:600;
   text-align:center;
 }
-
-/* ===== MAIN CONTAINER ===== */
 .container{
   padding:16px;
   max-width:480px;
   margin:auto;
 }
-
-/* ===== SCREENS ===== */
-.card{
-  background:transparent;
-  padding:0;
-  margin-bottom:20px;
-}
-
-/* ===== TITLES ===== */
+.card{margin-bottom:20px}
 h2,h3{
   margin:12px 0;
   color:#1f3a5f;
   text-align:center;
 }
-
-/* ===== INPUTS ===== */
 input,select,textarea{
   width:100%;
   padding:12px;
@@ -52,8 +37,6 @@ input,select,textarea{
   border:1px solid #dcdfe4;
   font-size:15px;
 }
-
-/* ===== BUTTONS ===== */
 button{
   width:100%;
   padding:14px;
@@ -64,42 +47,26 @@ button{
   border-radius:14px;
   cursor:pointer;
 }
-
 .btn-login{background:#1f3a5f;color:#fff}
 .btn-shutdown{background:#e74c3c;color:#fff}
 .btn-resume{background:#27ae60;color:#fff}
 .btn-back{background:#7f8c8d;color:#fff}
-
 .hidden{display:none}
-
-/* ===== ACTIVE SHUTDOWN PRO CARD ===== */
 .shutdown-item{
-  background:#ffffff;
+  background:#fff;
   border-radius:16px;
-  padding:18px 20px;
+  padding:18px;
   margin-bottom:14px;
   box-shadow:0 6px 18px rgba(0,0,0,.08);
 }
-
 .shutdown-row{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   margin-bottom:8px;
   font-size:14px;
 }
-
-.shutdown-label{
-  color:#6b7280;
-  font-weight:600;
-}
-
-.shutdown-value{
-  color:#111827;
-  font-weight:700;
-  text-align:right;
-}
-
+.shutdown-label{color:#6b7280;font-weight:600}
+.shutdown-value{font-weight:700}
 .install-badge{
   padding:4px 12px;
   border-radius:999px;
@@ -108,23 +75,15 @@ button{
   font-size:12px;
   font-weight:700;
 }
-
-#msg{
-  text-align:center;
-  margin-top:10px;
-  font-weight:600;
-  color:#1f3a5f;
-}
+#msg{text-align:center;margin-top:10px;font-weight:600}
 </style>
 </head>
 
 <body>
-
 <header>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</header>
 
 <div class="container">
 
-<!-- LOGIN -->
 <div class="card" id="loginBox">
 <h3>USER LOGIN</h3>
 <input id="loginUser" placeholder="Username">
@@ -132,7 +91,6 @@ button{
 <button class="btn-login" onclick="login()">Login</button>
 </div>
 
-<!-- MAIN -->
 <div class="card hidden" id="mainBox">
 <h2>ACTIVE SHUTDOWN FEEDERS</h2>
 <div id="activeShutdowns">Loading...</div>
@@ -140,7 +98,6 @@ button{
 <button class="btn-resume" onclick="openResume()">Resume</button>
 </div>
 
-<!-- SHUTDOWN -->
 <div class="card hidden" id="shutdownBox">
 <h3>Shutdown Entry</h3>
 <select id="sd_feeder"></select>
@@ -156,7 +113,6 @@ button{
 <button class="btn-back" onclick="backToMain()">Back</button>
 </div>
 
-<!-- RESUME -->
 <div class="card hidden" id="resumeBox">
 <h3>Resume Entry</h3>
 <select id="rs_feeder"></select>
@@ -246,75 +202,33 @@ function loadActiveShutdowns(){
   const h=rows.shift().map(x=>x.toUpperCase());
 
   const idx={
-    feeder: h.findIndex(x=>x.includes("FEEDER")),
-    type:   h.findIndex(x=>x.includes("TYPE")),
-    sd:     h.findIndex(x=>x.includes("SHUTDOWN")),
-    rs:     h.findIndex(x=>x.includes("RESUME")),
-    inst:   h.findIndex(x=>x.includes("INSTALL"))
+    feeder:h.findIndex(x=>x.includes("FEEDER")),
+    type:h.findIndex(x=>x.includes("TYPE")),
+    sd:h.findIndex(x=>x.includes("SHUTDOWN")),
+    rs:h.findIndex(x=>x.includes("RESUME")),
+    inst:h.findIndex(x=>x.includes("INSTALL"))
   };
 
   activeShutdowns.innerHTML="";
-let activeCount = 0;
+  let count=0;
 
-rows.forEach(r=>{
-  if(!r[idx.rs] || r[idx.rs]==="NA"){
-    activeCount++;
-
-    activeShutdowns.innerHTML+=`
-    <div class="shutdown-item">
-      <div class="shutdown-row">
-        <span class="shutdown-label">FEEDER</span>
-        <span class="shutdown-value">${r[idx.feeder] || "-"}</span>
-      </div>
-      <div class="shutdown-row">
-        <span class="shutdown-label">SHUTDOWN TYPE</span>
-        <span class="shutdown-value">${r[idx.type] || "-"}</span>
-      </div>
-      <div class="shutdown-row">
-        <span class="shutdown-label">SHUTDOWN TIME</span>
-        <span class="shutdown-value">${r[idx.sd] || "-"}</span>
-      </div>
-      <div class="shutdown-row">
-        <span class="shutdown-label">INSTALLATION</span>
-        <span class="install-badge">${r[idx.inst] || "-"}</span>
-      </div>
-    </div>`;
-  }
-});
-
-/* ✅ NO ACTIVE SHUTDOWN MESSAGE */
-if(activeCount === 0){
-  activeShutdowns.innerHTML = `
-  <div class="shutdown-item" style="text-align:center">
-    <div style="font-size:16px;font-weight:700;color:#27ae60">
-      ✅ All FEEDERS ARE HEALTHY
-    </div>
-  </div>`;
-}
-
+  rows.forEach(r=>{
+    if(!r[idx.rs] || r[idx.rs]==="NA"){
+      count++;
       activeShutdowns.innerHTML+=`
       <div class="shutdown-item">
-        <div class="shutdown-row">
-          <span class="shutdown-label">FEEDER</span>
-          <span class="shutdown-value">${r[idx.feeder]||"-"}</span>
-        </div>
-        <div class="shutdown-row">
-          <span class="shutdown-label">SHUTDOWN TYPE</span>
-          <span class="shutdown-value">${r[idx.type]||"-"}</span>
-        </div>
-        <div class="shutdown-row">
-          <span class="shutdown-label">SHUTDOWN TIME</span>
-          <span class="shutdown-value">${r[idx.sd]||"-"}</span>
-        </div>
-        <div class="shutdown-row">
-          <span class="shutdown-label">INSTALLATION</span>
-          <span class="install-badge">${r[idx.inst]||"-"}</span>
-        </div>
+        <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[idx.feeder]||"-"}</span></div>
+        <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${r[idx.type]||"-"}</span></div>
+        <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${r[idx.sd]||"-"}</span></div>
+        <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[idx.inst]||"-"}</span></div>
       </div>`;
     }
   });
- })
- .catch(()=>activeShutdowns.innerHTML="Error loading data");
+
+  if(count===0){
+    activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;font-weight:700;color:#27ae60">✅ All FEEDERS ARE HEALTHY</div>`;
+  }
+ });
 }
 
 function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
@@ -361,3 +275,5 @@ function showMsg(t){
 
 setInterval(loadActiveShutdowns,30000);
 </script>
+</body>
+</html>
