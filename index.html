@@ -195,24 +195,32 @@ function loadActiveShutdowns(){
  fetch(CSV_URL)
  .then(r=>r.text())
  .then(t=>{
-  const rows=t.split("\n").map(r=>r.split(","));
-  const header=rows.shift();
 
-  const f=header.indexOf("Feeder");
-  const sd=header.indexOf("Shutdown Time");
-  const rs=header.indexOf("Resume Time");
-  const i=header.indexOf("Installation");
+  const rows=t.split("\n").map(r=>r.split(","));
+  const header=rows.shift().map(h=>h.trim());
+
+  // 🔥 FLEXIBLE HEADER FIND
+  const f = header.findIndex(h=>h.toLowerCase().includes("feeder"));
+  const sd = header.findIndex(h=>h.toLowerCase().includes("shutdown"));
+  const rs = header.findIndex(h=>h.toLowerCase().includes("resume"));
+  const i = header.findIndex(h=>h.toLowerCase().includes("installation"));
 
   activeShutdowns.innerHTML="";
   ACTIVE_SHUTDOWN_FEEDERS=[];
 
   rows.forEach(r=>{
-   if(r[i]===CURRENT_USER.i && r[sd] && !r[rs]){
+   if(
+     r[i]?.trim()===CURRENT_USER.i &&
+     r[sd]?.trim()!=="" &&
+     (!r[rs] || r[rs].trim()==="")
+   ){
     ACTIVE_SHUTDOWN_FEEDERS.push(r[f]);
+
     activeShutdowns.innerHTML+=`
-    <div class="shutdown-item">
-     ${r[f]}<br>Shutdown @ ${r[sd]}
-    </div>`;
+     <div class="shutdown-item">
+      ${r[f]}<br>
+      Shutdown @ ${r[sd]}
+     </div>`;
    }
   });
 
