@@ -2,242 +2,124 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Shutdown & Resume Power Management</title>
+<title>Shutdown & Resume</title>
 
 <style>
 body{font-family:Segoe UI,Arial;background:#f4f6f8;margin:0}
 header{background:#1f3a5f;color:#fff;padding:12px 20px;font-size:20px}
 .container{padding:20px}
 .card{background:#fff;padding:20px;border-radius:6px;margin-bottom:20px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
-h3{margin-top:0;color:#1f3a5f}
-label{display:block;margin-top:10px;font-weight:600}
-select,input,textarea{width:100%;padding:8px;margin-top:4px}
-textarea{resize:vertical}
-button{padding:10px 18px;border:none;border-radius:4px;cursor:pointer;margin-right:5px}
-.btn-login{background:#3498db;color:#fff}
-.btn-shutdown{background:#e74c3c;color:#fff}
-.btn-resume{background:#27ae60;color:#fff}
-.footer{position:fixed;bottom:0;width:100%;background:#ecf0f1;padding:10px;text-align:center}
-.hidden{display:none}
-#msg{margin-top:5px;font-weight:bold}
-
-.shutdown-item{
- background:#ffe6e6;
- color:#b30000;
- padding:8px;
- margin-bottom:6px;
- border-left:5px solid #e74c3c;
- font-weight:600;
-}
+h2{margin-top:0}
+label{font-weight:600}
+input,select,textarea{width:100%;padding:8px;margin-top:5px;margin-bottom:15px}
+button{padding:10px 20px;border:none;border-radius:4px;font-size:15px;cursor:pointer}
+.red{background:#e74c3c;color:#fff}
+.green{background:#27ae60;color:#fff}
+.shutdown-item{background:#ffeaea;padding:10px;border-left:5px solid #e74c3c;margin-bottom:8px}
 </style>
 </head>
 
 <body>
 
-<header>Shutdown & Resume Power Management</header>
+<header>Shutdown / Resume System</header>
 
 <div class="container">
 
-<!-- LOGIN -->
-<div class="card" id="loginBox">
-<h3>Operator Login</h3>
-<label>Username</label>
-<input id="loginUser">
-<label>Password</label>
-<input type="password" id="loginPass">
-<br><br>
-<button class="btn-login" onclick="login()">Login</button>
-</div>
-
-<!-- OPERATOR DETAILS -->
-<div class="card hidden" id="operatorBox">
-<h3>Operator Details</h3>
+<div class="card">
+<h2>Operator Details</h2>
 <label>Operator Name</label>
-<input id="opName" disabled>
+<input id="opName" value="SANDESH BHARDWAJ">
+
 <label>Installation</label>
-<input id="installation" disabled>
+<input id="install" value="LIMBODARA-GGS-2">
 </div>
 
-<!-- DASHBOARD -->
-<div class="card hidden" id="dashboardBox">
-<h3>Active Shutdown Feeders</h3>
-<div id="activeShutdowns"></div>
+<div class="card">
+<h2>Active Shutdown Feeders</h2>
+<div id="activeShutdowns"><i>Loading...</i></div>
 <br>
-<button class="btn-shutdown" onclick="openShutdown()">Shutdown Entry</button>
-<button class="btn-resume" onclick="openResume()">Resume Entry</button>
+<button class="red">Shutdown Entry</button>
+<button class="green">Resume Entry</button>
 </div>
 
-<!-- SHUTDOWN -->
-<div class="card hidden" id="shutdownBox">
-<h3>Shutdown Entry</h3>
+<div class="card">
+<h2>Shutdown Entry</h2>
 <label>Feeder</label>
-<select id="sd_feeder"></select>
+<input value="ITLA ONGC FEEDER - LG2">
+
 <label>Shutdown Time</label>
-<input type="datetime-local" id="sd_time">
+<input value="02-01-2026 09:28">
+
 <label>Shutdown Type</label>
-<select id="sd_type">
-<option>PLAN PSD</option>
-<option>PARTIAL PLAN PSD</option>
-<option>UNPLAN PSD</option>
-<option>PARTIAL UNPLAN PSD</option>
-</select>
+<input value="PLAN PSD">
+
 <label>Information</label>
-<textarea id="sd_info"></textarea>
-<br><br>
-<button class="btn-shutdown" onclick="submitShutdown()">Submit Shutdown</button>
-</div>
-
-<!-- RESUME -->
-<div class="card hidden" id="resumeBox">
-<h3>Resume Entry</h3>
-<label>Feeder</label>
-<select id="rs_feeder"></select>
-<label>Resume Time</label>
-<input type="datetime-local" id="rs_time">
-<label>Production Loss</label>
-<input id="rs_loss">
-<label>DG Deployed</label>
-<input id="rs_dg">
-<label>Remarks</label>
-<textarea id="rs_rem"></textarea>
-<br><br>
-<button class="btn-resume" onclick="submitResume()">Submit Resume</button>
+<textarea>VV</textarea>
 </div>
 
 </div>
-
-<div class="footer"><div id="msg"></div></div>
 
 <script>
-const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
-const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv"
 
-let CURRENT_USER={};
-let ACTIVE_SHUTDOWN_FEEDERS=[];
+const activeDiv = document.getElementById("activeShutdowns");
 
-/* LOGIN */
-function login(){
- const u=loginUser.value.trim();
- const p=loginPass.value.trim();
- const user=USERS.find(x=>x.u===u && x.p===p);
- if(!user){ showMsg("Invalid Login"); return; }
-
- CURRENT_USER=user;
- opName.value=user.n;
- installation.value=user.i;
-
- loginBox.classList.add("hidden");
- operatorBox.classList.remove("hidden");
- dashboardBox.classList.remove("hidden");
-
- populateFeeders();
- loadActiveShutdowns();
- setInterval(loadActiveShutdowns,30000);
-
- showMsg("Welcome "+user.n);
+function normalize(v){
+ return (v||"").trim().toUpperCase();
 }
 
-/* FEEDERS */
-function populateFeeders(){
- sd_feeder.innerHTML=rs_feeder.innerHTML='<option value="">Select Feeder</option>';
- (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
-  sd_feeder.innerHTML+=`<option>${f}</option>`;
-  rs_feeder.innerHTML+=`<option>${f}</option>`;
- });
-}
-
-/* ✅ ACTIVE SHUTDOWN LOGIC — Resume Time = NA */
 function loadActiveShutdowns(){
- fetch(CSV_URL)
+
+ fetch(CSV_URL + "&t=" + Date.now())
  .then(r=>r.text())
- .then(t=>{
-  const rows=t.split("\n").map(r=>r.split(","));
-  const header=rows.shift().map(h=>h.trim().toLowerCase());
+ .then(text=>{
 
-  const f=header.findIndex(h=>h.includes("feeder"));
-  const sd=header.findIndex(h=>h.includes("shutdown"));
-  const rs=header.findIndex(h=>h.includes("resume"));
-  const i=header.findIndex(h=>h.includes("installation"));
+  const rows = text.split("\n").map(r=>r.split(","));
+  const header = rows.shift().map(h=>normalize(h));
 
-  activeShutdowns.innerHTML="";
-  ACTIVE_SHUTDOWN_FEEDERS=[];
+  const idx = {
+   feeder: header.findIndex(h=>h.includes("FEEDER")),
+   shutdown: header.findIndex(h=>h.includes("SHUTDOWN")),
+   resume: header.findIndex(h=>h.includes("RESUME")),
+   install: header.findIndex(h=>h.includes("INSTALL"))
+  };
+
+  const curInstall = normalize(document.getElementById("install").value);
+  activeDiv.innerHTML="";
+  let found=false;
 
   rows.forEach(r=>{
+   if(!r[idx.feeder]) return;
+
+   const install = normalize(r[idx.install]);
+   const resume  = normalize(r[idx.resume]);
+
+   // 🔥 CORE LOGIC — THIS WAS THE ISSUE
    if(
-    r[i]?.trim()===CURRENT_USER.i &&
-    r[sd]?.trim()!=="" &&
-    r[rs]?.trim().toUpperCase()==="NA"
+     install === curInstall &&
+     (resume === "" || resume === "NA")
    ){
-    ACTIVE_SHUTDOWN_FEEDERS.push(r[f]);
-    activeShutdowns.innerHTML+=`
+    found=true;
+    activeDiv.innerHTML += `
      <div class="shutdown-item">
-      ${r[f]}<br>
-      Shutdown @ ${r[sd]}
+      <b>${r[idx.feeder]}</b><br>
+      Shutdown @ ${r[idx.shutdown]}
      </div>`;
    }
   });
 
-  if(ACTIVE_SHUTDOWN_FEEDERS.length===0){
-   activeShutdowns.innerHTML="<i>No Active Shutdown</i>";
+  if(!found){
+   activeDiv.innerHTML="<i>No Active Shutdown</i>";
   }
+ })
+ .catch(e=>{
+  activeDiv.innerHTML="<span style='color:red'>CSV Load Error</span>";
  });
 }
 
-/* OPEN FORMS */
-function openShutdown(){
- shutdownBox.classList.remove("hidden");
- resumeBox.classList.add("hidden");
-}
-function openResume(){
- resumeBox.classList.remove("hidden");
- shutdownBox.classList.add("hidden");
-}
-
-/* SHUTDOWN */
-function submitShutdown(){
- if(!sd_feeder.value||!sd_time.value){
-  showMsg("Feeder & Time required"); return;
- }
- fetch(WEBAPP_URL+"?"+new URLSearchParams({
-  action:"shutdown",
-  feeder:sd_feeder.value,
-  ShutdownTime:sd_time.value.replace("T"," "),
-  ShutdownType:sd_type.value,
-  Information:sd_info.value,
-  ShutdownEntryBy:CURRENT_USER.n,
-  Installation:CURRENT_USER.i
- }),{mode:"no-cors"});
- showMsg("Shutdown submitted");
- setTimeout(loadActiveShutdowns,2000);
-}
-
-/* RESUME */
-function submitResume(){
- if(!ACTIVE_SHUTDOWN_FEEDERS.includes(rs_feeder.value)){
-  showMsg("Selected feeder is not in Shutdown");
-  return;
- }
- if(!rs_time.value){
-  showMsg("Resume time required"); return;
- }
- fetch(WEBAPP_URL+"?"+new URLSearchParams({
-  action:"resume",
-  feeder:rs_feeder.value,
-  ResumeTime:rs_time.value.replace("T"," "),
-  ResumeEntryBy:CURRENT_USER.n,
-  TotalProdLoss:rs_loss.value,
-  DGDeployed:rs_dg.value,
-  Remarks:rs_rem.value
- }),{mode:"no-cors"});
- showMsg("Resume submitted");
- setTimeout(loadActiveShutdowns,2000);
-}
-
-/* MESSAGE */
-function showMsg(t){
- msg.innerText=t;
- setTimeout(()=>msg.innerText="",3000);
-}
+// ⏱ AUTO REFRESH EVERY 30 SEC
+loadActiveShutdowns();
+setInterval(loadActiveShutdowns,30000);
 </script>
 
 </body>
