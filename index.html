@@ -88,14 +88,14 @@ button{
 <h3>USER LOGIN</h3>
 <input id="loginUser" placeholder="Username">
 <input type="password" id="loginPass" placeholder="Password">
-<button type="button" class="btn-login" onclick="login()">Login</button>
+<button type="button" class="btn-login" onclick="login(); return false;">Login</button>
 </div>
 
 <div class="card hidden" id="mainBox">
 <h2>ACTIVE SHUTDOWN FEEDERS</h2>
 <div id="activeShutdowns">Loading...</div>
-<button type="button" class="btn-shutdown" onclick="openShutdown()">Shutdown</button>
-<button type="button" class="btn-resume" onclick="openResume()">Resume</button>
+<button type="button" class="btn-shutdown" onclick="openShutdown(); return false;">Shutdown</button>
+<button type="button" class="btn-resume" onclick="openResume(); return false;">Resume</button>
 </div>
 
 <div class="card hidden" id="shutdownBox">
@@ -109,9 +109,8 @@ button{
 <option>PARTIAL UNPLAN PSD</option>
 </select>
 <textarea id="sd_info" placeholder="Information"></textarea>
-<button type="button" class="btn-shutdown" onclick="submitShutdown()">Submit</button>
-<button type="button" class="btn-back" onclick="backToMain()">Back</button>
-
+<button type="button" class="btn-shutdown" onclick="submitShutdown(); return false;">Submit</button>
+<button type="button" class="btn-back" onclick="backToMain(); return false;">Back</button>
 </div>
 
 <div class="card hidden" id="resumeBox">
@@ -121,9 +120,8 @@ button{
 <input id="rs_loss" placeholder="Production Loss">
 <input id="rs_dg" placeholder="DG Deployed">
 <textarea id="rs_rem" placeholder="Remarks"></textarea>
-<button type="button" class="btn-resume" onclick="submitResume()">Submit</button>
-<button type="button" class="btn-back" onclick="backToMain()">Back</button>
-
+<button type="button" class="btn-resume" onclick="submitResume(); return false;">Submit</button>
+<button type="button" class="btn-back" onclick="backToMain(); return false;">Back</button>
 </div>
 
 <div id="msg"></div>
@@ -293,6 +291,9 @@ function showMsg(t){
 }
 
 setInterval(loadActiveShutdowns,30000);
+document.addEventListener("submit", function(e){
+  e.preventDefault();
+});
 </script>
 </body>
 </html>
