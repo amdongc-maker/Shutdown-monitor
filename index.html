@@ -51,7 +51,7 @@ button{
 .btn-shutdown{background:#e74c3c;color:#fff}
 .btn-resume{background:#27ae60;color:#fff}
 .btn-back{background:#7f8c8d;color:#fff}
-.hidden{display:none}
+.hidden{display:none !important}
 .shutdown-item{
   background:#fff;
   border-radius:16px;
@@ -84,6 +84,7 @@ button{
 
 <div class="container">
 
+<!-- LOGIN -->
 <div class="card" id="loginBox">
 <h3>USER LOGIN</h3>
 <input id="loginUser" placeholder="Username">
@@ -91,10 +92,10 @@ button{
 <button type="button" class="btn-login" onclick="login()">Login</button>
 </div>
 
+<!-- MAIN -->
 <div class="card hidden" id="mainBox">
 <h2>ACTIVE SHUTDOWN FEEDERS</h2>
 
-<!-- ✅ USER INFO CARD -->
 <div id="userInfo" style="
   background:#ffffff;
   border-radius:16px;
@@ -102,11 +103,10 @@ button{
   margin-bottom:16px;
   box-shadow:0 6px 18px rgba(0,0,0,.08);
   text-align:center;">
-  
-  <div style="font-size:16px;font-weight:700;color:#1f3a5f" id="ui_name"></div>
+  <div id="ui_name" style="font-size:16px;font-weight:700;color:#1f3a5f"></div>
   <div style="margin-top:4px;font-size:13px;font-weight:600;color:#6b7280">
     Installation :
-    <span style="color:#1f3a5f;font-weight:700" id="ui_inst"></span>
+    <span id="ui_inst" style="color:#1f3a5f;font-weight:700"></span>
   </div>
 </div>
 
@@ -114,11 +114,8 @@ button{
 <button type="button" class="btn-shutdown" onclick="openShutdown()">Shutdown</button>
 <button type="button" class="btn-resume" onclick="openResume()">Resume</button>
 </div>
-<div id="activeShutdowns">Loading...</div>
-<button type="button" class="btn-shutdown" onclick="openShutdown()">Shutdown</button>
-<button type="button" class="btn-resume" onclick="openResume()">Resume</button>
-</div>
 
+<!-- SHUTDOWN -->
 <div class="card hidden" id="shutdownBox">
 <h3>Shutdown Entry</h3>
 <select id="sd_feeder"></select>
@@ -134,6 +131,7 @@ button{
 <button type="button" class="btn-back" onclick="backToMain()">Back</button>
 </div>
 
+<!-- RESUME -->
 <div class="card hidden" id="resumeBox">
 <h3>Resume Entry</h3>
 <select id="rs_feeder"></select>
@@ -153,11 +151,11 @@ const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtV
 const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
 
 const USERS=[
- {u:"121318",p:"admin123",n:"BHAVESH PARMAR",i:"SURFACE TEAM AREA-IV",admin:true},
- {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"SURFACE TEAM AREA-IV",admin:true},
- {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"SURFACE TEAM AREA-IV",admin:true},
- {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"SURFACE TEAM AREA-IV",admin:true},
- {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"SURFACE TEAM AREA-IV",admin:true},
+ {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
+ {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
+ {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"ALL",admin:true},
+ {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"ALL",admin:true},
+ {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"ALL",admin:true},
  {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
  {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
  {u:"124470",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
@@ -181,7 +179,7 @@ const FEEDERS={
 "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
 "GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
 "MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
-"SURFACE TEAM AREA_IV":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
+"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
  "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
  "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
  "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
@@ -208,57 +206,46 @@ function login(){
  resumeBox.classList.add("hidden");
  mainBox.classList.remove("hidden");
 
- ui_name.innerText = CURRENT_USER.n;
- ui_inst.innerText = CURRENT_USER.i;
+ ui_name.innerText=CURRENT_USER.n;
+ ui_inst.innerText=CURRENT_USER.i;
 
  populateFeeders();
  loadActiveShutdowns();
 }
 
-window.onload = function(){
-  loginBox.classList.remove("hidden");
-  mainBox.classList.add("hidden");
-  shutdownBox.classList.add("hidden");
-  resumeBox.classList.add("hidden");
+window.onload=function(){
+ loginBox.classList.remove("hidden");
+ mainBox.classList.add("hidden");
+ shutdownBox.classList.add("hidden");
+ resumeBox.classList.add("hidden");
 };
 
- // 🔹 SHOW USER INFO
- ui_name.innerText = CURRENT_USER.n;
- ui_inst.innerText = CURRENT_USER.i === "SURFACE TEAM AREA_IV" ? "ALL INSTALLATIONS" : CURRENT_USER.i;
+function openShutdown(){
+ mainBox.classList.add("hidden");
+ resumeBox.classList.add("hidden");
+ shutdownBox.classList.remove("hidden");
+}
 
- populateFeeders();
+function openResume(){
+ mainBox.classList.add("hidden");
+ shutdownBox.classList.add("hidden");
+ resumeBox.classList.remove("hidden");
+}
+
+function backToMain(){
+ shutdownBox.classList.add("hidden");
+ resumeBox.classList.add("hidden");
+ mainBox.classList.remove("hidden");
  loadActiveShutdowns();
 }
 
 function populateFeeders(){
-
-  sd_feeder.innerHTML="";
-  rs_feeder.innerHTML="";
-
-function openShutdown(){
-  mainBox.classList.add("hidden");
-  resumeBox.classList.add("hidden");
-  shutdownBox.classList.remove("hidden");
-}
-
-function openResume(){
-  mainBox.classList.add("hidden");
-  shutdownBox.classList.add("hidden");
-  resumeBox.classList.remove("hidden");
-}
-
-function backToMain(){
-  shutdownBox.classList.add("hidden");
-  resumeBox.classList.add("hidden");
-  mainBox.classList.remove("hidden");
-  loadActiveShutdowns();
-}
-
-  // 🔓 ALL USERS CAN SHUTDOWN / RESUME ALL FEEDERS
-  FEEDERS["SURFACE TEAM AREA-IV"].forEach(f=>{
-    sd_feeder.innerHTML+=`<option>${f}</option>`;
-    rs_feeder.innerHTML+=`<option>${f}</option>`;
-  });
+ sd_feeder.innerHTML="";
+ rs_feeder.innerHTML="";
+ FEEDERS["SURFACE TEAM AREA_IV"].forEach(f=>{
+   sd_feeder.innerHTML+=`<option>${f}</option>`;
+   rs_feeder.innerHTML+=`<option>${f}</option>`;
+ });
 }
 
 function loadActiveShutdowns(){
@@ -266,60 +253,17 @@ function loadActiveShutdowns(){
  .then(r=>r.text())
  .then(t=>{
   const rows=t.split("\n").map(r=>r.split(","));
-  const h=rows.shift().map(x=>x.toUpperCase());
-
-  const idx={
-    feeder:h.findIndex(x=>x.includes("FEEDER")),
-    type:h.findIndex(x=>x.includes("TYPE")),
-    sd:h.findIndex(x=>x.includes("SHUTDOWN")),
-    rs:h.findIndex(x=>x.includes("RESUME")),
-    inst:h.findIndex(x=>x.includes("INSTALL"))
-  };
-
+  rows.shift();
   activeShutdowns.innerHTML="";
-  let count=0;
-
   rows.forEach(r=>{
-    const resumeVal = r[idx.rs];
-    const rowInst   = r[idx.inst];
-
-    // 🔹 INSTALLATION FILTER
-    if(CURRENT_USER.i !== "SURFACE TEAM AREA-IV" && rowInst !== CURRENT_USER.i) return;
-
-    // 🔹 ACTIVE SHUTDOWN ONLY
-    if(!resumeVal || resumeVal==="NA"){
-      count++;
+    if(!r[3]||r[3]==="NA"){
       activeShutdowns.innerHTML+=`
       <div class="shutdown-item">
-        <div class="shutdown-row">
-          <span class="shutdown-label">FEEDER</span>
-          <span class="shutdown-value">${r[idx.feeder]||"-"}</span>
-        </div>
-        <div class="shutdown-row">
-          <span class="shutdown-label">TYPE</span>
-          <span class="shutdown-value">${r[idx.type]||"-"}</span>
-        </div>
-        <div class="shutdown-row">
-          <span class="shutdown-label">TIME</span>
-          <span class="shutdown-value">${r[idx.sd]||"-"}</span>
-        </div>
-        <div class="shutdown-row">
-          <span class="shutdown-label">INSTALLATION</span>
-          <span class="install-badge">${rowInst||"-"}</span>
-        </div>
+        <div class="shutdown-row"><b>${r[0]}</b></div>
+        <div class="shutdown-row">${r[1]}</div>
       </div>`;
     }
   });
-
-  if(count===0){
-    activeShutdowns.innerHTML=`
-      <div class="shutdown-item" style="
-        text-align:center;
-        font-weight:700;
-        color:#27ae60">
-        ✅ NO ACTIVE SHUTDOWN FOR YOUR INSTALLATION
-      </div>`;
-  }
  });
 }
 
@@ -355,8 +299,6 @@ function showMsg(t){
  msg.innerText=t;
  setTimeout(()=>msg.innerText="",3000);
 }
-
-setInterval(loadActiveShutdowns,30000);
 </script>
 </body>
 </html>
