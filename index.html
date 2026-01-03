@@ -146,11 +146,11 @@ const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtV
 const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
 
 const USERS=[
- {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
- {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
- {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"ALL",admin:true},
- {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"ALL",admin:true},
- {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"ALL",admin:true},
+ {u:"121318",p:"admin123",n:"BHAVESH PARMAR",i:"SURFACE TEAM AREA-IV",admin:true},
+ {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"SURFACE TEAM AREA-IV",admin:true},
+ {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"SURFACE TEAM AREA-IV",admin:true},
+ {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"SURFACE TEAM AREA-IV",admin:true},
+ {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"SURFACE TEAM AREA-IV",admin:true},
  {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
  {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
  {u:"124470",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
@@ -174,7 +174,7 @@ const FEEDERS={
 "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
 "GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
 "MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
-"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
+"SURFACE TEAM AREA_IV":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
  "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
  "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
  "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
@@ -201,18 +201,22 @@ function login(){
 
  // 🔹 SHOW USER INFO
  ui_name.innerText = CURRENT_USER.n;
- ui_inst.innerText = CURRENT_USER.i === "ALL" ? "ALL INSTALLATIONS" : CURRENT_USER.i;
+ ui_inst.innerText = CURRENT_USER.i === "SURFACE TEAM AREA_IV" ? "ALL INSTALLATIONS" : CURRENT_USER.i;
 
  populateFeeders();
  loadActiveShutdowns();
 }
 
 function populateFeeders(){
- sd_feeder.innerHTML=rs_feeder.innerHTML="";
- (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
-  sd_feeder.innerHTML+=`<option>${f}</option>`;
-  rs_feeder.innerHTML+=`<option>${f}</option>`;
- });
+
+  sd_feeder.innerHTML="";
+  rs_feeder.innerHTML="";
+
+  // 🔓 ALL USERS CAN SHUTDOWN / RESUME ALL FEEDERS
+  FEEDERS["SURFACE TEAM AREA-IV"].forEach(f=>{
+    sd_feeder.innerHTML+=`<option>${f}</option>`;
+    rs_feeder.innerHTML+=`<option>${f}</option>`;
+  });
 }
 
 function loadActiveShutdowns(){
@@ -238,7 +242,7 @@ function loadActiveShutdowns(){
     const rowInst   = r[idx.inst];
 
     // 🔹 INSTALLATION FILTER
-    if(CURRENT_USER.i !== "ALL" && rowInst !== CURRENT_USER.i) return;
+    if(CURRENT_USER.i !== "SURFACE TEAM AREA-IV" && rowInst !== CURRENT_USER.i) return;
 
     // 🔹 ACTIVE SHUTDOWN ONLY
     if(!resumeVal || resumeVal==="NA"){
