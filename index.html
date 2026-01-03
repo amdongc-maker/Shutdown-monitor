@@ -270,17 +270,26 @@ function submitResume(){
 
 function submitShutdown(){
  if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
-  showMsg("All Shutdown fields required");return;
+  showMsg("All Shutdown fields required");
+  return;
  }
+
+ /* ✅ NEW CHECK */
+ if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
+  showMsg("Feeder already in shutdown");
+  return;
+ }
+
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"shutdown",
   feeder:sd_feeder.value,
   ShutdownTime:sd_time.value.replace("T"," "),
   ShutdownType:sd_type.value,
   Information:sd_info.value,
-  ShutdownEntryBy:CURRENT_USER.n,
+  ShutdownEntryBy:USER_WITH_INSTALL,
   Installation:CURRENT_USER.i
  }),{mode:"no-cors"});
+
  showMsg("Shutdown Submitted");
  backToMain();
 }
