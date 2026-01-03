@@ -131,8 +131,7 @@ button{
 <script>
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
 const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
-
-const USERS=[ /* SAME USER DATA – NO CHANGE */ 
+const USERS=[
  {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
  {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
  {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"ALL",admin:true},
@@ -153,6 +152,7 @@ const USERS=[ /* SAME USER DATA – NO CHANGE */
  {u:"135515",p:"1234",n:"ADITYA ARYA",i:"GAMIJ-GGS-3"},
  {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
 ];
+
 const FEEDERS={
  "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
@@ -173,6 +173,7 @@ const FEEDERS={
  "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
 ]
 };
+
 let CURRENT_USER={}, LAST_SHUTDOWN_TIME={};
 
 function login(){
@@ -194,6 +195,7 @@ function populateFeeders(){
 }
 
 function loadActiveShutdowns(){
+ LAST_SHUTDOWN_TIME={};
  fetch(CSV_URL+"&t="+Date.now()).then(r=>r.text()).then(t=>{
   const rows=t.split("\n").map(r=>r.split(","));
   const h=rows.shift().map(x=>x.toUpperCase());
@@ -223,6 +225,35 @@ function loadActiveShutdowns(){
  });
 }
 
+function submitResume(){
+ if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
+  showMsg("All Resume fields required");return;
+ }
+
+ if(!LAST_SHUTDOWN_TIME[rs_feeder.value]){
+  showMsg("Feeder not found in shutdown");return;
+ }
+
+ const sd=new Date(LAST_SHUTDOWN_TIME[rs_feeder.value]);
+ const rt=new Date(rs_time.value);
+ if(rt<=sd){
+  showMsg("Resume time must be greater than Shutdown time");return;
+ }
+
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"resume",
+  feeder:rs_feeder.value,
+  ResumeTime:rs_time.value.replace("T"," "),
+  ResumeEntryBy:CURRENT_USER.n,
+  TotalProdLoss:rs_loss.value,
+  DGDeployed:rs_dg.value,
+  Remarks:rs_rem.value
+ }),{mode:"no-cors"});
+
+ showMsg("Resume Submitted");
+ backToMain();
+}
+
 function submitShutdown(){
  if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
   showMsg("All Shutdown fields required");return;
@@ -236,26 +267,8 @@ function submitShutdown(){
   ShutdownEntryBy:CURRENT_USER.n,
   Installation:CURRENT_USER.i
  }),{mode:"no-cors"});
- showMsg("Shutdown Submitted"); backToMain();
-}
-
-function submitResume(){
- if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
-  showMsg("All Resume fields required");return;
- }
- const sd=new Date(LAST_SHUTDOWN_TIME[rs_feeder.value]);
- const rt=new Date(rs_time.value);
- if(rt<=sd){showMsg("Resume time must be greater than Shutdown time");return;}
- fetch(WEBAPP_URL+"?"+new URLSearchParams({
-  action:"resume",
-  feeder:rs_feeder.value,
-  ResumeTime:rs_time.value.replace("T"," "),
-  ResumeEntryBy:CURRENT_USER.n,
-  TotalProdLoss:rs_loss.value,
-  DGDeployed:rs_dg.value,
-  Remarks:rs_rem.value
- }),{mode:"no-cors"});
- showMsg("Resume Submitted"); backToMain();
+ showMsg("Shutdown Submitted");
+ backToMain();
 }
 
 function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
