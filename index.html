@@ -1,17 +1,3 @@
-<div id="userInfo" style="
-  background:#ffffff;
-  border-radius:16px;
-  padding:14px 18px;
-  margin-bottom:16px;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
-  text-align:center;">
-  
-  <div style="font-size:16px;font-weight:700;color:#1f3a5f" id="ui_name"></div>
-  <div style="margin-top:4px;font-size:13px;font-weight:600;color:#6b7280">
-    Installation :
-    <span style="color:#1f3a5f;font-weight:700" id="ui_inst"></span>
-  </div>
-</div>
 <!DOCTYPE html>
 <html>
 <head>
@@ -107,6 +93,27 @@ button{
 
 <div class="card hidden" id="mainBox">
 <h2>ACTIVE SHUTDOWN FEEDERS</h2>
+
+<!-- ✅ USER INFO CARD -->
+<div id="userInfo" style="
+  background:#ffffff;
+  border-radius:16px;
+  padding:14px 18px;
+  margin-bottom:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  text-align:center;">
+  
+  <div style="font-size:16px;font-weight:700;color:#1f3a5f" id="ui_name"></div>
+  <div style="margin-top:4px;font-size:13px;font-weight:600;color:#6b7280">
+    Installation :
+    <span style="color:#1f3a5f;font-weight:700" id="ui_inst"></span>
+  </div>
+</div>
+
+<div id="activeShutdowns">Loading...</div>
+<button type="button" class="btn-shutdown" onclick="openShutdown()">Shutdown</button>
+<button type="button" class="btn-resume" onclick="openResume()">Resume</button>
+</div>
 <div id="activeShutdowns">Loading...</div>
 <button type="button" class="btn-shutdown" onclick="openShutdown()">Shutdown</button>
 <button type="button" class="btn-resume" onclick="openResume()">Resume</button>
@@ -211,6 +218,25 @@ function populateFeeders(){
 
   sd_feeder.innerHTML="";
   rs_feeder.innerHTML="";
+
+function openShutdown(){
+  mainBox.classList.add("hidden");
+  resumeBox.classList.add("hidden");
+  shutdownBox.classList.remove("hidden");
+}
+
+function openResume(){
+  mainBox.classList.add("hidden");
+  shutdownBox.classList.add("hidden");
+  resumeBox.classList.remove("hidden");
+}
+
+function backToMain(){
+  shutdownBox.classList.add("hidden");
+  resumeBox.classList.add("hidden");
+  mainBox.classList.remove("hidden");
+  loadActiveShutdowns();
+}
 
   // 🔓 ALL USERS CAN SHUTDOWN / RESUME ALL FEEDERS
   FEEDERS["SURFACE TEAM AREA-IV"].forEach(f=>{
