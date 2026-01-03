@@ -1,3 +1,17 @@
+<div id="userInfo" style="
+  background:#ffffff;
+  border-radius:16px;
+  padding:14px 18px;
+  margin-bottom:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  text-align:center;">
+  
+  <div style="font-size:16px;font-weight:700;color:#1f3a5f" id="ui_name"></div>
+  <div style="margin-top:4px;font-size:13px;font-weight:600;color:#6b7280">
+    Installation :
+    <span style="color:#1f3a5f;font-weight:700" id="ui_inst"></span>
+  </div>
+</div>
 <!DOCTYPE html>
 <html>
 <head>
@@ -179,9 +193,16 @@ let CURRENT_USER={};
 function login(){
  const user=USERS.find(x=>x.u===loginUser.value && x.p===loginPass.value);
  if(!user){showMsg("Invalid Login");return;}
+
  CURRENT_USER=user;
+
  loginBox.classList.add("hidden");
  mainBox.classList.remove("hidden");
+
+ // 🔹 SHOW USER INFO
+ ui_name.innerText = CURRENT_USER.n;
+ ui_inst.innerText = CURRENT_USER.i === "ALL" ? "ALL INSTALLATIONS" : CURRENT_USER.i;
+
  populateFeeders();
  loadActiveShutdowns();
 }
@@ -213,31 +234,47 @@ function loadActiveShutdowns(){
   let count=0;
 
   rows.forEach(r=>{
-    if(!r[idx.rs] || r[idx.rs]==="NA"){
+    const resumeVal = r[idx.rs];
+    const rowInst   = r[idx.inst];
+
+    // 🔹 INSTALLATION FILTER
+    if(CURRENT_USER.i !== "ALL" && rowInst !== CURRENT_USER.i) return;
+
+    // 🔹 ACTIVE SHUTDOWN ONLY
+    if(!resumeVal || resumeVal==="NA"){
       count++;
       activeShutdowns.innerHTML+=`
       <div class="shutdown-item">
-        <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[idx.feeder]||"-"}</span></div>
-        <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${r[idx.type]||"-"}</span></div>
-        <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${r[idx.sd]||"-"}</span></div>
-        <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[idx.inst]||"-"}</span></div>
+        <div class="shutdown-row">
+          <span class="shutdown-label">FEEDER</span>
+          <span class="shutdown-value">${r[idx.feeder]||"-"}</span>
+        </div>
+        <div class="shutdown-row">
+          <span class="shutdown-label">TYPE</span>
+          <span class="shutdown-value">${r[idx.type]||"-"}</span>
+        </div>
+        <div class="shutdown-row">
+          <span class="shutdown-label">TIME</span>
+          <span class="shutdown-value">${r[idx.sd]||"-"}</span>
+        </div>
+        <div class="shutdown-row">
+          <span class="shutdown-label">INSTALLATION</span>
+          <span class="install-badge">${rowInst||"-"}</span>
+        </div>
       </div>`;
     }
   });
 
   if(count===0){
-    activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;font-weight:700;color:#27ae60">✅ All FEEDERS ARE HEALTHY</div>`;
+    activeShutdowns.innerHTML=`
+      <div class="shutdown-item" style="
+        text-align:center;
+        font-weight:700;
+        color:#27ae60">
+        ✅ NO ACTIVE SHUTDOWN FOR YOUR INSTALLATION
+      </div>`;
   }
  });
-}
-
-function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
-function openResume(){mainBox.classList.add("hidden");resumeBox.classList.remove("hidden")}
-function backToMain(){
- shutdownBox.classList.add("hidden");
- resumeBox.classList.add("hidden");
- mainBox.classList.remove("hidden");
- loadActiveShutdowns();
 }
 
 function submitShutdown(){
