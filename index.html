@@ -204,7 +204,23 @@ function login(){
  CURRENT_USER=user;
 
  loginBox.classList.add("hidden");
+ shutdownBox.classList.add("hidden");
+ resumeBox.classList.add("hidden");
  mainBox.classList.remove("hidden");
+
+ ui_name.innerText = CURRENT_USER.n;
+ ui_inst.innerText = CURRENT_USER.i;
+
+ populateFeeders();
+ loadActiveShutdowns();
+}
+
+window.onload = function(){
+  loginBox.classList.remove("hidden");
+  mainBox.classList.add("hidden");
+  shutdownBox.classList.add("hidden");
+  resumeBox.classList.add("hidden");
+};
 
  // 🔹 SHOW USER INFO
  ui_name.innerText = CURRENT_USER.n;
