@@ -194,6 +194,7 @@ function populateFeeders(){
  });
 }
 
+<script>
 function loadActiveShutdowns(){
  fetch(CSV_URL+"&t="+Date.now())
  .then(r=>r.text())
@@ -213,33 +214,50 @@ function loadActiveShutdowns(){
   let count=0;
 
   rows.forEach(r=>{
-    if(!r[idx.rs] || r[idx.rs]==="NA"){
-      count++;
-      activeShutdowns.innerHTML+=`
-      <div class="shutdown-item">
-        <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[idx.feeder]||"-"}</span></div>
-        <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${r[idx.type]||"-"}</span></div>
-        <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${r[idx.sd]||"-"}</span></div>
-        <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[idx.inst]||"-"}</span></div>
-      </div>`;
+    const resumeVal = (r[idx.rs] || "").trim();
+    const instVal   = (r[idx.inst] || "").trim();
+
+    /* ===== ACTIVE SHUTDOWN ONLY ===== */
+    if(resumeVal==="" || resumeVal==="NA"){
+
+      /* ===== ADMIN OR INSTALLATION MATCH ===== */
+      if(
+        CURRENT_USER.admin === true ||
+        instVal === CURRENT_USER.i
+      ){
+        count++;
+        activeShutdowns.innerHTML+=`
+        <div class="shutdown-item">
+          <div class="shutdown-row">
+            <span class="shutdown-label">FEEDER</span>
+            <span class="shutdown-value">${r[idx.feeder]||"-"}</span>
+          </div>
+          <div class="shutdown-row">
+            <span class="shutdown-label">TYPE</span>
+            <span class="shutdown-value">${r[idx.type]||"-"}</span>
+          </div>
+          <div class="shutdown-row">
+            <span class="shutdown-label">TIME</span>
+            <span class="shutdown-value">${r[idx.sd]||"-"}</span>
+          </div>
+          <div class="shutdown-row">
+            <span class="shutdown-label">INSTALLATION</span>
+            <span class="install-badge">${instVal||"-"}</span>
+          </div>
+        </div>`;
+      }
     }
   });
 
   if(count===0){
-    activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;font-weight:700;color:#27ae60">✅ All FEEDERS ARE HEALTHY</div>`;
+    activeShutdowns.innerHTML=
+      `<div class="shutdown-item" style="text-align:center;font-weight:700;color:#27ae60">
+        ✅ NO ACTIVE SHUTDOWN
+      </div>`;
   }
  });
 }
-
-function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
-function openResume(){mainBox.classList.add("hidden");resumeBox.classList.remove("hidden")}
-function backToMain(){
- shutdownBox.classList.add("hidden");
- resumeBox.classList.add("hidden");
- mainBox.classList.remove("hidden");
- loadActiveShutdowns();
-}
-
+</script>
 function submitShutdown(){
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"shutdown",
