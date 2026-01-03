@@ -252,8 +252,12 @@ function loadActiveShutdowns(){
   if(count===0){
     activeShutdowns.innerHTML=
       `<div class="shutdown-item" style="text-align:center;font-weight:700;color:#27ae60">
-        ✅ NO ACTIVE
-
+        ✅ NO ACTIVE SHUTDOWN FOR YOUR INSTALLATION
+      </div>`;
+  }
+ });
+}
+</script>
 function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
 function openResume(){mainBox.classList.add("hidden");resumeBox.classList.remove("hidden")}
 function backToMain(){
