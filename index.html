@@ -194,7 +194,6 @@ function populateFeeders(){
  });
 }
 
-<script>
 function loadActiveShutdowns(){
  fetch(CSV_URL+"&t="+Date.now())
  .then(r=>r.text())
@@ -257,7 +256,7 @@ function loadActiveShutdowns(){
   }
  });
 }
-</script>
+
 function submitShutdown(){
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"shutdown",
