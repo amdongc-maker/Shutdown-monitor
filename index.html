@@ -209,71 +209,34 @@ function populateFeeders(){
 }
 
 function loadActiveShutdowns(){
-  LAST_SHUTDOWN_TIME = {};
-  activeShutdowns.innerHTML = "Loading...";
-
-  fetch(CSV_URL + "&t=" + Date.now())
-    .then(r => r.text())
-    .then(t => {
-
-      const rows = t.split("\n").map(r => r.split(","));
-      const h = rows.shift().map(x => x.toUpperCase());
-
-      const i = {
-        feeder: h.findIndex(x => x.includes("FEEDER")),
-        sd:     h.findIndex(x => x.includes("SHUTDOWN")),
-        rs:     h.findIndex(x => x.includes("RESUME")),
-        inst:   h.findIndex(x => x.includes("INSTALL")),
-        type:   h.findIndex(x => x.includes("TYPE"))
-      };
-
-      activeShutdowns.innerHTML = "";
-      let c = 0;
-
-      rows.forEach(r => {
-
-        if (!r[i.feeder]) return;
-
-        // 🔴 ACTIVE SHUTDOWN ONLY
-        if (!r[i.rs] || r[i.rs] === "NA") {
-
-          // 🔐 INSTALLATION FILTER
-          if (!CURRENT_USER.admin && r[i.inst] !== CURRENT_USER.i) return;
-
-          // store shutdown time for resume validation
-          LAST_SHUTDOWN_TIME[r[i.feeder]] = r[i.sd];
-
-          c++;
-
-          activeShutdowns.innerHTML += `
-            <div class="shutdown-item">
-              <div class="shutdown-row">
-                <span class="shutdown-label">FEEDER</span>
-                <span class="shutdown-value">${r[i.feeder]}</span>
-              </div>
-              <div class="shutdown-row">
-                <span class="shutdown-label">TYPE</span>
-                <span class="shutdown-value">${r[i.type]}</span>
-              </div>
-              <div class="shutdown-row">
-                <span class="shutdown-label">TIME</span>
-                <span class="shutdown-value">${r[i.sd]}</span>
-              </div>
-              <div class="shutdown-row">
-                <span class="shutdown-label">INSTALLATION</span>
-                <span class="install-badge">${r[i.inst]}</span>
-              </div>
-            </div>`;
-        }
-      });
-
-      if (c === 0) {
-        activeShutdowns.innerHTML = `
-          <div class="shutdown-item" style="text-align:center;color:#27ae60;font-weight:700">
-            ✅ All Feeders Are Healthy
-          </div>`;
-      }
-    });
+ LAST_SHUTDOWN_TIME={};
+ fetch(CSV_URL+"&t="+Date.now()).then(r=>r.text()).then(t=>{
+  const rows=t.split("\n").map(r=>r.split(","));
+  const h=rows.shift().map(x=>x.toUpperCase());
+  const i={
+   feeder:h.findIndex(x=>x.includes("FEEDER")),
+   sd:h.findIndex(x=>x.includes("SHUTDOWN")),
+   rs:h.findIndex(x=>x.includes("RESUME")),
+   inst:h.findIndex(x=>x.includes("INSTALL")),
+   type:h.findIndex(x=>x.includes("TYPE"))
+  };
+  activeShutdowns.innerHTML=""; let c=0;
+  rows.forEach(r=>{
+   if(!r[i.rs]||r[i.rs]==="NA"){
+    if(!CURRENT_USER.admin && r[i.inst]!==CURRENT_USER.i) return;
+    LAST_SHUTDOWN_TIME[r[i.feeder]]=r[i.sd];
+    c++;
+    activeShutdowns.innerHTML+=`
+    <div class="shutdown-item">
+     <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[i.feeder]}</span></div>
+     <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${r[i.type]}</span></div>
+     <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${r[i.sd]}</span></div>
+     <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[i.inst]}</span></div>
+    </div>`;
+   }
+  });
+  if(!c) activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;color:#27ae60;font-weight:700">✅ All FEEDERS ARE HEALTHY</div>`;
+ });
 }
 
 function submitResume(){
