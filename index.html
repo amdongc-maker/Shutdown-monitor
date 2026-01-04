@@ -223,9 +223,12 @@ function loadActiveShutdowns(){
   activeShutdowns.innerHTML=""; let c=0;
   rows.forEach(r=>{
    if(!r[i.rs]||r[i.rs]==="NA"){
-    if(!CURRENT_USER.admin && r[i.inst]!==CURRENT_USER.i) return;
-    LAST_SHUTDOWN_TIME[r[i.feeder]]=r[i.sd];
-    c++;
+    // ❌ REMOVE THIS LINE COMPLETELY
+// if(!CURRENT_USER.admin && r[i.inst]!==CURRENT_USER.i) return;
+    if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
+  showMsg("Feeder already in shutdown");
+  return;
+}
     activeShutdowns.innerHTML+=`
     <div class="shutdown-item">
      <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[i.feeder]}</span></div>
@@ -274,7 +277,7 @@ function submitShutdown(){
   return;
  }
 
- /* ✅ NEW CHECK */
+ // 🚫 Prevent duplicate shutdown
  if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
   showMsg("Feeder already in shutdown");
   return;
@@ -286,8 +289,8 @@ function submitShutdown(){
   ShutdownTime:sd_time.value.replace("T"," "),
   ShutdownType:sd_type.value,
   Information:sd_info.value,
-  ShutdownEntryBy:USER_WITH_INSTALL,
-  Installation:CURRENT_USER.i
+  ShutdownEntryBy: CURRENT_USER.n,
+  Installation: CURRENT_USER.i
  }),{mode:"no-cors"});
 
  showMsg("Shutdown Submitted");
