@@ -129,8 +129,8 @@ button{
 <h3>Resume Entry</h3>
 <select id="rs_feeder"></select>
 <input type="datetime-local" id="rs_time">
-<input id="rs_loss" placeholder="Production Loss">
-<input id="rs_dg" placeholder="DG Deployed">
+<input id="rs_loss" type="number" placeholder="Production Loss" inputmode="numeric" min="0">
+<input id="rs_dg" type="number" placeholder="DG Deployed" inputmode="numeric" min="0">
 <textarea id="rs_rem" placeholder="Remarks"></textarea>
 <button class="btn-resume" onclick="submitResume()">Submit</button>
 <button class="btn-back" onclick="backToMain()">Back</button>
