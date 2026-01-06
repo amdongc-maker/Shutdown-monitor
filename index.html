@@ -219,8 +219,7 @@ userInfo.classList.remove("hidden");
  shutdownBox.classList.add("hidden");
  resumeBox.classList.add("hidden");
  mainBox.classList.remove("hidden");
- document.getElementById("resumeShareBtn").classList.add("hidden");
- populateFeeders();
+  populateFeeders();
  loadActiveShutdowns();
 }
 
@@ -383,7 +382,13 @@ function submitShutdown(){
 }
 
 function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden")}
-function openResume(){mainBox.classList.add("hidden");resumeBox.classList.remove("hidden")}
+function openResume(){
+ mainBox.classList.add("hidden");
+ resumeBox.classList.remove("hidden");
+
+ // hide initially, will show only after submit
+ document.getElementById("resumeShareBtn").classList.add("hidden");
+}
 function backToMain(){
  shutdownBox.classList.add("hidden");
  resumeBox.classList.add("hidden");
