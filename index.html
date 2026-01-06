@@ -246,6 +246,12 @@ function loadActiveShutdowns(){
  <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${r[i.type]}</span></div>
  <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${r[i.sd]}</span></div>
  <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[i.inst]}</span></div>
+ </div>`;
+   }
+  });
+  if(!c) activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;color:#27ae60;font-weight:700">✅ All FEEDERS ARE HEALTHY</div>`;
+ });
+}
 
  <button style="
    margin-top:10px;
@@ -266,7 +272,6 @@ function loadActiveShutdowns(){
  )">
  📲 Share on WhatsApp
  </button>
-</div>`;
 
 function submitResume(){
  if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
