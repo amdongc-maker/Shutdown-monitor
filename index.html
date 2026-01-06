@@ -241,17 +241,32 @@ function loadActiveShutdowns(){
     LAST_SHUTDOWN_TIME[r[i.feeder]]=r[i.sd];
     c++;
     activeShutdowns.innerHTML+=`
-    <div class="shutdown-item">
-     <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[i.feeder]}</span></div>
-     <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${r[i.type]}</span></div>
-     <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${r[i.sd]}</span></div>
-     <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[i.inst]}</span></div>
-    </div>`;
-   }
-  });
-  if(!c) activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;color:#27ae60;font-weight:700">✅ All FEEDERS ARE HEALTHY</div>`;
- });
-}
+<div class="shutdown-item">
+ <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${r[i.feeder]}</span></div>
+ <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${r[i.type]}</span></div>
+ <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${r[i.sd]}</span></div>
+ <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${r[i.inst]}</span></div>
+
+ <button style="
+   margin-top:10px;
+   width:100%;
+   background:#25D366;
+   color:#fff;
+   border:none;
+   padding:10px;
+   border-radius:10px;
+   font-weight:700;
+   cursor:pointer;
+ "
+ onclick="shareWhatsApp(
+   '${r[i.feeder]}',
+   '${r[i.type]}',
+   '${r[i.sd]}',
+   '${r[i.inst]}'
+ )">
+ 📲 Share on WhatsApp
+ </button>
+</div>`;
 
 function submitResume(){
  if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
@@ -318,7 +333,18 @@ function backToMain(){
 }
 function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000)}
 setInterval(loadActiveShutdowns,30000);
+function shareWhatsApp(feeder, type, time, inst){
+ const msg =
+  "⚡ *POWER SHUTDOWN ALERT* ⚡\n\n" +
+  "🔌 *Feeder:* " + feeder + "\n" +
+  "📝 *Type:* " + type + "\n" +
+  "⏰ *Shutdown Time:* " + time + "\n" +
+  "🏭 *Installation:* " + inst + "\n\n" +
+  "— Area-IV Power Shutdown App";
+
+ const url = "https://wa.me/?text=" + encodeURIComponent(msg);
+ window.open(url, "_blank");
+}
 </script>
 </body>
 </html>
-
