@@ -147,6 +147,11 @@ button{
 <input id="rs_dg" type="number" placeholder="DG Deployed" inputmode="numeric" min="0">
 <textarea id="rs_rem" placeholder="Actual Reason"></textarea>
 <button class="btn-resume" onclick="submitResume()">Submit</button>
+<button id="resumeShareBtn"
+  class="btn-resume hidden"
+  onclick="shareResumeWhatsApp()">
+  📲 Share Resume on WhatsApp
+</button>
 <button class="btn-back" onclick="backToMain()">Back</button>
 </div>
 
@@ -200,6 +205,7 @@ const FEEDERS={
 };
 
 let CURRENT_USER={}, LAST_SHUTDOWN_TIME={};
+let LAST_RESUME_DATA = null;
 
 function login(){
  const u=USERS.find(x=>x.u===loginUser.value && x.p===loginPass.value);
@@ -210,6 +216,10 @@ ui_inst.innerText = "Installation : " + CURRENT_USER.i;
 userInfo.classList.remove("hidden");
  loginBox.classList.add("hidden");
  mainBox.classList.remove("hidden");
+ shutdownBox.classList.add("hidden");
+ resumeBox.classList.add("hidden");
+ mainBox.classList.remove("hidden");
+ document.getElementById("resumeShareBtn").classList.add("hidden");
  populateFeeders();
  loadActiveShutdowns();
 }
@@ -302,31 +312,48 @@ function loadActiveShutdowns(){
 
 function submitResume(){
  if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
-  showMsg("All Resume fields required");return;
+  showMsg("All Resume fields required");
+  return;
  }
 
  if(!LAST_SHUTDOWN_TIME[rs_feeder.value]){
-  showMsg("Feeder not found in shutdown");return;
+  showMsg("Feeder not found in shutdown");
+  return;
  }
 
- const sd=new Date(LAST_SHUTDOWN_TIME[rs_feeder.value]);
- const rt=new Date(rs_time.value);
- if(rt<=sd){
-  showMsg("Resume time must be greater than Shutdown time");return;
+ const sd = new Date(LAST_SHUTDOWN_TIME[rs_feeder.value]);
+ const rt = new Date(rs_time.value);
+
+ if(rt <= sd){
+  showMsg("Resume time must be greater than Shutdown time");
+  return;
  }
 
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"resume",
-  feeder:rs_feeder.value,
-  ResumeTime:rs_time.value.replace("T"," "),
-  ResumeEntryBy:CURRENT_USER.n,
-  TotalProdLoss:rs_loss.value,
-  DGDeployed:rs_dg.value,
-  Remarks:rs_rem.value
- }),{mode:"no-cors"});
+  feeder: rs_feeder.value,
+  ResumeTime: rs_time.value.replace("T"," "),
+  ResumeEntryBy: CURRENT_USER.n,
+  TotalProdLoss: rs_loss.value,
+  DGDeployed: rs_dg.value,
+  Remarks: rs_rem.value
+ }), { mode:"no-cors" });
+
+ // ✅ STORE LAST RESUME DATA
+ LAST_RESUME_DATA = {
+  feeder: rs_feeder.value,
+  resumeTime: rs_time.value.replace("T"," "),
+  loss: rs_loss.value,
+  dg: rs_dg.value,
+  reason: rs_rem.value,
+  user: CURRENT_USER.n,
+  inst: CURRENT_USER.i
+ };
+
+ // ✅ SHOW WHATSAPP BUTTON
+ document.getElementById("resumeShareBtn").classList.remove("hidden");
 
  showMsg("Resume Submitted");
- backToMain();
 }
 
 function submitShutdown(){
@@ -376,6 +403,30 @@ function shareWhatsApp(feeder, type, time, inst){
 
  const url = "https://wa.me/?text=" + encodeURIComponent(msg);
  window.open(url, "_blank");
+}
+function shareResumeWhatsApp(){
+ if(!LAST_RESUME_DATA){
+  showMsg("No Resume Data Found");
+  return;
+ }
+
+ const d = LAST_RESUME_DATA;
+
+ const msg =
+  "✅ *POWER RESUME UPDATE* ✅\n\n" +
+  "🔌 *Feeder:* " + d.feeder + "\n" +
+  "⏰ *Resume Time:* " + d.resumeTime + "\n" +
+  "📉 *Production Loss:* " + d.loss + "\n" +
+  "⚙️ *DG Deployed:* " + d.dg + "\n" +
+  "📝 *Reason:* " + d.reason + "\n" +
+  "👤 *Updated By:* " + d.user + "\n" +
+  "🏭 *Installation:* " + d.inst + "\n\n" +
+  "— Area-IV Power Shutdown App";
+
+ window.open(
+  "https://wa.me/?text=" + encodeURIComponent(msg),
+  "_blank"
+ );
 }
 </script>
 </body>
