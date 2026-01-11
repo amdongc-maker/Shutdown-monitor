@@ -251,46 +251,37 @@ function loadActiveShutdowns(){
       let count = 0;
 
       rows.forEach(r => {
-  const feeder = r[i.feeder];
-  const sdTime = r[i.sd];
+        const feeder = r[i.feeder];
+        const sdTime = r[i.sd];
+        const rsTime = r[i.rs];
+        const inst   = r[i.inst];
+        const type   = r[i.type];
 
-  const rsTimeRaw = r[i.rs] || "";
-  const rsTime = rsTimeRaw.toString().trim().toUpperCase();
+        if (!rsTime || rsTime === "NA") {
+          if (!CURRENT_USER.admin && inst !== CURRENT_USER.i) return;
 
-  const inst   = r[i.inst];
-  const type   = r[i.type];
+          LAST_SHUTDOWN_TIME[feeder] = sdTime;
+          count++;
 
-  // ✅ ONLY ACTIVE IF RESUME TIME EMPTY / NA
-  if (rsTime === "" || rsTime === "NA" || rsTime === "N/A") {
+          activeShutdowns.innerHTML += `
+<div class="shutdown-item">
+  <div class="shutdown-row">
+    <span class="shutdown-label">FEEDER</span>
+    <span class="shutdown-value">${feeder}</span>
+  </div>
+  <div class="shutdown-row">
+    <span class="shutdown-label">TYPE</span>
+    <span class="shutdown-value">${type}</span>
+  </div>
+  <div class="shutdown-row">
+    <span class="shutdown-label">TIME</span>
+    <span class="shutdown-value">${sdTime}</span>
+  </div>
+  <div class="shutdown-row">
+    <span class="shutdown-label">INSTALLATION</span>
+    <span class="install-badge">${inst}</span>
+  </div>
 
-
-  // ✅ NEW FEEDER-BASED VISIBILITY LOGIC
-  if (!CURRENT_USER.admin) {
-    const userFeeders = FEEDERS[CURRENT_USER.i] || [];
-    if (!userFeeders.includes(feeder)) return;
-  }
-
-  LAST_SHUTDOWN_TIME[feeder] = sdTime;
-  count++;
-
-  activeShutdowns.innerHTML += `
-    <div class="shutdown-item">
-      <div class="shutdown-row">
-        <span class="shutdown-label">FEEDER</span>
-        <span class="shutdown-value">${feeder}</span>
-      </div>
-      <div class="shutdown-row">
-        <span class="shutdown-label">TYPE</span>
-        <span class="shutdown-value">${type}</span>
-      </div>
-      <div class="shutdown-row">
-        <span class="shutdown-label">TIME</span>
-        <span class="shutdown-value">${sdTime}</span>
-      </div>
-      <div class="shutdown-row">
-        <span class="shutdown-label">INSTALLATION</span>
-        <span class="install-badge">${inst}</span>
-      </div>
   <!-- ✅ WHATSAPP SHARE BUTTON -->
   <button style="
     margin-top:10px;
@@ -420,6 +411,22 @@ function shareWhatsApp(feeder, type, time, inst){
 }
 function shareResumeWhatsApp(){
  if(!LAST_RESUME_DATA){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   showMsg("No Resume Data Found");
   return;
  }
