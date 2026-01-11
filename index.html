@@ -251,13 +251,18 @@ function loadActiveShutdowns(){
       let count = 0;
 
       rows.forEach(r => {
-        const feeder = r[i.feeder];
-        const sdTime = r[i.sd];
-        const rsTime = r[i.rs];
-        const inst   = r[i.inst];
-        const type   = r[i.type];
+  const feeder = r[i.feeder];
+  const sdTime = r[i.sd];
 
-        if (!rsTime || rsTime === "NA") {
+  const rsTimeRaw = r[i.rs] || "";
+  const rsTime = rsTimeRaw.toString().trim().toUpperCase();
+
+  const inst   = r[i.inst];
+  const type   = r[i.type];
+
+  // ✅ ONLY ACTIVE IF RESUME TIME EMPTY / NA
+  if (rsTime === "" || rsTime === "NA" || rsTime === "N/A") {
+
 
   // ✅ NEW FEEDER-BASED VISIBILITY LOGIC
   if (!CURRENT_USER.admin) {
