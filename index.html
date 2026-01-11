@@ -207,6 +207,12 @@ const FEEDERS={
 let CURRENT_USER={}, LAST_SHUTDOWN_TIME={};
 let LAST_RESUME_DATA = null;
 
+// 🚫 Special Character Validator
+function hasSpecialChar(text){
+  // allowed: A–Z, a–z, 0–9, space, - and /
+  const regex = /^[a-zA-Z0-9 \-/]+$/;
+  return !regex.test(text);
+}
 function login(){
  const u=USERS.find(x=>x.u===loginUser.value && x.p===loginPass.value);
  if(!u){showMsg("Invalid Login");return;}
@@ -311,9 +317,16 @@ function loadActiveShutdowns(){
 
 function submitResume(){
  if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
-  showMsg("All Resume fields required");
-  return;
- }
+ showMsg("All Resume fields required");
+ return;
+}
+
+// 🚫 Special character validation
+if(hasSpecialChar(rs_rem.value)){
+ showMsg("❌ Do not use special characters");
+ return;
+}
+
 
  if(!LAST_SHUTDOWN_TIME[rs_feeder.value]){
   showMsg("Feeder not found in shutdown");
@@ -354,12 +367,23 @@ function submitResume(){
 
  showMsg("Resume Submitted");
 }
-
+function hasSpecialChar(text){
+  // allowed: letters, numbers, space, - and /
+  const regex = /^[a-zA-Z0-9 \-/]+$/;
+  return !regex.test(text);
+}
 function submitShutdown(){
  if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
-  showMsg("All Shutdown fields required");
-  return;
- }
+ showMsg("All Shutdown fields required");
+ return;
+}
+
+// 🚫 Special character validation
+if(hasSpecialChar(sd_info.value)){
+ showMsg("❌ Do not use special characters");
+ return;
+}
+
 
  // 🚫 Prevent duplicate shutdown
  if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
@@ -448,6 +472,12 @@ function shareResumeWhatsApp(){
   "_blank"
  );
 }
+// 🚫 Live blocking of special characters
+document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
+ el.addEventListener("input",()=>{
+  el.value = el.value.replace(/[^a-zA-Z0-9 \-/]/g,"");
+ });
+});
 </script>
 </body>
 </html>
