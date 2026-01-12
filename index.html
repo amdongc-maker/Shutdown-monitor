@@ -209,7 +209,7 @@ let LAST_RESUME_DATA = null;
 
 // 🚫 Special Character Validator
 function hasSpecialChar(text){
-  // allowed: A–Z, a–z, 0–9, space, - and /
+  // allowed: A–Z, a–z, 0–9, space,., - and /
   const regex = /^[a-zA-Z0-9 \-/]+$/;
   return !regex.test(text);
 }
@@ -481,3 +481,4 @@ document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
 </script>
 </body>
 </html>
+
