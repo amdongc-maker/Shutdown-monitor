@@ -3,15 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <title>PLAN SHUTDOWN ENTRY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+:root{
+  --primary:#0f3d3e;
+  --bg:#eef2f5;
+}
+*{box-sizing:border-box}
 body{
-  font-family:Segoe UI,Arial;
-  background:#eef2f5;
   margin:0;
+  font-family:Segoe UI,Arial;
+  background:var(--bg);
 }
 header{
-  background:#0f3d3e;
+  background:var(--primary);
   color:#fff;
   padding:14px;
   font-size:18px;
@@ -19,33 +25,61 @@ header{
   font-weight:600;
 }
 .container{
-  padding:20px;
-  max-width:650px;
+  padding:12px;
+  max-width:720px;
   margin:auto;
 }
 .card{
   background:#fff;
-  padding:15px;
-  border-radius:12px;
-  margin-bottom:15px;
-  box-shadow:0 3px 10px rgba(0,0,0,.1);
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
-input, select, button{
-  width:100%;
-  padding:10px;
+.card h3{
+  margin:4px 0 10px;
+}
+label{
+  font-size:13px;
+  font-weight:600;
   margin-top:10px;
+  display:block;
+}
+input,select,button{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
   font-size:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+input:read-only{
+  background:#f4f6f8;
 }
 button{
-  background:#0f3d3e;
+  background:var(--primary);
   color:#fff;
   border:none;
-  cursor:pointer;
+  font-weight:600;
+  margin-top:14px;
 }
-.red{background:#ff9999}
-.green{background:#ccffcc}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{border:1px solid #ccc;padding:6px;text-align:center}
+button:active{transform:scale(.98)}
+
+.plan-red{background:#ffe0e0}
+.plan-green{background:#e3f7e7}
+
+.plan-item{
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.plan-item b{font-size:14px}
+.small{font-size:13px;color:#444}
+
+@media(min-width:600px){
+  .row{display:flex;gap:10px}
+  .row>div{flex:1}
+}
 </style>
 </head>
 
@@ -55,79 +89,82 @@ th,td{border:1px solid #ccc;padding:6px;text-align:center}
 
 <div class="container">
 
+<!-- ENTRY CARD -->
 <div class="card">
-  <input id="date" type="date" required>
-  <input id="from" type="time" required>
-  <input id="to" type="time" required>
+  <div class="row">
+    <div>
+      <label>Date</label>
+      <input id="date" type="date">
+    </div>
+    <div>
+      <label>From</label>
+      <input id="from" type="time">
+    </div>
+    <div>
+      <label>To</label>
+      <input id="to" type="time">
+    </div>
+  </div>
 
-  <select id="feeder" required>
+  <label>Feeder</label>
+  <select id="feeder">
     <option value="">-- Select Feeder --</option>
   </select>
 
+  <label>Installation</label>
   <input id="installation" readonly>
+
+  <label>Reason</label>
   <input id="reason" placeholder="Reason for Shutdown">
+
+  <label>Entry By</label>
   <input id="entryby" readonly>
 
   <button onclick="savePlan()">SAVE PLAN</button>
 </div>
 
+<!-- PLAN LIST -->
 <div class="card">
   <h3>Plan List</h3>
-  <table id="planTable"></table>
+  <div id="planList"></div>
 </div>
 
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCiErL2ZyjdWIplAZVPxSi-g-RCxVEKY5h1ZxbZEKql7VA9HFQKhWRAsDMyXuA22Qa8Q/exec";
-let CURRENT_USER = null;
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbw7zH7vu6zoFEHryclQq4S3EeoKGn3e9nJo4kbCc3X4PIaHM1-ODoRw0PEwOUlUOgBYbg/exec";
+let CURRENT_USER=null;
 
-/* ===== FEEDERS ===== */
+/* FEEDERS */
 const FEEDERS={
- "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
-"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
-"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
-"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
-"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
-"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
-"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
- "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
- "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
- "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
- "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
- "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
- "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
- "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
- "KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4",
- "SIHUNJ FEEDER","VANSOLI FEEDER",
- "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
-]
+"LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER"],
+"GAMIJ-GGS-3":["BARMUVADA FEEDER"],
+"MOTERA-GGS":["TP-44 FEEDER"]
 };
-/* ===== ON LOAD ===== */
-window.onload = function(){
-  CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
+window.onload=()=>{
+  CURRENT_USER=JSON.parse(localStorage.getItem("CURRENT_USER"));
   if(!CURRENT_USER){
-    alert("Session expired. Please login again.");
-    window.location.href = "index.html";
+    alert("Please login again");
+    location.href="index.html";
     return;
   }
-
-  installation.value = CURRENT_USER.i;
-  entryby.value = CURRENT_USER.n;
-
+  installation.value=CURRENT_USER.i;
+  entryby.value=CURRENT_USER.n;
   loadFeeders();
   loadPlans();
 };
 
-/* ===== LOAD FEEDERS ===== */
 function loadFeeders(){
-  feeder.innerHTML = "<option value=''>-- Select Feeder --</option>";
-  (FEEDERS[CURRENT_USER.i] || []).forEach(f=>{
-    feeder.innerHTML += `<option value="${f}">${f}</option>`;
+  feeder.innerHTML="<option value=''>-- Select Feeder --</option>";
+  (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
+    feeder.innerHTML+=`<option>${f}</option>`;
   });
 }
-/* ===== SAVE PLAN ===== */
+
 function savePlan(){
 
   if(!date.value || !from.value || !to.value || !feeder.value){
@@ -136,16 +173,15 @@ function savePlan(){
   }
 
   let url = SCRIPT_URL + "?" + new URLSearchParams({
-  action:"plan",
-  feeder:feeder.value,
-  date:date.value,
-  from:from.value,
-  to:to.value,
-  installation:installation.value,
-  reason:reason.value,
-  entryby:entryby.value,
-  t: Date.now()   // 👈 cache killer
-});
+    action:"plan",
+    feeder:feeder.value,
+    date:date.value,
+    from:from.value,
+    to:to.value,
+    installation:installation.value,
+    reason:reason.value,
+    entryby:entryby.value
+  });
 
   fetch(url)
   .then(r=>r.text())
@@ -154,60 +190,29 @@ function savePlan(){
     loadPlans();
   });
 }
-
-/* ===== LOAD PLAN LIST ===== */
 function loadPlans(){
   fetch(SCRIPT_URL+"?action=getallplans")
   .then(r=>r.json())
   .then(data=>{
-
-    let html=`<tr>
-      <th>Date</th>
-      <th>From</th>
-      <th>To</th>
-      <th>Feeder</th>
-      <th>Installation</th>
-      <th>Reason</th>
-    </tr>`;
-    let today = new Date();
-    today.setHours(0,0,0,0);
+    let today=new Date();today.setHours(0,0,0,0);
+    let html="";
     data.reverse().forEach(r=>{
-      let d = new Date(r.date);
-      d.setHours(0,0,0,0);
-      let cls = (d >= today) ? "red" : "green";
-
+      let d=new Date(r.date);d.setHours(0,0,0,0);
+      let cls=d>=today?"plan-red":"plan-green";
       html+=`
-      <tr class="${cls}">
-        <td>${r.date}</td>
-        <td>${formatTime(r.from)}</td>
-        <td>${formatTime(r.to)}</td>
-        <td>${r.feeder}</td>
-        <td>${r.installation}</td>
-        <td>${r.reason || ""}</td>
-      </tr>`;
+      <div class="plan-item ${cls}">
+        <b>${r.feeder}</b><br>
+        <span class="small">
+          ${r.date} | ${r.from} - ${r.to}<br>
+          ${r.installation}<br>
+          ${r.reason||""}
+        </span>
+      </div>`;
     });
-
-    planTable.innerHTML = html;
+    planList.innerHTML=html;
   });
 }
-
-function formatTime(t){
-  if(!t) return "";
-  let d = new Date(t);
-  return d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:false});
-}
-
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
