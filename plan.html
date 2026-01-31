@@ -127,8 +127,7 @@ function loadFeeders(){
     feeder.innerHTML += `<option value="${f}">${f}</option>`;
   });
 }
-
-/* ===== SAVE PLAN ===== */
+/* ===== SAVE PLAN (POST) ===== */
 function savePlan(){
 
   if(!date.value || !from.value || !to.value || !feeder.value){
@@ -136,24 +135,27 @@ function savePlan(){
     return;
   }
 
-  let url = SCRIPT_URL + "?" + new URLSearchParams({
-    action:"plan",
-    feeder:feeder.value,
-    date:date.value,
-    from:from.value,
-    to:to.value,
-    installation:installation.value,
-    reason:reason.value,
-    entryby:entryby.value
-  });
+  let formData = new FormData();
+  formData.append("action","plan");
+  formData.append("date",date.value);
+  formData.append("from",from.value);
+  formData.append("to",to.value);
+  formData.append("feeder",feeder.value);
+  formData.append("installation",installation.value);
+  formData.append("reason",reason.value);
+  formData.append("entryby",entryby.value);
 
-  fetch(url)
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body: formData
+  })
   .then(r=>r.text())
   .then(msg=>{
-    alert(msg);
+    alert(msg);   // "Saved Successfully"
     loadPlans();
   });
 }
+
 
 /* ===== LOAD PLAN LIST ===== */
 function loadPlans(){
@@ -202,6 +204,7 @@ function loadPlans(){
 
 </body>
 </html>
+
 
 
 
