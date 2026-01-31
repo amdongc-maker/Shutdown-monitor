@@ -75,6 +75,7 @@ th,td{border:1px solid #ccc;padding:6px;text-align:center}
 </div>
 
 <script>
+  let CURRENT_USER = null;
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd0xvIH4jYe1CElD7BVFSNJzsfyu0IktPQx16AVPCYn5OKG9z8M11bGAQ_VR5KGav4WQ/exec";
 
 /* ==== USERS ==== */
@@ -120,48 +121,26 @@ const FEEDERS={
  "SIHUNJ FEEDER","VANSOLI FEEDER",
  "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
 ]
-};
-/* ==== SIMULATED LOGIN ==== */
-let CURRENT_USER = null;
+window.onload = function(){
+  CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
-function doLogin(){
-  let u = uid.value.trim();
-  let p = pwd.value.trim();
-
-  let user = USERS.find(x => x.u === u && x.p === p);
-
-  if(!user){
-    alert("Invalid User ID or Password");
+  if(!CURRENT_USER){
+    alert("Please login first");
+    window.location.href="index.html";
     return;
   }
 
-  CURRENT_USER = user;   // 👈 REAL SETTING
-
-  // UI control
-  loginCard.style.display = "none";
-  mainCard.style.display  = "block";
-
-  // Auto fill
   installation.value = CURRENT_USER.i;
-  entryby.value      = CURRENT_USER.n;
+  entryby.value = CURRENT_USER.n;
 
   loadFeeders();
   loadPlans();
-}
-
-// auto fill
-installation.value = CURRENT_USER.i;
-entryby.value = CURRENT_USER.n;
-
-// populate feeder
-loadFeeders();
-
-// load table
-loadPlans();
+};
 
 function loadFeeders(){
   feeder.innerHTML = "<option value=''>-- Select Feeder --</option>";
-  (FEEDERS[CURRENT_USER.i] || []).forEach(f=>{
+  let list = FEEDERS[CURRENT_USER.i] || [];
+  list.forEach(f=>{
     feeder.innerHTML += `<option value="${f}">${f}</option>`;
   });
 }
@@ -230,3 +209,4 @@ function formatTime(t){
 
 </body>
 </html>
+
