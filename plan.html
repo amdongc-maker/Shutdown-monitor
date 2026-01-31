@@ -75,6 +75,13 @@ th,td{border:1px solid #ccc;padding:6px;text-align:center}
 </div>
 
 <script>
+  let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
+
+if(!CURRENT_USER){
+  alert("Session expired. Please login again.");
+  window.location.href = "index.html";
+}
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxP1iLv7THt6Lb9S_NGW1mJ4_UqjkShErqYMnrQVxGtYI8i80BtGaKpM2DN8DrY7i-2Zg/exec";
 
 /* ==== USERS ==== */
@@ -143,15 +150,10 @@ function doLogin(){
 
   // Auto fill
   installation.value = CURRENT_USER.i;
-  entryby.value      = CURRENT_USER.n;
-
-  loadFeeders();
-  loadPlans();
-}
-
-// auto fill
-installation.value = CURRENT_USER.i;
 entryby.value = CURRENT_USER.n;
+loadFeeders();
+loadPlans();
+
 
 // populate feeder
 loadFeeders();
