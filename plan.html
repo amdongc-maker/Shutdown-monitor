@@ -1,5 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PLAN SHUTDOWN ENTRY</title>
+
+<style>
+body{
+  font-family:Segoe UI,Arial;
+  background:#eef2f5;
+  margin:0;
+}
+header{
+  background:#0f3d3e;
+  color:#fff;
+  padding:14px;
+  font-size:18px;
+  text-align:center;
+  font-weight:600;
+}
+.container{
+  padding:20px;
+  max-width:600px;
+  margin:auto;
+}
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:15px;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+input, select, button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  font-size:15px;
+  box-sizing:border-box;
+}
+button{
+  background:#0f3d3e;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+.red{background:#ff9999}
+.green{background:#ccffcc}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px
+}
+th,td{
+  border:1px solid #ccc;
+  padding:6px;
+  text-align:center
+}
+</style>
+</head>
+
+<body>
+
+<header>PLAN SHUTDOWN ENTRY</header>
+
+<div class="container">
+
+<!-- ✅ PLAN ENTRY FORM -->
+<div class="card">
+  <input id="date" type="date">
+  <input id="from" type="time">
+  <input id="to" type="time">
+
+  <select id="feeder"></select>
+
+  <input id="installation" readonly>
+  <input id="reason" placeholder="Reason for Shutdown">
+  <input id="entryby" readonly>
+
+  <button onclick="savePlan()">SAVE PLAN</button>
+
+  <button onclick="goBack()">⬅ Back</button>
+</div>
+
+<!-- ✅ PLAN LIST TABLE -->
+<div class="card">
+  <h3>Plan List</h3>
+  <table id="planTable"></table>
+</div>
+
+</div>
+
 <script>
-/* ✅ USER SESSION FROM INDEX.HTML */
+/* =====================================================
+   ✅ GET USER SESSION FROM INDEX.HTML
+===================================================== */
 let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
 if (!CURRENT_USER) {
@@ -7,49 +100,93 @@ if (!CURRENT_USER) {
   window.location.href = "index.html";
 }
 
-/* ✅ SCRIPT URL */
+/* =====================================================
+   ✅ GOOGLE APPS SCRIPT URL
+===================================================== */
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbw-yiypiQPY_Bj8EQSlygCZxZwhGPCzbcgxd5WxFYvIQdGIGhrqIqYlCucYqHglDuv6Tg/exec";
+  "https://script.google.com/macros/s/AKfycbxP1iLv7THt6Lb9S_NGW1mJ4_UqjkShErqYMnrQVxGtYI8i80BtGaKpM2DN8DrY7i-2Zg/exec";
 
-/* ✅ FEEDERS LIST */
+/* =====================================================
+   ✅ FEEDERS LIST
+===================================================== */
 const FEEDERS = {
-  "LIMBODARA-GGS-1": ["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
-  "LIMBODARA-GGS-2": ["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER"],
-  "GAMIJ-GGS-1": ["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1"],
-  "GAMIJ-GGS-2": ["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2"],
-  "GAMIJ-GGS-3": ["BARMUVADA FEEDER","GINJAR FEEDER"],
-  "MOTERA-GGS": ["TP-44 FEEDER","ZUNDAL AG FEEDER"],
-  "ALL": []
+  "LIMBODARA-GGS-1":[
+    "AKASH CERAMIC FEEDER",
+    "ITLA ONGC FEEDER-LG1",
+    "MANSA CITY FEEDER",
+    "MANSA CIVIL FEEDER"
+  ],
+  "LIMBODARA-GGS-2":[
+    "ITLA ONGC FEEDER-LG2",
+    "KIRTIDHAM FEEDER",
+    "LISA FEEDER",
+    "MAHAKALI FEEDER"
+  ],
+  "GAMIJ-GGS-1":[
+    "BAHIYAL ONGC FEEDER",
+    "RAM FEEDER-GAMIJ-1",
+    "SOMNATH JGY FEEDER"
+  ],
+  "GAMIJ-GGS-2":[
+    "BADARPUR FEEDER",
+    "CHAULAJ FEEDER-GAMIJ-2",
+    "GADWEL FEEDER"
+  ],
+  "GAMIJ-GGS-3":[
+    "BARMUVADA FEEDER",
+    "GINJAR FEEDER",
+    "HALDARWAS FEEDER-GAMIJ-3"
+  ],
+  "MOTERA-GGS":[
+    "TP-44 FEEDER",
+    "ZUNDAL AG FEEDER"
+  ],
+  "ALL":[]
 };
 
-/* ✅ AUTO LOAD ON PAGE OPEN */
+/* =====================================================
+   ✅ AUTO LOAD WHEN PAGE OPENS
+===================================================== */
 window.onload = function () {
 
   // ✅ Auto Fill Installation & EntryBy
   installation.value = CURRENT_USER.i;
   entryby.value = CURRENT_USER.n;
 
-  // ✅ Auto Load Feeder Dropdown
+  // ✅ Populate Feeders Dropdown
   loadFeeders();
 
   // ✅ Load Existing Plans Table
   loadPlans();
 };
 
-/* ✅ POPULATE FEEDERS */
+/* =====================================================
+   ✅ LOAD FEEDERS BASED ON INSTALLATION
+===================================================== */
 function loadFeeders() {
-  feeder.innerHTML = "<option value=''>-- Select Feeder --</option>";
 
-  (FEEDERS[CURRENT_USER.i] || []).forEach(f => {
+  feeder.innerHTML =
+    "<option value=''>-- Select Feeder --</option>";
+
+  let list = FEEDERS[CURRENT_USER.i];
+
+  if (!list) {
+    alert("No feeder list found for installation: " + CURRENT_USER.i);
+    return;
+  }
+
+  list.forEach(f => {
     feeder.innerHTML += `<option value="${f}">${f}</option>`;
   });
 }
 
-/* ✅ SAVE PLAN ENTRY */
+/* =====================================================
+   ✅ SAVE PLAN ENTRY
+===================================================== */
 function savePlan() {
 
   if (!date.value || !from.value || !to.value || !feeder.value) {
-    alert("All fields required");
+    alert("❌ Please fill all required fields");
     return;
   }
 
@@ -63,52 +200,65 @@ function savePlan() {
     reason: reason.value,
     entryby: entryby.value
   }))
-    .then(r => r.text())
-    .then(msg => {
-      alert("✅ Plan Saved Successfully");
-      loadPlans();
-    });
+  .then(r => r.text())
+  .then(msg => {
+    alert("✅ Plan Saved Successfully");
+    reason.value = "";
+    loadPlans();
+  });
 }
 
-/* ✅ LOAD PLAN LIST TABLE */
+/* =====================================================
+   ✅ LOAD PLAN LIST TABLE
+===================================================== */
 function loadPlans() {
 
   fetch(SCRIPT_URL + "?action=getallplans")
-    .then(r => r.json())
-    .then(data => {
+  .then(r => r.json())
+  .then(data => {
 
-      let html = `
-        <tr>
-          <th>Date</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Feeder</th>
-          <th>Installation</th>
-          <th>Reason</th>
+    let html = `
+      <tr>
+        <th>Date</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Feeder</th>
+        <th>Installation</th>
+        <th>Reason</th>
+      </tr>`;
+
+    let today = new Date();
+    today.setHours(0,0,0,0);
+
+    data.reverse().forEach(r => {
+
+      let d = new Date(r.date);
+      d.setHours(0,0,0,0);
+
+      let cls = (d >= today) ? "red" : "green";
+
+      html += `
+        <tr class="${cls}">
+          <td>${r.date}</td>
+           <td>${formatTime(r.from)}</td>
+           <td>${formatTime(r.to)}</td>
+          <td>${r.feeder}</td>
+          <td>${r.installation}</td>
+          <td>${r.reason || ""}</td>
         </tr>`;
-
-      let today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      data.reverse().forEach(r => {
-
-        let d = new Date(r.date);
-        d.setHours(0, 0, 0, 0);
-
-        let cls = (d >= today) ? "red" : "green";
-
-        html += `
-          <tr class="${cls}">
-            <td>${r.date}</td>
-            <td>${r.from}</td>
-            <td>${r.to}</td>
-            <td>${r.feeder}</td>
-            <td>${r.installation}</td>
-            <td>${r.reason || ""}</td>
-          </tr>`;
-      });
-
-      planTable.innerHTML = html;
     });
+
+    planTable.innerHTML = html;
+  });
+}
+
+/* =====================================================
+   ✅ BACK BUTTON
+===================================================== */
+function goBack(){
+  window.location.href = "index.html";
 }
 </script>
+
+</body>
+</html>
