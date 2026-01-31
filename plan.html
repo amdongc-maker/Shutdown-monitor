@@ -64,7 +64,7 @@ th,td{
 <div class="container">
 
 <!-- PLAN ENTRY -->
-<div class="card" id="mainCard">
+<div class="card">
   <h3>Plan Entry</h3>
 
   <input id="date" type="date">
@@ -81,7 +81,7 @@ th,td{
 </div>
 
 <!-- PLAN LIST -->
-<div class="card" id="listCard">
+<div class="card">
   <h3>Plan List (All Users)</h3>
   <table id="planTable"></table>
 </div>
@@ -92,15 +92,7 @@ th,td{
 /* ================= CONFIG ================= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsfZT47Guev38UbIF72d0GVFuMMSyILfskVtQcDuTA78y2_oZWKvC6RO_xbVSknO1wsg/exec";
 
-/* ================= USER DATA (FROM index.html LOGIN) ================= */
-// index.html se ye values localStorage me set honi chahiye
-let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
-
-if(!CURRENT_USER){
-  alert("Session Expired. Please Login Again.");
-  window.location.href = "index.html"; // login page
-}
-
+/* ================= FEEDERS ================= */
 const FEEDERS={
  "LIMBODARA-GGS-1":["AKASH CERAMIC","ITLA ONGC","MANSA CITY"],
  "LIMBODARA-GGS-2":["KIRTIDHAM","LISA","MAHAKALI"],
@@ -108,6 +100,13 @@ const FEEDERS={
  "MOTERA-GGS":["PREKSHA","TP-44","ZUNDAL"],
  "ALL":["AKASH CERAMIC","ITLA ONGC","MANSA CITY","KIRTIDHAM","LISA","MAHAKALI","BAHIYAL","RAM","SOMNATH","PREKSHA","TP-44","ZUNDAL"]
 };
+
+let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
+
+if(!CURRENT_USER){
+  alert("Login Required");
+  window.location="index.html";
+}
 
 /* ================= INIT ================= */
 installation.value = CURRENT_USER.i;
@@ -166,11 +165,9 @@ function loadPlans(){
       d.setHours(0,0,0,0);
       let cls = (d>=today)?"red":"green";
 
-      let showDate = r.date.split("-").reverse().join("-");
-
       html+=`
       <tr class="${cls}">
-        <td>${showDate}</td>
+        <td>${r.date.split("-").reverse().join("-")}</td>
         <td>${r.from}</td>
         <td>${r.to}</td>
         <td>${r.feeder}</td>
