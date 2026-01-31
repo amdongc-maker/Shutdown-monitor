@@ -192,7 +192,14 @@ function loadPlans(){
     planTable.innerHTML = html;
   });
 }
+  function formatTime(t){
+  if(!t) return "";
+  let [h,m]=t.split(":");
+  return h+":"+m;
+  }
+  
 </script>
 
 </body>
 </html>
+
