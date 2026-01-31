@@ -5,106 +5,91 @@
 <title>PLAN SHUTDOWN SYSTEM</title>
 
 <style>
-:root{
-  --primary:#0f3d3e;
-  --bg:#eef2f5;
-  --card:#ffffff;
-  --border:#dcdcdc;
-}
 body{
   font-family:Segoe UI,Arial;
-  background:var(--bg);
+  background:#eef2f5;
   margin:0;
 }
 header{
-  background:var(--primary);
+  background:#0f3d3e;
   color:#fff;
-  padding:16px;
-  font-size:20px;
+  padding:14px;
+  font-size:18px;
   text-align:center;
   font-weight:600;
-  letter-spacing:.5px;
 }
 .container{
   padding:20px;
-  max-width:900px;
+  max-width:600px;
   margin:auto;
 }
 .card{
-  background:var(--card);
-  padding:20px;
+  background:#fff;
+  padding:15px;
   border-radius:12px;
-  margin-bottom:20px;
-  box-shadow:0 4px 14px rgba(0,0,0,.08);
-}
-.card h3{margin-top:0;color:#333}
-.form-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+  margin-bottom:15px;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);
 }
 input, select, button{
   width:100%;
-  padding:11px;
-  font-size:14px;
-  border-radius:8px;
-  border:1px solid var(--border);
+  padding:10px;
+  margin-top:10px;
+  font-size:15px;
 }
-input[readonly]{background:#f6f6f6}
 button{
-  grid-column:1/3;
-  background:var(--primary);
+  background:#0f3d3e;
   color:#fff;
   border:none;
-  font-weight:600;
   cursor:pointer;
 }
-button:hover{opacity:.9}
-
 table{
   width:100%;
   border-collapse:collapse;
   margin-top:10px;
-  font-size:13px;
 }
 th,td{
   border:1px solid #ccc;
-  padding:8px;
+  padding:6px;
   text-align:center;
 }
-th{background:#f1f3f6}
-.red{background:#ffd6d6}
-.green{background:#d9f7d9}
+.red{background:#ffcccc}
+.green{background:#ccffcc}
 </style>
 </head>
 
 <body>
+
 <header>PLAN SHUTDOWN SYSTEM</header>
 
 <div class="container">
 
+<!-- LOGIN -->
+<div class="card" id="loginCard">
+  <h3>Login</h3>
+  <input id="uid" placeholder="User ID">
+  <input id="pwd" type="password" placeholder="Password">
+  <button onclick="doLogin()">LOGIN</button>
+</div>
+
 <!-- PLAN ENTRY -->
-<div class="card">
+<div class="card" id="mainCard" style="display:none">
   <h3>Plan Entry</h3>
 
-  <div class="form-grid">
-    <input id="date" type="date">
-    <input id="from" type="time">
+  <input id="date" type="date">
+  <input id="from" type="time">
+  <input id="to" type="time">
 
-    <input id="to" type="time">
-    <select id="feeder"></select>
+  <select id="feeder"></select>
 
-    <input id="installation" readonly placeholder="Installation">
-    <input id="entryby" readonly placeholder="Entry By">
+  <input id="installation" readonly>
+  <input id="reason" placeholder="Reason for Shutdown">
+  <input id="entryby" readonly>
 
-    <input id="reason" placeholder="Reason for Shutdown" style="grid-column:1/3">
-
-    <button onclick="savePlan()">SAVE PLAN</button>
-  </div>
+  <button onclick="savePlan()">SAVE PLAN</button>
 </div>
 
 <!-- PLAN LIST -->
-<div class="card">
+<div class="card" id="listCard" style="display:none">
   <h3>Plan List (All Users)</h3>
   <table id="planTable"></table>
 </div>
@@ -115,37 +100,82 @@ th{background:#f1f3f6}
 /* ================= CONFIG ================= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsfZT47Guev38UbIF72d0GVFuMMSyILfskVtQcDuTA78y2_oZWKvC6RO_xbVSknO1wsg/exec";
 
-/* ================= INIT FROM SHEET ================= */
-// index.html login ke baad URL me uid pass karo ?uid=124470
-const params = new URLSearchParams(window.location.search);
-const UID = params.get("uid");
-
-if(!UID){
-  alert("User not identified. Please login again.");
-}
-
-// Fetch user details from Sheet2 (same sheet as plan or separate master if you want)
-fetch(SCRIPT_URL + "?action=getuser&uid=" + UID)
-.then(r=>r.json())
-.then(user=>{
-  installation.value = user.installation;
-  entryby.value = user.name;
-  loadFeeders(user.installation);
-  loadPlans();
-});
-
+/* ================= USERS ================= */
+const USERS=[
+ {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
+ {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
+ {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"ALL",admin:true},
+ {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"ALL",admin:true},
+ {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"ALL",admin:true},
+ {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
+ {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
+ {u:"124470",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
+ {u:"135597",p:"1234",n:"KUNAL RANJAN",i:"LIMBODARA-GGS-2"},
+ {u:"139938",p:"1234",n:"HAREKRISHNA",i:"LIMBODARA-GGS-2"},
+ {u:"125223",p:"1234",n:"SUKUMAR LAHA",i:"GAMIJ-GGS-1"},
+ {u:"139646",p:"1234",n:"RAVI KUMAR SHARMA",i:"GAMIJ-GGS-1"},
+ {u:"137317",p:"1234",n:"SONUKUMAR SINGH",i:"GAMIJ-GGS-1"},
+ {u:"121028",p:"1234",n:"ABHISHEK PATEL",i:"GAMIJ-GGS-2"},
+ {u:"133181",p:"1234",n:"KETUL PATEL",i:"GAMIJ-GGS-2"},
+ {u:"123310",p:"1234",n:"DHEERENDRA SINGH",i:"GAMIJ-GGS-3"},
+ {u:"133643",p:"1234",n:"ASHUTOSH KUMAR SINGH",i:"GAMIJ-GGS-3"},
+ {u:"135515",p:"1234",n:"ADITYA ARYA",i:"GAMIJ-GGS-3"},
+ {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
+];
 /* ================= FEEDERS ================= */
 const FEEDERS={
- "LIMBODARA-GGS-1":["AKASH CERAMIC","ITLA ONGC","MANSA CITY"],
- "LIMBODARA-GGS-2":["KIRTIDHAM","LISA","MAHAKALI"],
- "GAMIJ-GGS-1":["BAHIYAL","RAM","SOMNATH"],
- "MOTERA-GGS":["PREKSHA","TP-44","ZUNDAL"],
- "ALL":["AKASH CERAMIC","ITLA ONGC","MANSA CITY","KIRTIDHAM","LISA","MAHAKALI","BAHIYAL","RAM","SOMNATH","PREKSHA","TP-44","ZUNDAL"]
+ "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
+"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
+"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
+"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
+ "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
+ "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
+ "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
+ "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
+ "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
+ "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
+ "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
+ "KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4",
+ "SIHUNJ FEEDER","VANSOLI FEEDER",
+ "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
+]
 };
 
-function loadFeeders(inst){
+let CURRENT_USER = null;
+
+/* ================= LOGIN ================= */
+function doLogin(){
+  let u = uid.value.trim();
+  let p = pwd.value.trim();
+
+  let user = USERS.find(x=>x.u===u && x.p===p);
+
+  if(!user){
+    alert("Invalid Login");
+    return;
+  }
+
+  CURRENT_USER = user;
+  localStorage.setItem("CURRENT_USER",JSON.stringify(user));
+
+  loginCard.style.display="none";
+  mainCard.style.display="block";
+  listCard.style.display="block";
+
+  installation.value = user.i;
+  entryby.value = user.n;
+
+  loadFeeders();
+  loadPlans();
+}
+
+/* ================= FEEDER LOAD ================= */
+function loadFeeders(){
   feeder.innerHTML="<option value=''>-- Select Feeder --</option>";
-  (FEEDERS[inst]||[]).forEach(f=>{
+  (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
     feeder.innerHTML+=`<option value="${f}">${f}</option>`;
   });
 }
@@ -154,7 +184,7 @@ function loadFeeders(inst){
 function savePlan(){
   fetch(SCRIPT_URL+"?"+new URLSearchParams({
     action:"plan",
-    date:date.value,
+    date:Date.value,
     from:from.value,
     to:to.value,
     feeder:feeder.value,
@@ -176,20 +206,26 @@ function loadPlans(){
   .then(r=>r.json())
   .then(data=>{
     let html=`<tr>
-      <th>Date</th><th>From</th><th>To</th>
-      <th>Feeder</th><th>Installation</th>
-      <th>Entry By</th><th>Reason</th>
+      <th>Date</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Feeder</th>
+      <th>Installation</th>
+      <th>Entry By</th>
+      <th>Reason</th>
     </tr>`;
 
-    let today=new Date();today.setHours(0,0,0,0);
+    let today=new Date();
+    today.setHours(0,0,0,0);
 
     data.reverse().forEach(r=>{
-      let d=new Date(r.date);d.setHours(0,0,0,0);
-      let cls=(d>=today)?"red":"green";
-      let showDate=r.date.split("-").reverse().join("-");
+      let d=new Date(r.date);
+      d.setHours(0,0,0,0);
+      let cls = (d>=today)?"red":"green";
 
-      html+=`<tr class="${cls}">
-        <td>${showDate}</td>
+      html+=`
+      <tr class="${cls}">
+        <td>${r.date.split("-").reverse().join("-")}</td>
         <td>${r.from}</td>
         <td>${r.to}</td>
         <td>${r.feeder}</td>
@@ -198,6 +234,7 @@ function loadPlans(){
         <td>${r.reason||""}</td>
       </tr>`;
     });
+
     planTable.innerHTML=html;
   });
 }
