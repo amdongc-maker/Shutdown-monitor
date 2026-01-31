@@ -173,74 +173,77 @@ function loadFeeders() {
     feeder.innerHTML += `<option value="${f}">${f}</option>`;
   });
 }
-
-/* =====================================================
+=====================================================
    ✅ SAVE PLAN ENTRY
 ===================================================== */
- function savePlan(){
-   if (!date.value || !from.value || !to.value || !feeder.value) {
+function savePlan() {
+
+  if (!date.value || !from.value || !to.value || !feeder.value) {
     alert("❌ Please fill all required fields");
-    return;}
-  fetch(SCRIPT_URL+"?"+new URLSearchParams({
-    action:"plan",
-    feeder:feeder.value,
-    date:date.value,
-    from:from.value,
-    to:to.value,
-    installation:installation.value,
-    reason:reason.value,
-    entryby:entryby.value
+    return;
+  }
+
+  fetch(SCRIPT_URL + "?" + new URLSearchParams({
+    action: "plan",
+    feeder: feeder.value,
+    date: date.value,
+    from: from.value,
+    to: to.value,
+    installation: installation.value,
+    reason: reason.value,
+    entryby: entryby.value
   }))
-  .then(r=>r.text())
-  .then(a=>{
-    alert(a);
+  .then(r => r.text())
+  .then(msg => {
+    alert("✅ Plan Saved Successfully");
+    reason.value = "";
     loadPlans();
   });
 }
 
-function loadPlans(){
-  fetch(SCRIPT_URL+"?action=getallplans")
-  .then(r=>r.json())
-  .then(data=>{
+/* =====================================================
+   ✅ LOAD PLAN LIST TABLE
+===================================================== */
+function loadPlans() {
 
-    let html=`<tr>
-      <th>Date</th>
-      <th>From</th>
-      <th>To</th>
-      <th>Feeder</th>
-      <th>Installation</th>
-      <th>Reason</th>
-    </tr>`;
+  fetch(SCRIPT_URL + "?action=getallplans")
+  .then(r => r.json())
+  .then(data => {
 
-    let today=new Date();
+    let html = `
+      <tr>
+        <th>Date</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Feeder</th>
+        <th>Installation</th>
+        <th>Reason</th>
+      </tr>`;
+
+    let today = new Date();
     today.setHours(0,0,0,0);
 
-    data.reverse().forEach(r=>{
-      let d=new Date(r.date);
+    data.reverse().forEach(r => {
+
+      let d = new Date(r.date);
       d.setHours(0,0,0,0);
+
       let cls = (d >= today) ? "red" : "green";
 
-      html+=`
-      <tr class="${cls}">
-        <td>${r.date}</td>
-        <td>${formatTime(r.from)}</td>
-        <td>${formatTime(r.to)}</td>
-        <td>${r.feeder}</td>
-        <td>${r.installation}</td>
-        <td>${r.reason || ""}</td>
-      </tr>`;
+      html += `
+        <tr class="${cls}">
+          <td>${r.date}</td>
+           <td>${formatTime(r.from)}</td>
+           <td>${formatTime(r.to)}</td>
+          <td>${r.feeder}</td>
+          <td>${r.installation}</td>
+          <td>${r.reason || ""}</td>
+        </tr>`;
     });
 
     planTable.innerHTML = html;
   });
 }
-
-function formatTime(t){
-  if(!t) return "";
-  let d = new Date(t);
-  return d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:false});
-}
-
 /* =====================================================
    ✅ BACK BUTTON
 ===================================================== */
@@ -251,6 +254,7 @@ function goBack(){
 
 </body>
 </html>
+
 
 
 
