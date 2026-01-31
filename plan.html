@@ -136,15 +136,16 @@ function savePlan(){
   }
 
   let url = SCRIPT_URL + "?" + new URLSearchParams({
-    action:"plan",
-    feeder:feeder.value,
-    date:date.value,
-    from:from.value,
-    to:to.value,
-    installation:installation.value,
-    reason:reason.value,
-    entryby:entryby.value
-  });
+  action:"plan",
+  feeder:feeder.value,
+  date:date.value,
+  from:from.value,
+  to:to.value,
+  installation:installation.value,
+  reason:reason.value,
+  entryby:entryby.value,
+  t: Date.now()   // 👈 cache killer
+});
 
   fetch(url)
   .then(r=>r.text())
@@ -201,6 +202,7 @@ function loadPlans(){
 
 </body>
 </html>
+
 
 
 
