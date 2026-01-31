@@ -180,8 +180,8 @@ function loadPlans(){
       html += `
       <tr class="${cls}">
         <td>${r.date}</td>
-        <td>${formatDateTime(r.from)}</td>
-         <td>${formatDateTime(r.to)}</td>
+        <td>${r.from}</td>
+         <td>${r.to}</td>
         <td>${r.feeder}</td>
         <td>${r.installation}</td>
         <td>${r.reason || ""}</td>
@@ -201,6 +201,7 @@ function loadPlans(){
 
 </body>
 </html>
+
 
 
 
