@@ -220,8 +220,8 @@ function loadPlans() {
     let html = `
       <tr>
         <th>Date</th>
-        <th>From</th>
-        <th>To</th>
+        <td>${formatTime(r.from)}</td>
+        <td>${formatTime(r.to)}</td>
         <th>Feeder</th>
         <th>Installation</th>
         <th>Reason</th>
@@ -262,3 +262,4 @@ function goBack(){
 
 </body>
 </html>
+
