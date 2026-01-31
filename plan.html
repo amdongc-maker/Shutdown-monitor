@@ -146,18 +146,6 @@ const FEEDERS={
 
 let CURRENT_USER = null;
 
-/* ================= LOGIN ================= */
-function doLogin(){
-  let u = uid.value.trim();
-  let p = pwd.value.trim();
-
-  let user = USERS.find(x=>x.u===u && x.p===p);
-
-  if(!user){
-    alert("Invalid Login");
-    return;
-  }
-
   CURRENT_USER = user;
   localStorage.setItem("CURRENT_USER",JSON.stringify(user));
 
@@ -241,4 +229,5 @@ function loadPlans(){
 </script>
 </body>
 </html>
+
 
