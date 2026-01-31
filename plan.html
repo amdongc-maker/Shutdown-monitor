@@ -169,20 +169,18 @@ function loadPlans(){
       <th>Installation</th>
       <th>Reason</th>
     </tr>`;
-
     let today = new Date();
     today.setHours(0,0,0,0);
-
     data.reverse().forEach(r=>{
       let d = new Date(r.date);
       d.setHours(0,0,0,0);
       let cls = (d >= today) ? "red" : "green";
 
-      html += `
+      html+=`
       <tr class="${cls}">
         <td>${r.date}</td>
-        <td>${r.from}</td>
-         <td>${r.to}</td>
+        <td>${formatTime(r.from)}</td>
+        <td>${formatTime(r.to)}</td>
         <td>${r.feeder}</td>
         <td>${r.installation}</td>
         <td>${r.reason || ""}</td>
@@ -192,16 +190,18 @@ function loadPlans(){
     planTable.innerHTML = html;
   });
 }
-  function formatTime(t){
+
+function formatTime(t){
   if(!t) return "";
-  let [h,m]=t.split(":");
-  return h+":"+m;
-  }
-  
+  let d = new Date(t);
+  return d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:false});
+}
+
 </script>
 
 </body>
 </html>
+
 
 
 
