@@ -20,7 +20,7 @@ header{
 }
 .container{
   padding:20px;
-  max-width:600px;
+  max-width:650px;
   margin:auto;
 }
 .card{
@@ -35,7 +35,6 @@ input, select, button{
   padding:10px;
   margin-top:10px;
   font-size:15px;
-  box-sizing:border-box;
 }
 button{
   background:#0f3d3e;
@@ -57,13 +56,18 @@ th,td{border:1px solid #ccc;padding:6px;text-align:center}
 <div class="container">
 
 <div class="card">
-  <input id="date" type="date">
-  <input id="from" type="time">
-  <input id="to" type="time">
-  <select id="feeder"></select>
+  <input id="date" type="date" required>
+  <input id="from" type="time" required>
+  <input id="to" type="time" required>
+
+  <select id="feeder" required>
+    <option value="">-- Select Feeder --</option>
+  </select>
+
   <input id="installation" readonly>
   <input id="reason" placeholder="Reason for Shutdown">
   <input id="entryby" readonly>
+
   <button onclick="savePlan()">SAVE PLAN</button>
 </div>
 
@@ -75,58 +79,27 @@ th,td{border:1px solid #ccc;padding:6px;text-align:center}
 </div>
 
 <script>
-  let CURRENT_USER = null;
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd0xvIH4jYe1CElD7BVFSNJzsfyu0IktPQx16AVPCYn5OKG9z8M11bGAQ_VR5KGav4WQ/exec";
+let CURRENT_USER = null;
 
-/* ==== USERS ==== */
-const USERS=[
- {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
- {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
- {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"ALL",admin:true},
- {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"ALL",admin:true},
- {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"ALL",admin:true},
- {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
- {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
- {u:"124470",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
- {u:"135597",p:"1234",n:"KUNAL RANJAN",i:"LIMBODARA-GGS-2"},
- {u:"139938",p:"1234",n:"HAREKRISHNA",i:"LIMBODARA-GGS-2"},
- {u:"125223",p:"1234",n:"SUKUMAR LAHA",i:"GAMIJ-GGS-1"},
- {u:"139646",p:"1234",n:"RAVI KUMAR SHARMA",i:"GAMIJ-GGS-1"},
- {u:"137317",p:"1234",n:"SONUKUMAR SINGH",i:"GAMIJ-GGS-1"},
- {u:"121028",p:"1234",n:"ABHISHEK PATEL",i:"GAMIJ-GGS-2"},
- {u:"133181",p:"1234",n:"KETUL PATEL",i:"GAMIJ-GGS-2"},
- {u:"123310",p:"1234",n:"DHEERENDRA SINGH",i:"GAMIJ-GGS-3"},
- {u:"133643",p:"1234",n:"ASHUTOSH KUMAR SINGH",i:"GAMIJ-GGS-3"},
- {u:"135515",p:"1234",n:"ADITYA ARYA",i:"GAMIJ-GGS-3"},
- {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
-];
+/* ===== FEEDERS ===== */
+const FEEDERS = {
+  "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+  "LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER"],
+  "GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1"],
+  "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2"],
+  "GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3"],
+  "MOTERA-GGS":["TP-44 FEEDER","ZUNDAL AG FEEDER"],
+  "ALL":[]
+};
 
-/* ==== FEEDERS ==== */
-const FEEDERS={
- "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
-"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
-"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
-"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
-"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
-"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
-"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
- "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
- "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
- "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
- "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
- "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
- "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
- "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
- "KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4",
- "SIHUNJ FEEDER","VANSOLI FEEDER",
- "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
-]
+/* ===== ON LOAD ===== */
 window.onload = function(){
   CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
   if(!CURRENT_USER){
-    alert("Please login first");
-    window.location.href="index.html";
+    alert("Session expired. Please login again.");
+    window.location.href = "index.html";
     return;
   }
 
@@ -137,32 +110,44 @@ window.onload = function(){
   loadPlans();
 };
 
+/* ===== LOAD FEEDERS ===== */
 function loadFeeders(){
   feeder.innerHTML = "<option value=''>-- Select Feeder --</option>";
-  let list = FEEDERS[CURRENT_USER.i] || [];
-  list.forEach(f=>{
+  (FEEDERS[CURRENT_USER.i] || []).forEach(f=>{
     feeder.innerHTML += `<option value="${f}">${f}</option>`;
   });
 }
 
+/* ===== SAVE PLAN ===== */
 function savePlan(){
-  fetch(SCRIPT_URL+"?"+new URLSearchParams({
-    action:"plan",
-    feeder:feeder.value,
-    date:date.value,
-    from:from.value,
-    to:to.value,
-    installation:installation.value,
-    reason:reason.value,
-    entryby:entryby.value
-  }))
+
+  if(!date.value || !from.value || !to.value || !feeder.value){
+    alert("Please fill all required fields");
+    return;
+  }
+
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({
+      action:"plan",
+      feeder:feeder.value,
+      date:date.value,
+      from:from.value,
+      to:to.value,
+      installation:installation.value,
+      reason:reason.value,
+      entryby:entryby.value
+    })
+  })
   .then(r=>r.text())
-  .then(a=>{
-    alert(a);
+  .then(msg=>{
+    alert(msg);
     loadPlans();
   });
 }
 
+/* ===== LOAD PLAN LIST ===== */
 function loadPlans(){
   fetch(SCRIPT_URL+"?action=getallplans")
   .then(r=>r.json())
@@ -177,19 +162,19 @@ function loadPlans(){
       <th>Reason</th>
     </tr>`;
 
-    let today=new Date();
+    let today = new Date();
     today.setHours(0,0,0,0);
 
     data.reverse().forEach(r=>{
-      let d=new Date(r.date);
+      let d = new Date(r.date);
       d.setHours(0,0,0,0);
       let cls = (d >= today) ? "red" : "green";
 
-      html+=`
+      html += `
       <tr class="${cls}">
         <td>${r.date}</td>
-        <td>${formatTime(r.from)}</td>
-        <td>${formatTime(r.to)}</td>
+        <td>${r.from}</td>
+        <td>${r.to}</td>
         <td>${r.feeder}</td>
         <td>${r.installation}</td>
         <td>${r.reason || ""}</td>
@@ -199,14 +184,7 @@ function loadPlans(){
     planTable.innerHTML = html;
   });
 }
-
-function formatTime(t){
-  if(!t) return "";
-  let d = new Date(t);
-  return d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:false});
-}
 </script>
 
 </body>
 </html>
-
