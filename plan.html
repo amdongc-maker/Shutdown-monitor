@@ -5,60 +5,80 @@
 <title>PLAN SHUTDOWN SYSTEM</title>
 
 <style>
+:root{
+  --primary:#0f3d3e;
+  --bg:#eef2f5;
+  --card:#ffffff;
+  --border:#dcdcdc;
+}
 body{
   font-family:Segoe UI,Arial;
-  background:#eef2f5;
+  background:var(--bg);
   margin:0;
 }
 header{
-  background:#0f3d3e;
+  background:var(--primary);
   color:#fff;
-  padding:14px;
-  font-size:18px;
+  padding:16px;
+  font-size:20px;
   text-align:center;
   font-weight:600;
+  letter-spacing:.5px;
 }
 .container{
   padding:20px;
-  max-width:600px;
+  max-width:900px;
   margin:auto;
 }
 .card{
-  background:#fff;
-  padding:15px;
+  background:var(--card);
+  padding:20px;
   border-radius:12px;
-  margin-bottom:15px;
-  box-shadow:0 3px 10px rgba(0,0,0,.1);
+  margin-bottom:20px;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+.card h3{margin-top:0;color:#333}
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
 input, select, button{
   width:100%;
-  padding:10px;
-  margin-top:10px;
-  font-size:15px;
+  padding:11px;
+  font-size:14px;
+  border-radius:8px;
+  border:1px solid var(--border);
 }
+input[readonly]{background:#f6f6f6}
 button{
-  background:#0f3d3e;
+  grid-column:1/3;
+  background:var(--primary);
   color:#fff;
   border:none;
+  font-weight:600;
   cursor:pointer;
 }
+button:hover{opacity:.9}
+
 table{
   width:100%;
   border-collapse:collapse;
   margin-top:10px;
+  font-size:13px;
 }
 th,td{
   border:1px solid #ccc;
-  padding:6px;
+  padding:8px;
   text-align:center;
 }
-.red{background:#ffcccc}
-.green{background:#ccffcc}
+th{background:#f1f3f6}
+.red{background:#ffd6d6}
+.green{background:#d9f7d9}
 </style>
 </head>
 
 <body>
-
 <header>PLAN SHUTDOWN SYSTEM</header>
 
 <div class="container">
@@ -67,17 +87,20 @@ th,td{
 <div class="card">
   <h3>Plan Entry</h3>
 
-  <input id="date" type="date">
-  <input id="from" type="time">
-  <input id="to" type="time">
+  <div class="form-grid">
+    <input id="date" type="date">
+    <input id="from" type="time">
 
-  <select id="feeder"></select>
+    <input id="to" type="time">
+    <select id="feeder"></select>
 
-  <input id="installation" readonly>
-  <input id="reason" placeholder="Reason for Shutdown">
-  <input id="entryby" readonly>
+    <input id="installation" readonly placeholder="Installation">
+    <input id="entryby" readonly placeholder="Entry By">
 
-  <button onclick="savePlan()">SAVE PLAN</button>
+    <input id="reason" placeholder="Reason for Shutdown" style="grid-column:1/3">
+
+    <button onclick="savePlan()">SAVE PLAN</button>
+  </div>
 </div>
 
 <!-- PLAN LIST -->
@@ -92,6 +115,25 @@ th,td{
 /* ================= CONFIG ================= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsfZT47Guev38UbIF72d0GVFuMMSyILfskVtQcDuTA78y2_oZWKvC6RO_xbVSknO1wsg/exec";
 
+/* ================= INIT FROM SHEET ================= */
+// index.html login ke baad URL me uid pass karo ?uid=124470
+const params = new URLSearchParams(window.location.search);
+const UID = params.get("uid");
+
+if(!UID){
+  alert("User not identified. Please login again.");
+}
+
+// Fetch user details from Sheet2 (same sheet as plan or separate master if you want)
+fetch(SCRIPT_URL + "?action=getuser&uid=" + UID)
+.then(r=>r.json())
+.then(user=>{
+  installation.value = user.installation;
+  entryby.value = user.name;
+  loadFeeders(user.installation);
+  loadPlans();
+});
+
 /* ================= FEEDERS ================= */
 const FEEDERS={
  "LIMBODARA-GGS-1":["AKASH CERAMIC","ITLA ONGC","MANSA CITY"],
@@ -101,23 +143,9 @@ const FEEDERS={
  "ALL":["AKASH CERAMIC","ITLA ONGC","MANSA CITY","KIRTIDHAM","LISA","MAHAKALI","BAHIYAL","RAM","SOMNATH","PREKSHA","TP-44","ZUNDAL"]
 };
 
-let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
-
-if(!CURRENT_USER){
-  alert("Login Required");
-  window.location="index.html";
-}
-
-/* ================= INIT ================= */
-installation.value = CURRENT_USER.i;
-entryby.value = CURRENT_USER.n;
-loadFeeders();
-loadPlans();
-
-/* ================= FEEDER LOAD ================= */
-function loadFeeders(){
+function loadFeeders(inst){
   feeder.innerHTML="<option value=''>-- Select Feeder --</option>";
-  (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
+  (FEEDERS[inst]||[]).forEach(f=>{
     feeder.innerHTML+=`<option value="${f}">${f}</option>`;
   });
 }
@@ -148,26 +176,20 @@ function loadPlans(){
   .then(r=>r.json())
   .then(data=>{
     let html=`<tr>
-      <th>Date</th>
-      <th>From</th>
-      <th>To</th>
-      <th>Feeder</th>
-      <th>Installation</th>
-      <th>Entry By</th>
-      <th>Reason</th>
+      <th>Date</th><th>From</th><th>To</th>
+      <th>Feeder</th><th>Installation</th>
+      <th>Entry By</th><th>Reason</th>
     </tr>`;
 
-    let today=new Date();
-    today.setHours(0,0,0,0);
+    let today=new Date();today.setHours(0,0,0,0);
 
     data.reverse().forEach(r=>{
-      let d=new Date(r.date);
-      d.setHours(0,0,0,0);
-      let cls = (d>=today)?"red":"green";
+      let d=new Date(r.date);d.setHours(0,0,0,0);
+      let cls=(d>=today)?"red":"green";
+      let showDate=r.date.split("-").reverse().join("-");
 
-      html+=`
-      <tr class="${cls}">
-        <td>${r.date.split("-").reverse().join("-")}</td>
+      html+=`<tr class="${cls}">
+        <td>${showDate}</td>
         <td>${r.from}</td>
         <td>${r.to}</td>
         <td>${r.feeder}</td>
@@ -176,7 +198,6 @@ function loadPlans(){
         <td>${r.reason||""}</td>
       </tr>`;
     });
-
     planTable.innerHTML=html;
   });
 }
