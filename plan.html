@@ -184,7 +184,7 @@ function loadFeeders(){
 function savePlan(){
   fetch(SCRIPT_URL+"?"+new URLSearchParams({
     action:"plan",
-    date:Date.value,
+    date:date.value,
     from:from.value,
     to:to.value,
     feeder:feeder.value,
@@ -241,3 +241,4 @@ function loadPlans(){
 </script>
 </body>
 </html>
+
