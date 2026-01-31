@@ -225,16 +225,20 @@ function hasSpecialChar(text){
 function login(){
  const u=USERS.find(x=>x.u===loginUser.value && x.p===loginPass.value);
  if(!u){showMsg("Invalid Login");return;}
- CURRENT_USER=u;
-ui_name.innerText = "👤 " + CURRENT_USER.n;
-ui_inst.innerText = "Installation : " + CURRENT_USER.i;
-userInfo.classList.remove("hidden");
+
+ CURRENT_USER = u;
+
+ // 🔐 SAVE LOGIN
+ localStorage.setItem("CURRENT_USER", JSON.stringify(CURRENT_USER));
+
+ ui_name.innerText = "👤 " + CURRENT_USER.n;
+ ui_inst.innerText = "Installation : " + CURRENT_USER.i;
+ userInfo.classList.remove("hidden");
+
  loginBox.classList.add("hidden");
  mainBox.classList.remove("hidden");
- shutdownBox.classList.add("hidden");
- resumeBox.classList.add("hidden");
- mainBox.classList.remove("hidden");
-  populateFeeders();
+
+ populateFeeders();
  loadActiveShutdowns();
 }
 
@@ -490,6 +494,7 @@ document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
 </script>
 </body>
 </html>
+
 
 
 
