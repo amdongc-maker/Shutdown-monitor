@@ -121,6 +121,13 @@ button{
 <div id="activeShutdowns">Loading...</div>
 <button class="btn-shutdown" onclick="openShutdown()">Shutdown</button>
 <button class="btn-resume" onclick="openResume()">Resume</button>
+  <div class="container">
+  <button onclick="openPlanPage()">
+    📅 PLAN SHUTDOWN ENTRY
+    <a href="plan.html"></a>
+  </button>
+</div>
+
 </div>
 
 <div class="card hidden" id="shutdownBox">
@@ -137,13 +144,7 @@ button{
 <textarea id="sd_info" placeholder="Information"></textarea>
 <button class="btn-shutdown" onclick="submitShutdown()">Submit</button>
 <button class="btn-back" onclick="backToMain()">Back</button>
-  <div class="container">
-  <button onclick="openPlanPage()">
-    📅 PLAN SHUTDOWN ENTRY
-    <a href="plan.html"></a>
-  </button>
-</div>
-</div>
+  </div>
 
 <div class="card hidden" id="resumeBox">
 <h3>Resume Entry</h3>
@@ -489,6 +490,7 @@ document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
 </script>
 </body>
 </html>
+
 
 
 
