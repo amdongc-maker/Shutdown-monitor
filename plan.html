@@ -109,41 +109,26 @@ const SCRIPT_URL =
 /* =====================================================
    ✅ FEEDERS LIST
 ===================================================== */
-const FEEDERS = {
-  "LIMBODARA-GGS-1":[
-    "AKASH CERAMIC FEEDER",
-    "ITLA ONGC FEEDER-LG1",
-    "MANSA CITY FEEDER",
-    "MANSA CIVIL FEEDER"
-  ],
-  "LIMBODARA-GGS-2":[
-    "ITLA ONGC FEEDER-LG2",
-    "KIRTIDHAM FEEDER",
-    "LISA FEEDER",
-    "MAHAKALI FEEDER"
-  ],
-  "GAMIJ-GGS-1":[
-    "BAHIYAL ONGC FEEDER",
-    "RAM FEEDER-GAMIJ-1",
-    "SOMNATH JGY FEEDER"
-  ],
-  "GAMIJ-GGS-2":[
-    "BADARPUR FEEDER",
-    "CHAULAJ FEEDER-GAMIJ-2",
-    "GADWEL FEEDER"
-  ],
-  "GAMIJ-GGS-3":[
-    "BARMUVADA FEEDER",
-    "GINJAR FEEDER",
-    "HALDARWAS FEEDER-GAMIJ-3"
-  ],
-  "MOTERA-GGS":[
-    "TP-44 FEEDER",
-    "ZUNDAL AG FEEDER"
-  ],
-  "ALL":[]
+const FEEDERS={
+ "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
+"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
+"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
+"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
+ "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
+ "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
+ "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
+ "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
+ "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
+ "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
+ "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
+ "KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4",
+ "SIHUNJ FEEDER","VANSOLI FEEDER",
+ "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
+]
 };
-
 /* =====================================================
    ✅ AUTO LOAD WHEN PAGE OPENS
 ===================================================== */
@@ -211,47 +196,48 @@ function savePlan() {
 /* =====================================================
    ✅ LOAD PLAN LIST TABLE
 ===================================================== */
-function loadPlans() {
+function loadPlans(){
+  fetch(SCRIPT_URL+"?action=getallplans")
+  .then(r=>r.json())
+  .then(data=>{
 
-  fetch(SCRIPT_URL + "?action=getallplans")
-  .then(r => r.json())
-  .then(data => {
+    let html=`<tr>
+      <th>Date</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Feeder</th>
+      <th>Installation</th>
+      <th>Reason</th>
+    </tr>`;
 
-    let html = `
-      <tr>
-        <th>Date</th>
-        <th>From</th>
-        <th>To</th>
-        <th>Feeder</th>
-        <th>Installation</th>
-        <th>Reason</th>
-      </tr>`;
-
-    let today = new Date();
+    let today=new Date();
     today.setHours(0,0,0,0);
 
-    data.reverse().forEach(r => {
-
-      let d = new Date(r.date);
+    data.reverse().forEach(r=>{
+      let d=new Date(r.date);
       d.setHours(0,0,0,0);
-
       let cls = (d >= today) ? "red" : "green";
 
-      html += `
-        <tr class="${cls}">
-          <td>${r.date}</td>
-         <td>${r.from}</td>
-          <td>${r.to}</td>
-          <td>${r.feeder}</td>
-          <td>${r.installation}</td>
-          <td>${r.reason || ""}</td>
-        </tr>`;
+      html+=`
+      <tr class="${cls}">
+        <td>${r.date}</td>
+        <td>${formatTime(r.from)}</td>
+        <td>${formatTime(r.to)}</td>
+        <td>${r.feeder}</td>
+        <td>${r.installation}</td>
+        <td>${r.reason || ""}</td>
+      </tr>`;
     });
 
     planTable.innerHTML = html;
   });
 }
 
+function formatTime(t){
+  if(!t) return "";
+  let d = new Date(t);
+  return d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:false});
+}
 /* =====================================================
    ✅ BACK BUTTON
 ===================================================== */
@@ -262,6 +248,7 @@ function goBack(){
 
 </body>
 </html>
+
 
 
 
