@@ -182,19 +182,24 @@ function loadFeeders(){
 
 /* ================= SAVE PLAN ================= */
 function savePlan(){
-  fetch(SCRIPT_URL+"?"+new URLSearchParams({
-    action:"plan",
-    date:date.value,
-    from:from.value,
-    to:to.value,
-    feeder:feeder.value,
-    installation:installation.value,
-    reason:reason.value,
-    entryby:entryby.value
-  }))
-  .then(r=>r.text())
-  .then(msg=>{
-    alert(msg);
+  fetch(SCRIPT_URL, {
+  method: "POST",
+  headers: {"Content-Type":"application/x-www-form-urlencoded"},
+  body: new URLSearchParams({
+    action: "plan",
+    feeder: feeder.value,
+    date: date.value,
+    from: fromTime.value,
+    to: toTime.value,
+    installation: installation.value,
+    reason: reason.value,
+    entryby: CURRENT_USER.name   // 🔥 EXACT KEY
+  })
+})
+.then(r => r.text())
+.then(t => {
+  alert(t);
+});
     reason.value="";
     loadPlans();
   });
@@ -241,4 +246,5 @@ function loadPlans(){
 </script>
 </body>
 </html>
+
 
