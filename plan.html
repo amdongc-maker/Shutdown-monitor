@@ -191,30 +191,44 @@ function savePlan(){
     loadPlans();
   });
 }
-
 function loadPlans(){
   fetch(SCRIPT_URL+"?action=getallplans")
   .then(r=>r.json())
   .then(data=>{
-    let today=new Date();today.setHours(0,0,0,0);
-    let html="";
+
+    let html=`<tr>
+      <th>Date</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Feeder</th>
+      <th>Installation</th>
+      <th>Reason</th>
+    </tr>`;
+
+    let today = new Date();
+    today.setHours(0,0,0,0);
+
     data.reverse().forEach(r=>{
-      let d=new Date(r.date);d.setHours(0,0,0,0);
-      let cls=d>=today?"plan-red":"plan-green";
-      html+=`
-      <div class="plan-item ${cls}">
-        <b>${r.feeder}</b><br>
-        <span class="small">
-          ${r.date} | ${r.from} - ${r.to}<br>
-          ${r.installation}<br>
-          ${r.reason||""}
-        </span>
-      </div>`;
+      let d = new Date(r.date);
+      d.setHours(0,0,0,0);
+      let cls = (d >= today) ? "red" : "green";
+
+      html += `
+      <tr class="${cls}">
+        <td>${r.date}</td>
+        <td>${formatTime(r.from)}</td>
+        <td>${formatTime(r.to)}</td>
+        <td>${r.feeder}</td>
+        <td>${r.installation}</td>
+        <td>${r.reason || ""}</td>
+      </tr>`;
     });
-    planList.innerHTML=html;
+
+    planTable.innerHTML = html;
   });
 }
 </script>
 
 </body>
 </html>
+
