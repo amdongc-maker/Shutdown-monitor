@@ -181,11 +181,11 @@ function savePlan(){
   }
 
   const fd=new URLSearchParams({
-    action:"plan",
-    feeder:feederEl.value,
+    action:"plan"
     date:dateEl.value,
     from:fromEl.value,
     to:toEl.value,
+    feeder:feederEl.value,
     installation:installationEl.value,
     reason:reasonEl.value,
     entryby:entryByEl.value
@@ -218,4 +218,5 @@ function loadPopupReminder(){
 
 </body>
 </html>
+
 
