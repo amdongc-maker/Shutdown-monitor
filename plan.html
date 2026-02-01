@@ -200,55 +200,6 @@ function savePlan(){
   });
 }
 
-function loadPlans(){
-
-  fetch(SCRIPT_URL+"?action=getallplans")
-  .then(r=>r.json())
-  .then(data=>{
-
-    if(!Array.isArray(data) || data.length===0){
-      planListEl.innerHTML="<p class='small'>No plans available</p>";
-      return;
-    }
-
-    const today=new Date();
-    today.setHours(0,0,0,0);
-
-    let html="";
-
-    data.forEach(r=>{
-
-      const d=new Date(r.date+"T00:00:00");
-
-      html+=`
-      <div class="plan-item ${d>=today?"plan-red":"plan-green"}">
-        <b>${r.feeder}</b><br>
-        <span class="small">
-          ${r.date} | ${r.from} - ${r.to}<br>
-          <b>${r.installation}</b><br>
-          ${r.reason||""}
-        </span>
-        <button class="delete-btn" onclick="deletePlan(${Number(r.id)})">DELETE</button>
-      </div>`;
-    });
-
-    planListEl.innerHTML=html;
-  })
-  .catch(()=>{
-    planListEl.innerHTML="<p class='small'>Failed to load plans</p>";
-  });
-}
-
-function deletePlan(id){
-  if(!confirm("Are you sure to delete this plan?")) return;
-  fetch(SCRIPT_URL+"?action=deleteplan&id="+id)
-  .then(r=>r.text())
-  .then(msg=>{
-    alert(msg);
-    loadPlans();
-  });
-}
-
 function loadPopupReminder(){
 
   fetch(SCRIPT_URL+"?action=getreminder")
@@ -267,3 +218,4 @@ function loadPopupReminder(){
 
 </body>
 </html>
+
