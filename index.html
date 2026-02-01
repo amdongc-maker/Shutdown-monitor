@@ -488,9 +488,49 @@ document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
   el.value = el.value.replace(/[^a-zA-Z0-9 \-/]/g,"");
  });
 });
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx9evhP6t8S3dNKOXmd1B4eOFSgZGsYgsByt55PdxOky9UDvcm71T829UWnKlXbAQM9GQ/exec";
+
+window.onload=()=>{
+  checkTomorrowOnIndex();
+};
+
+function checkTomorrowOnIndex(){
+
+  fetch(SCRIPT_URL+"?action=getallplans&t="+Date.now())
+  .then(r=>r.json())
+  .then(data=>{
+
+    let today = new Date();
+    today.setHours(0,0,0,0);
+
+    let tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate()+1);
+
+    let reminders=[];
+
+    data.forEach(r=>{
+      let parts = r.date.split("-");
+      let d = new Date(parts[2], parts[1]-1, parts[0]);
+      d.setHours(0,0,0,0);
+
+      if(d.getTime() === tomorrow.getTime()){
+        reminders.push(
+          r.feeder+" ("+r.from+"-"+r.to+")"
+        );
+      }
+    });
+
+    if(reminders.length>0 && !sessionStorage.getItem("INDEX_REM")){
+      alert("⚠️ SHUTDOWN TOMORROW:\n\n" + reminders.join("\n"));
+      sessionStorage.setItem("INDEX_REM","1");
+    }
+
+  });
+}
 </script>
 </body>
 </html>
+
 
 
 
