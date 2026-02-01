@@ -132,7 +132,7 @@ button:active{transform:scale(.98)}
 </div>
 
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxpl2AEi47QjDqgwZs_5hbw2pcH4a8lCKDWZASq6w7ZbtQaMHS9v0AMAkPglu2WqXereA/exec";
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxaE1TxpScjfVEP8S3fK5Wj-jHYmEzTOVTtgPcU8DW3kFyByejxCGD03RhbjXAn45Injw/exec";
 let CURRENT_USER=null;
 
 /* FEEDERS */
@@ -165,11 +165,8 @@ function loadFeeders(){
   });
 }
 
+/* ================= SAVE PLAN ================= */
 function savePlan(){
-  if(!date.value||!from.value||!to.value||!feeder.value){
-    alert("Fill all required fields");
-    return;
-  }
 
   fetch(SCRIPT_URL,{
     method:"POST",
@@ -185,39 +182,59 @@ function savePlan(){
       entryby:entryby.value
     })
   })
-  .then(r=>r.text())
-  .then(m=>{
-    alert(m);
-    loadPlans();
+  .then(r=>r.json())
+  .then(res=>{
+
+    alert(res.message);
+
+    if(res.status==="success"){
+      loadPlans();
+    }
   });
 }
 
+/* ================= LOAD PLAN LIST ================= */
 function loadPlans(){
-  fetch(SCRIPT_URL+"?action=getallplans")
+
+  // ✅ Cache Clear Trick
+  fetch(SCRIPT_URL+"?action=getallplans&t="+Date.now())
+
   .then(r=>r.json())
   .then(data=>{
-    let today=new Date();today.setHours(0,0,0,0);
+
+    if(data.length===0){
+      planList.innerHTML="<p>No Plans Found</p>";
+      return;
+    }
+
+    let today=new Date();
+    today.setHours(0,0,0,0);
+
     let html="";
+
     data.reverse().forEach(r=>{
-      let d=new Date(r.date);d.setHours(0,0,0,0);
+
+      let d=new Date(r.date);
+      d.setHours(0,0,0,0);
+
       let cls=d>=today?"plan-red":"plan-green";
+
       html+=`
       <div class="plan-item ${cls}">
         <b>${r.feeder}</b><br>
         <span class="small">
-          ${r.date} | ${r.from} - ${r.to}<br>
-          ${r.installation}<br>
-          ${r.reason||""}
+          Date: ${r.date}<br>
+          Time: ${r.from} - ${r.to}<br>
+          Installation: ${r.installation}<br>
+          Reason: ${r.reason||""}<br>
+          Entry By: ${r.entryby||""}
         </span>
       </div>`;
     });
+
     planList.innerHTML=html;
   });
 }
 </script>
-
 </body>
 </html>
-
-
-
