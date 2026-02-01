@@ -89,6 +89,7 @@ button:active{transform:scale(.98)}
 
 <div class="container">
 
+<!-- ENTRY CARD -->
 <div class="card">
   <div class="row">
     <div>
@@ -122,6 +123,7 @@ button:active{transform:scale(.98)}
   <button onclick="savePlan()">SAVE PLAN</button>
 </div>
 
+<!-- PLAN LIST -->
 <div class="card">
   <h3>Plan List</h3>
   <div id="planList"></div>
@@ -133,6 +135,7 @@ button:active{transform:scale(.98)}
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx9evhP6t8S3dNKOXmd1B4eOFSgZGsYgsByt55PdxOky9UDvcm71T829UWnKlXbAQM9GQ/exec";
 let CURRENT_USER=null;
 
+/* FEEDERS */
 const FEEDERS={
 "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER"],
@@ -162,7 +165,9 @@ function loadFeeders(){
   });
 }
 
+/* ================= SAVE PLAN ================= */
 function savePlan(){
+
   fetch(SCRIPT_URL,{
     method:"POST",
     headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -179,36 +184,40 @@ function savePlan(){
   })
   .then(r=>r.json())
   .then(res=>{
+
     alert(res.message);
+
     if(res.status==="success"){
       loadPlans();
     }
   });
 }
 
+/* ================= LOAD PLAN LIST ================= */
 function loadPlans(){
+
+  // ✅ Cache Clear Trick
   fetch(SCRIPT_URL+"?action=getallplans&t="+Date.now())
+
   .then(r=>r.json())
   .then(data=>{
-
-    checkTomorrowReminder(data); // popup
 
     if(data.length===0){
       planList.innerHTML="<p>No Plans Found</p>";
       return;
     }
 
+    let today=new Date();
+    today.setHours(0,0,0,0);
+
     let html="";
 
     data.reverse().forEach(r=>{
-      let parts = r.date.split("-");
-      let d = new Date(parts[2], parts[1]-1, parts[0]);
+
+      let d=new Date(r.date);
       d.setHours(0,0,0,0);
 
-      let today = new Date();
-      today.setHours(0,0,0,0);
-
-      let cls = (d < today) ? "plan-green" : "plan-red";
+      let cls=d>=today?"plan-red":"plan-green";
 
       html+=`
       <div class="plan-item ${cls}">
@@ -229,5 +238,3 @@ function loadPlans(){
 </script>
 </body>
 </html>
-
-
