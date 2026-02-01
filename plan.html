@@ -36,6 +36,9 @@ header{
   margin-bottom:14px;
   box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
+.card h3{
+  margin:4px 0 10px;
+}
 label{
   font-size:13px;
   font-weight:600;
@@ -50,7 +53,9 @@ input,select,button{
   border-radius:10px;
   border:1px solid #ccc;
 }
-input:read-only{background:#f4f6f8}
+input:read-only{
+  background:#f4f6f8;
+}
 button{
   background:var(--primary);
   color:#fff;
@@ -68,8 +73,8 @@ button:active{transform:scale(.98)}
   padding:12px;
   margin-bottom:10px;
 }
+.plan-item b{font-size:14px}
 .small{font-size:13px;color:#444}
-.delete-btn{margin-top:8px;background:#b30000}
 
 @media(min-width:600px){
   .row{display:flex;gap:10px}
@@ -84,7 +89,7 @@ button:active{transform:scale(.98)}
 
 <div class="container">
 
-<!-- ENTRY -->
+<!-- ENTRY CARD -->
 <div class="card">
   <div class="row">
     <div>
@@ -127,113 +132,92 @@ button:active{transform:scale(.98)}
 </div>
 
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycby9kiLRe6ZxmDYbi7a3aVkS97goimYS-Tt0rFZ2HmjWo9iyEHSSX49qIFpJPWjN7PUM/exec";
-
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxpl2AEi47QjDqgwZs_5hbw2pcH4a8lCKDWZASq6w7ZbtQaMHS9v0AMAkPglu2WqXereA/exec";
 let CURRENT_USER=null;
 
+/* FEEDERS */
 const FEEDERS={
-  "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1"],
-  "LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER"],
-  "GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER"],
-  "GAMIJ-GGS-2":["BADARPUR FEEDER"],
-  "GAMIJ-GGS-3":["BARMUVADA FEEDER"],
-  "MOTERA-GGS":["TP-44 FEEDER"]
+"LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER"],
+"GAMIJ-GGS-3":["BARMUVADA FEEDER"],
+"MOTERA-GGS":["TP-44 FEEDER"]
 };
 
-const dateEl=document.getElementById("date");
-const fromEl=document.getElementById("from");
-const toEl=document.getElementById("to");
-const feederEl=document.getElementById("feeder");
-const installationEl=document.getElementById("installation");
-const reasonEl=document.getElementById("reason");
-const entryByEl=document.getElementById("entryby");
-const planListEl=document.getElementById("planList");
-
 window.onload=()=>{
-
   CURRENT_USER=JSON.parse(localStorage.getItem("CURRENT_USER"));
   if(!CURRENT_USER){
     alert("Please login again");
     location.href="index.html";
     return;
   }
-
-  installationEl.value=CURRENT_USER.i;
-  entryByEl.value=CURRENT_USER.n;
-
+  installation.value=CURRENT_USER.i;
+  entryby.value=CURRENT_USER.n;
   loadFeeders();
   loadPlans();
-  loadPopupReminder();
 };
 
 function loadFeeders(){
-  feederEl.innerHTML="<option value=''>-- Select Feeder --</option>";
+  feeder.innerHTML="<option value=''>-- Select Feeder --</option>";
   (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
-    feederEl.innerHTML+=`<option value="${f}">${f}</option>`;
+    feeder.innerHTML+=`<option>${f}</option>`;
   });
 }
 
 function savePlan(){
-
-  if(!dateEl.value || !fromEl.value || !toEl.value || !feederEl.value){
-    alert("Please fill all required fields");
+  if(!date.value||!from.value||!to.value||!feeder.value){
+    alert("Fill all required fields");
     return;
   }
 
-  const fd=new URLSearchParams({
-    action:"plan",
-    date:dateEl.value,
-    from:fromEl.value,
-    to:toEl.value,
-    feeder:feederEl.value,
-    installation:installationEl.value,
-    reason:reasonEl.value,
-    entryby:entryByEl.value
-  });
-
-  fetch(SCRIPT_URL,{method:"POST",body:fd})
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({
+      action:"plan",
+      feeder:feeder.value,
+      date:date.value,
+      from:from.value,
+      to:to.value,
+      installation:installation.value,
+      reason:reason.value,
+      entryby:entryby.value
+    })
+  })
   .then(r=>r.text())
-  .then(msg=>{
-    alert(msg);
-    reasonEl.value="";
+  .then(m=>{
+    alert(m);
     loadPlans();
   });
 }
 
-
-
-function deletePlan(id){
-  if(!confirm("Are you sure to delete this plan?")) return;
-  fetch(SCRIPT_URL+"?action=deleteplan&id="+id)
-  .then(r=>r.text())
-  .then(msg=>{
-    alert(msg);
-    loadPlans();
-  });
-}
-  
-function loadPopupReminder(){
-
-  fetch(SCRIPT_URL+"?action=getreminder")
+function loadPlans(){
+  fetch(SCRIPT_URL+"?action=getallplans")
   .then(r=>r.json())
-  .then(list=>{
-    if(!Array.isArray(list) || list.length===0) return;
-
-    let msg="TOMORROW PLAN SHUTDOWN:\n\n";
-    list.forEach(p=>{
-      msg+=`${p.feeder} (${p.from} - ${p.to})\n`;
+  .then(data=>{
+    let today=new Date();today.setHours(0,0,0,0);
+    let html="";
+    data.reverse().forEach(r=>{
+      let d=new Date(r.date);d.setHours(0,0,0,0);
+      let cls=d>=today?"plan-red":"plan-green";
+      html+=`
+      <div class="plan-item ${cls}">
+        <b>${r.feeder}</b><br>
+        <span class="small">
+          ${r.date} | ${r.from} - ${r.to}<br>
+          ${r.installation}<br>
+          ${r.reason||""}
+        </span>
+      </div>`;
     });
-    alert(msg);
+    planList.innerHTML=html;
   });
 }
 </script>
 
 </body>
 </html>
-
-
-
-
 
 
 
