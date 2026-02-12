@@ -221,7 +221,7 @@ function loadPlans(){
       let d=new Date(r.date);
       d.setHours(0,0,0,0);
 
-      let cls=d>=today?"plan-red":"plan-green";
+      let cls=d>=today?"plan-green":"plan-red";
 
       html+=`
       <div class="plan-item ${cls}">
@@ -242,6 +242,7 @@ function loadPlans(){
 </script>
 </body>
 </html>
+
 
 
 
