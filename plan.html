@@ -246,27 +246,13 @@ data.reverse().forEach(r=>{
     </span>
   </div>`;
 });
-
-
-      html+=`
-      <div class="plan-item ${cls}">
-        <b>${r.feeder}</b><br>
-        <span class="small">
-          Date: ${r.date}<br>
-          Time: ${r.from} - ${r.to}<br>
-          Installation: ${r.installation}<br>
-          Reason: ${r.reason||""}<br>
-          Entry By: ${r.entryby||""}
-        </span>
-      </div>`;
-    });
-
     planList.innerHTML=html;
   });
 }
 </script>
 </body>
 </html>
+
 
 
 
