@@ -221,7 +221,32 @@ function loadPlans(){
       let d=new Date(r.date);
       d.setHours(0,0,0,0);
 
-      let cls=d>=today?"plan-red":"plan-green";
+      let today=new Date();
+today.setHours(0,0,0,0);
+
+let html="";
+
+data.reverse().forEach(r=>{
+
+  let d=new Date(r.date);
+  d.setHours(0,0,0,0);
+
+  // ✅ Correct logic
+  let cls = d < today ? "plan-red" : "plan-green";
+
+  html+=`
+  <div class="plan-item ${cls}">
+    <b>${r.feeder}</b><br>
+    <span class="small">
+      Date: ${r.date}<br>
+      Time: ${r.from} - ${r.to}<br>
+      Installation: ${r.installation}<br>
+      Reason: ${r.reason||""}<br>
+      Entry By: ${r.entryby||""}
+    </span>
+  </div>`;
+});
+
 
       html+=`
       <div class="plan-item ${cls}">
@@ -242,6 +267,7 @@ function loadPlans(){
 </script>
 </body>
 </html>
+
 
 
 
