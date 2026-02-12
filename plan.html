@@ -200,6 +200,209 @@ function savePlan(){
 /* ================= LOAD PLAN LIST ================= */
 function loadPlans(){
 
+You said:
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PLAN SHUTDOWN ENTRY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --primary:#0f3d3e;
+  --bg:#eef2f5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Segoe UI,Arial;
+  background:var(--bg);
+}
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:14px;
+  font-size:18px;
+  text-align:center;
+  font-weight:600;
+}
+.container{
+  padding:12px;
+  max-width:720px;
+  margin:auto;
+}
+.card{
+  background:#fff;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+.card h3{
+  margin:4px 0 10px;
+}
+label{
+  font-size:13px;
+  font-weight:600;
+  margin-top:10px;
+  display:block;
+}
+input,select,button{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  font-size:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+input:read-only{
+  background:#f4f6f8;
+}
+button{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  font-weight:600;
+  margin-top:14px;
+}
+button:active{transform:scale(.98)}
+
+.plan-red{background:#ffe0e0}
+.plan-green{background:#e3f7e7}
+
+.plan-item{
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.plan-item b{font-size:14px}
+.small{font-size:13px;color:#444}
+
+@media(min-width:600px){
+  .row{display:flex;gap:10px}
+  .row>div{flex:1}
+}
+</style>
+</head>
+
+<body>
+
+<header>PLAN SHUTDOWN ENTRY</header>
+
+<div class="container">
+
+<!-- ENTRY CARD -->
+<div class="card">
+  <div class="row">
+    <div>
+      <label>Date</label>
+      <input id="date" type="date">
+    </div>
+    <div>
+      <label>From</label>
+      <input id="from" type="time">
+    </div>
+    <div>
+      <label>To</label>
+      <input id="to" type="time">
+    </div>
+  </div>
+
+  <label>Feeder</label>
+  <select id="feeder">
+    <option value="">-- Select Feeder --</option>
+  </select>
+
+  <label>Installation</label>
+  <input id="installation" readonly>
+
+  <label>Reason</label>
+  <input id="reason" placeholder="Reason for Shutdown">
+
+  <label>Entry By</label>
+  <input id="entryby" readonly>
+
+  <button onclick="savePlan()">SAVE PLAN</button>
+</div>
+
+<!-- PLAN LIST -->
+<div class="card">
+  <h3>Plan List</h3>
+  <div id="planList"></div>
+</div>
+
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxxqDUKpvMuwvhVZ65FTXPyacuH065yQcUZOm-6SmH8OKNLEAHA3H5_dzgg02hqL4Z4/exec";
+let CURRENT_USER=null;
+
+/* FEEDERS */
+const FEEDERS={
+ "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
+"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
+"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
+"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER","ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER","BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
+ "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
+ "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4",
+ "SIHUNJ FEEDER","VANSOLI FEEDER","PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
+]
+};
+  window.onload=()=>{
+  CURRENT_USER=JSON.parse(localStorage.getItem("CURRENT_USER"));
+  if(!CURRENT_USER){
+    alert("Please login again");
+    location.href="index.html";
+    return;
+  }
+  installation.value=CURRENT_USER.i;
+  entryby.value=CURRENT_USER.n;
+  loadFeeders();
+  loadPlans();
+};
+
+function loadFeeders(){
+  feeder.innerHTML="<option value=''>-- Select Feeder --</option>";
+  (FEEDERS[CURRENT_USER.i]||[]).forEach(f=>{
+    feeder.innerHTML+=<option>${f}</option>;
+  });
+}
+
+/* ================= SAVE PLAN ================= */
+function savePlan(){
+
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({
+      action:"plan",
+      feeder:feeder.value,
+      date:date.value,
+      from:from.value,
+      to:to.value,
+      installation:installation.value,
+      reason:reason.value,
+      entryby:entryby.value
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+
+    alert(res.message);
+
+    if(res.status==="success"){
+      loadPlans();
+    }
+  });
+}
+
+/* ================= LOAD PLAN LIST ================= */
+function loadPlans(){
+
   // ✅ Cache Clear Trick
   fetch(SCRIPT_URL+"?action=getallplans&t="+Date.now())
 
@@ -221,37 +424,25 @@ function loadPlans(){
       let d=new Date(r.date);
       d.setHours(0,0,0,0);
 
-      let today=new Date();
-today.setHours(0,0,0,0);
+      let cls=d>=today?"plan-red":"plan-green";
 
-let html="";
-
-data.reverse().forEach(r=>{
-
-  let d=new Date(r.date);
-  d.setHours(0,0,0,0);
-
-  // ✅ Correct logic
-  let cls = d < today ? "plan-red" : "plan-green";
-
-  html+=`
-  <div class="plan-item ${cls}">
-    <b>${r.feeder}</b><br>
-    <span class="small">
-      Date: ${r.date}<br>
-      Time: ${r.from} - ${r.to}<br>
-      Installation: ${r.installation}<br>
-      Reason: ${r.reason||""}<br>
-      Entry By: ${r.entryby||""}
-    </span>
-  </div>`;
-});
-    planList.innerHTML=html;
-  });
+      html+=
+      <div class="plan-item ${cls}">
+        <b>${r.feeder}</b><br>
+        <span class="small">
+          Date: ${r.date}<br>
+          Time: ${r.from} - ${r.to}<br>
+          Installation: ${r.installation}<br>
+          Reason: ${r.reason||""}<br>
+          Entry By: ${r.entryby||""}
+        </span>
+      </div>;
+    });
 }
 </script>
 </body>
 </html>
+
 
 
 
