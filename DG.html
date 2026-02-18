@@ -127,8 +127,12 @@ Installation: <b id="userInst"></b>
 <div class="card">
 <h3>DG Requirement Form</h3>
 
-<label for="shutdownDate">Shutdown Date</label>
-<input type="date" id="shutdownDate">
+<input 
+  type="text" 
+  id="shutdownDate"
+  placeholder="Shutdown Date"
+  onfocus="this.type='date'"
+  onblur="if(!this.value)this.type='text'">
 <select id="shutdownType">
   <option value="">Select Shutdown Type</option>
   <option>PLAN PSD</option>
@@ -403,6 +407,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
 
 
 
