@@ -127,7 +127,7 @@ Installation: <b id="userInst"></b>
 <div class="card">
 <h3>DG Requirement Form</h3>
 
-<input type="date" id="shutdownDate">
+<input type="date" id="shutdownDate"placeholder="Shutdown Date">
 <select id="shutdownType">
   <option value="">Select Shutdown Type</option>
   <option>PLAN PSD</option>
@@ -233,6 +233,16 @@ function addWell(){
 }
 
 function submitRequest(){
+   // 🔴 BASIC VALIDATION
+ if(
+   !shutdownDate.value ||
+   !shutdownType.value ||
+   !information.value.trim() ||
+   !feeder.value
+ ){
+   alert("All fields are required");
+   return;
+ }
  let arr=[];
  document.querySelectorAll(".well-row").forEach(r=>{
   let i=r.querySelectorAll("input");
@@ -371,3 +381,4 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
