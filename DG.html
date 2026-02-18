@@ -160,7 +160,6 @@ Installation: <b id="userInst"></b>
 </div>
 
 <script>
-  const allowedRegex = /^[a-zA-Z0-9 .,#-]+$/;
 function formatDateDMY(dateStr){
   let d = new Date(dateStr);
   let dd = String(d.getDate()).padStart(2,"0");
@@ -234,11 +233,6 @@ function addWell(){
 }
 
 function submitRequest(){
-  if(!allowedRegex.test(information.value)){
-  alert("Invalid characters in Information field");
-  return;
-  }
-  
    // 🔴 BASIC VALIDATION
  if(
    !shutdownDate.value ||
@@ -276,6 +270,10 @@ function submitRequest(){
  .then(r=>r.json()).then(res=>{
   alert("Request ID "+res.requestId);
   loadMyRequests();
+    if(!allowedRegex.test(information.value)){
+  alert("Invalid characters in Information field");
+  return;
+       }
  });
 }
 
@@ -387,6 +385,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
 
 
 
