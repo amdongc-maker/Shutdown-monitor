@@ -136,6 +136,15 @@ Installation: <b id="userInst"></b>
   <option>PARTIAL UNPLAN PSD</option>
 </select>
 <input id="information" placeholder="Information / Remarks">
+  information.addEventListener("input", function(){
+  let val = information.value;
+  const allowedRegex = /^[a-zA-Z0-9 .,#-]*$/;
+
+  if(!allowedRegex.test(val)){
+    information.value = val.slice(0, -1);
+    alert('Only A-Z, 0-9 and . , - # allowed');
+  }
+});
 <select id="feeder">
 <option value="">Select Feeder</option>
 </select>
@@ -160,6 +169,7 @@ Installation: <b id="userInst"></b>
 </div>
 
 <script>
+  const allowedRegex = /^[a-zA-Z0-9 .,#-]+$/;
 function formatDateDMY(dateStr){
   let d = new Date(dateStr);
   let dd = String(d.getDate()).padStart(2,"0");
@@ -233,6 +243,11 @@ function addWell(){
 }
 
 function submitRequest(){
+  if(!allowedRegex.test(information.value)){
+  alert("Invalid characters in Information field");
+  return;
+  }
+  
    // 🔴 BASIC VALIDATION
  if(
    !shutdownDate.value ||
@@ -381,4 +396,5 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
 
