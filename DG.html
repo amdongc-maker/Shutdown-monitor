@@ -127,7 +127,7 @@ Installation: <b id="userInst"></b>
 <div class="card">
 <h3>DG Requirement Form</h3>
 
-<input type="date" id="shutdownDate"placeholder="Shutdown Date">
+<input type="date" id="shutdownDate" placeholder="Shutdown Date">
 <select id="shutdownType">
   <option value="">Select Shutdown Type</option>
   <option>PLAN PSD</option>
@@ -136,15 +136,6 @@ Installation: <b id="userInst"></b>
   <option>PARTIAL UNPLAN PSD</option>
 </select>
 <input id="information" placeholder="Information / Remarks">
-  information.addEventListener("input", function(){
-  let val = information.value;
-  const allowedRegex = /^[a-zA-Z0-9 .,#-]*$/;
-
-  if(!allowedRegex.test(val)){
-    information.value = val.slice(0, -1);
-    alert('Only A-Z, 0-9 and . , - # allowed');
-  }
-});
 <select id="feeder">
 <option value="">Select Feeder</option>
 </select>
@@ -396,5 +387,6 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
 
 
