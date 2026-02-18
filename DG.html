@@ -142,8 +142,8 @@ Installation: <b id="userInst"></b>
 
 <div id="wells">
 <div class="well-row">
-<input placeholder="Well No">
-<input placeholder="Capacity (Ton)" type="number">
+<<input placeholder="Well No" oninput="liveValidate(this)">
+<input placeholder="Capacity (Ton)" type="number" oninput="liveValidate(this)">
 </div>
 </div>
 
@@ -403,6 +403,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
 
 
 
