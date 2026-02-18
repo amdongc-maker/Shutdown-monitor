@@ -135,7 +135,7 @@ Installation: <b id="userInst"></b>
   <option>PARTIAL PLAN PSD</option>
   <option>PARTIAL UNPLAN PSD</option>
 </select>
-<input id="information" placeholder="Information / Remarks">
+<input id="information" placeholder="Information / Remarks" oninput="liveValidate(this)">
 <select id="feeder">
 <option value="">Select Feeder</option>
 </select>
@@ -195,7 +195,7 @@ const FEEDERS={
  "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDER-GAMIJ-2"],
  "GAMIJ-GGS-3":["BADARPUR FEEDER","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER","KALPSAR FEEDER","SATRUNDA FEEDER","SIHUNJ FEEDER","VANSOLI FEEDER"]
 };
-
+const LIVE_REGEX = /^[a-zA-Z0-9 .,#-]*$/;
 let CURRENT_USER=null;
 
 // LOGIN
@@ -380,11 +380,30 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
   myRequests.innerHTML = html || "No Requests";
  });
 }
+  function liveValidate(el){
+  let val = el.value;
+
+  // Special character block
+  if(!LIVE_REGEX.test(val)){
+    el.value = val.slice(0,-1);
+    el.style.border = "2px solid red";
+    return;
+  }
+
+  // Required field check
+  if(val.trim()===""){
+    el.style.border = "2px solid red";
+  }else{
+    el.style.border = "2px solid #22c55e"; // green
+  }
+  }
+  
 </script>
 
 </body>
 
 </html>
+
 
 
 
