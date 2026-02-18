@@ -211,6 +211,7 @@ function login(){
 
  loadFeeders();
  loadMyRequests();
+ setInterval(loadMyRequests,15000);
 }
 
 // Load feeder list
@@ -269,6 +270,10 @@ function submitRequest(){
  fetch(WEBAPP_URL+"?action=submitRequest&data="+encodeURIComponent(JSON.stringify(req)))
  .then(r=>r.json()).then(res=>{
   alert("Request ID "+res.requestId);
+  shutdownDate.value="";
+  shutdownType.value="";
+  information.value="";
+  feeder.value="";
   loadMyRequests();
     if(!allowedRegex.test(information.value)){
   alert("Invalid characters in Information field");
@@ -403,6 +408,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
 
 
 
