@@ -274,6 +274,12 @@ function submitRequest(){
   shutdownType.value="";
   information.value="";
   feeder.value="";
+   wells.innerHTML=`
+   <div class="well-row">
+    <input placeholder="Well No">
+    <input placeholder="Capacity (Ton)" type="number">
+   </div>
+  `;
   loadMyRequests();
     if(!allowedRegex.test(information.value)){
   alert("Invalid characters in Information field");
@@ -408,6 +414,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 </body>
 
 </html>
+
 
 
 
