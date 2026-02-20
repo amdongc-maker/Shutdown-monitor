@@ -169,7 +169,7 @@ function formatDateDMY(dateStr){
   return dd+"-"+mm+"-"+yy;
 }
 
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz7Vpccy3z7T92GucyEX1fgwjTVJYQrdrKdakr-RdO9DC1hUb75nGRw2nqOjtnPTDEr/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzn7RKXugXZvtQPhf16BjVadBAnIrIIL2lJAFSrFFutaXMwU6227qEBuoIwX6cYBaGcWA/exec";
 
 // USERS
 const USERS=[
@@ -395,11 +395,12 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
         mobile: d.mobile,
         installation: d.installation,
         fmpStatus: d.fmpStatus || "Pending",
-        dgApprovalStatus: d.dgApprovalStatus || "Pending",
+        approverStatus: d.approverStatus || "Pending",
+
+        // ✅ CORRECT FIELDS
+        contractor: d.contractor || "NA",
         dgDeployStatus: d.dgDeployStatus || "Pending",
-        operatorName: d.operatorName || "",
-        operatorMobile: d.operatorMobile || "",
-        contractor: d.contractor || "",
+
         wells: []
       };
     }
@@ -408,8 +409,10 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
     map[d.requestId].wells.push({
       well: d.well || "NA",
       cap: Number(d.cap || 0),
-      operator: d.operatorName || "",
-      opMobile: d.operatorMobile || ""
+
+      // ✅ Operator fields corrected
+      operator: d.operator || "Not Assigned",
+      opMobile: d.operatorMobile || "-"
     });
 
   });
@@ -420,22 +423,16 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 
     let colorClass="card-red";
     if(req.fmpStatus=="Forwarded") colorClass="card-orange";
-    if(req.dgApprovalStatus=="Approved") colorClass="card-green";
-    if(req.dgApprovalStatus=="Rejected") colorClass="card-reject";
+    if(req.approverStatus=="Approved") colorClass="card-green";
+    if(req.approverStatus=="Rejected") colorClass="card-reject";
 
     let wellsHtml="";
     let totalCap=0;
 
     req.wells.forEach(w=>{
       totalCap += w.cap;
-      wellsHtml += `
-        <div style="margin-bottom:6px"><br>
-      • ${w.well} - ${w.cap} Ton - 👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}
-        </div>
-      `;
+      wellsHtml += `<div>• ${w.well} - ${w.cap} Ton - 👷 ${w.operator} - 📞 ${w.opMobile}</div>`;
     });
-
-    let safeReq = encodeURIComponent(JSON.stringify(req));
 
     html += `
     <div class="status-card ${colorClass}">
@@ -448,7 +445,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
       <b>Information:</b> ${req.information}<br>
       <b>Feeder:</b> ${req.feeder}<br><br>
 
-      <b>Contractor:</b> ${req.contractor || "-"}<br><br>
+      <b>Contractor:</b> ${req.contractor}<br><br>
 
       <b>DG Requirements:</b><br>
       ${wellsHtml}
@@ -458,48 +455,71 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
       <b>Total Production:</b> ${totalCap} Ton<br><br>
 
       <b>FMP Status:</b> ${req.fmpStatus}<br>
-      <b>DG Approval Status:</b> ${req.dgApprovalStatus}<br>
-      <b>DG Deploy Status:</b> ${req.dgDeployStatus}<br><br>
-
-      <button onclick="shareDGWhatsApp(JSON.parse(decodeURIComponent('${safeReq}')))" class="dg-wa-btn">
-        📲 Share WhatsApp
-      </button>
+      <b>DG Approval Status:</b> ${req.approverStatus}<br>
+      <b>DG Deploy Status:</b> ${req.dgDeployStatus}<br>
+      <button class="dg-wa-btn" onclick='shareDGWhatsApp(${JSON.stringify(req)})'>
+📲 Share WhatsApp
+</button>
     </div>`;
-  });
+      });
 
   myRequests.innerHTML = html || "No Requests Found";
+
 });
 }
+
 function shareDGWhatsApp(req){
 
-  let wellsText="";
+  let wellsText = "";
   req.wells.forEach(w=>{
-    wellsText += `• ${w.well} | ${w.cap} Ton | ${w.operator || "NA"} (${w.opMobile || "-"})\n`;
+    wellsText += `• ${w.well} | ${w.cap} Ton\n`;
   });
 
   let msg =
-`⚡ DG REQUIREMENT REQUEST ⚡
+`⚡ *DG REQUIREMENT REQUEST* ⚡
 
-Request ID: ${req.requestId}
+*Request ID: ${req.requestId}*
 Installation: ${req.installation}
 Shutdown Date: ${formatDateDMY(req.shutdownDate)}
 Shutdown Type: ${req.shutdownType}
 Feeder: ${req.feeder}
 
-Contractor: ${req.contractor || "-"}
-DG Status: ${req.dgDeployStatus}
-
-Requested By: ${req.requestedBy}
+*Requested By: ${req.requestedBy}*
 Mobile: ${req.mobile}
 
-Wells:
+*Wells:*
 ${wellsText}
 
-Total Wells: ${req.wells.length}`;
+*Total Wells: ${req.wells.length}*`;
 
-  window.open("https://wa.me/?text="+encodeURIComponent(msg));
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg));
 }
 
+window.onload = function(){
+  allowOnlySafeChars(document.getElementById("information"));
+
+  // Apply to text fields
+  document.querySelectorAll("input[type='text'], input[placeholder], textarea").forEach(el=>{
+    allowOnlySafeChars(el);
+  });
+
+  // Wells dynamic fields also
+  document.addEventListener("input", function(e){
+    if(e.target.placeholder=="Well No"){
+      e.target.value = e.target.value.replace(/[^a-zA-Z0-9 #.\-]/g,"");
+    }
+  });
+
+};
+function allowOnlySafeChars(input){
+  input.addEventListener("input", function(){
+    let clean = this.value.replace(/[^a-zA-Z0-9 #.\-]/g, "");
+    if(this.value !== clean){
+      this.value = clean;
+      console.warn("Special character blocked");
+    }
+  });
+}
 </script>
 
 </body>
