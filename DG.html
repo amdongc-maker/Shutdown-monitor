@@ -293,13 +293,20 @@ function submitRequest(){
   }
  });
 
- // 🔐 Duplicate Entry Check (Frontend)
- let uniqueKey = CURRENT_USER.inst+"_"+shutdownDate.value+"_"+shutdownType.value+"_"+feeder.value;
+// 🔐 WELL-WISE DUPLICATE CHECK
+for(let w of arr){
 
- if(localStorage.getItem(uniqueKey)){
-   alert("❌ Duplicate Entry Prohibited");
-   return;
- }
+  let wellKey =
+    CURRENT_USER.inst + "_" +
+    shutdownDate.value + "_" +
+    feeder.value + "_" +
+    w.well.toUpperCase();
+
+  if(localStorage.getItem(wellKey)){
+    alert("❌ Duplicate Well Entry Not Allowed\nSame Well + Date + Feeder already exists");
+    return;
+  }
+}
 
  // Final Request Object
  let req={
@@ -527,4 +534,5 @@ function allowOnlySafeChars(input){
 
 </body>
 </html>
+
 
