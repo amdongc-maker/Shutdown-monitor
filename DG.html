@@ -127,7 +127,10 @@ Installation: <b id="userInst"></b>
 <div class="card">
 <h3>DG Requirement Form</h3>
 
-<input type="date" id="shutdownDate">
+<label for="shutdownDate" style="font-weight:600;margin-top:6px;display:block">
+Shutdown Date <span style="color:red">*</span>
+</label>
+<input type="date" id="shutdownDate" placeholder="Select shutdown date">
 
 <select id="shutdownType">
   <option value="">Select Shutdown Type</option>
@@ -524,3 +527,4 @@ function allowOnlySafeChars(input){
 
 </body>
 </html>
+
