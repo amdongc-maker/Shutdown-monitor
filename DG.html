@@ -257,6 +257,19 @@ function submitRequest(){
  // Wells Array
  let arr=[];
  document.querySelectorAll(".well-row").forEach(r=>{
+   // 🚫 SAME FORM DUPLICATE WELL CHECK
+let wellSet = new Set();
+
+for(let w of arr){
+  let key = w.well.toUpperCase().trim();
+
+  if(wellSet.has(key)){
+    alert("❌ Same Well Number twice allowed nahi hai in same request");
+    return;
+  }
+
+  wellSet.add(key);
+}
   let i=r.querySelectorAll("input");
   if(i[0].value && i[1].value){
     arr.push({well:i[0].value.trim(),cap:Number(i[1].value)});
@@ -300,7 +313,7 @@ for(let w of arr){
     CURRENT_USER.inst + "_" +
     shutdownDate.value + "_" +
     feeder.value + "_" +
-    w.well.toUpperCase();
+    w.well.toUpperCase().trim();
 
   if(localStorage.getItem(wellKey)){
     alert("❌ Duplicate Well Entry Not Allowed\nSame Well + Date + Feeder already exists");
@@ -541,6 +554,7 @@ function allowOnlySafeChars(input){
 
 </body>
 </html>
+
 
 
 
