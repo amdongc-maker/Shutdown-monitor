@@ -332,9 +332,16 @@ for(let w of arr){
      submitBtn.disabled=false;
      return;
    }
+  // Save well-wise keys
+arr.forEach(w=>{
+  let wellKey =
+    CURRENT_USER.inst + "_" +
+    shutdownDate.value + "_" +
+    feeder.value + "_" +
+    w.well.toUpperCase();
 
-   // Save duplicate key
-   localStorage.setItem(uniqueKey,res.requestId);
+  localStorage.setItem(wellKey,res.requestId);
+});
 
    alert("✅ Request Submitted ID: "+res.requestId);
 
@@ -534,5 +541,6 @@ function allowOnlySafeChars(input){
 
 </body>
 </html>
+
 
 
