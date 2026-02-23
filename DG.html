@@ -169,7 +169,7 @@ function formatDateDMY(dateStr){
   return dd+"-"+mm+"-"+yy;
 }
 
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz7Vpccy3z7T92GucyEX1fgwjTVJYQrdrKdakr-RdO9DC1hUb75nGRw2nqOjtnPTDEr/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxzOWoPTt-dvyhTcmZz49C2fvAoXiGun-_XEWFN-rb4rn6Q_mNO7wcYYXlVzZUhaiF_WQ/exec";
 
 // USERS
 const USERS=[
@@ -354,31 +354,33 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 
     if(!map[d.requestId]){
       map[d.requestId] = {
-        requestId: d.requestId,
-        shutdownDate: d.shutdownDate,
-        shutdownType: d.shutdownType || "",
-        information: d.information || "",
-        feeder: d.feeder || "",
-        requestedBy: d.requestedBy || "",
-        mobile: d.mobile || "",
-        installation: d.installation || "",
-        fmpStatus: d.fmpStatus || d.FMP_Status || d["FMP Status"] || "Pending",
-        dgApprovalStatus: d.dgApprovalStatus || d.DG_Approval_Status || "Pending",
-        dgDeployStatus: d.dgDeployStatus || d.DG_Deploy_Status || "Pending",
-        operatorName: d.operatorName || "",
-        operatorMobile: d.operatorMobile || "",
-        contractor: d.contractor || "",
-        wells: []
-      };
-    }
+  requestId: d.requestId,
+  shutdownDate: d.shutdownDate,
+  shutdownType: d.shutdownType || "",
+  information: d.information || "",
+  feeder: d.feeder || "",
+  requestedBy: d.requestedBy || "",
+  mobile: d["requester mobile"] || d.mobile || "",
+  installation: d.installation || "",
 
-    // WELL DATA PUSH
-    map[d.requestId].wells.push({
-      well: d.well || "NA",
-      cap: Number(d.cap || 0),
-      operator: d.operatorName || "",
-      opMobile: d.operatorMobile || ""
-    });
+  // ✅ FIXED STATUS FIELDS
+  fmpStatus: d["fmp status"] || d.fmpStatus || "Pending",
+  dgApprovalStatus: d.approverStatus || "Pending",
+  dgDeployStatus: d.dgDeployStatus || "Pending",
+  contractor: d["contractor"] || d.Contractor || "",
+  operatorName: d["operator name"] || d["Operator Name"] || "",
+  operatorMobile: d["oprator mobile"] || d["Oprator Mobile"] || "",
+
+  wells: []
+};
+    }
+    
+   map[d.requestId].wells.push({
+  well: d.well || "NA",
+  cap: Number(d.capacity || d.cap || 0),
+  operator: d["operator name"] || "",
+  opMobile: d["oprator mobile"] || ""
+});
 
   });
 
@@ -403,9 +405,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
       totalCap += w.cap;
       wellsHtml += `
         <div style="margin-bottom:6px">
-          • ${w.well} - ${w.cap} Ton<br>
-          👷 Operator: ${w.operator || "Not Assigned"}<br>
-          📞 Mobile: ${w.opMobile || "-"}
+          • ${w.well} - ${w.cap} Ton<br> 👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}
         </div>
       `;
     });
