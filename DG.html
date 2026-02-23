@@ -127,10 +127,7 @@ Installation: <b id="userInst"></b>
 <div class="card">
 <h3>DG Requirement Form</h3>
 
-<label for="shutdownDate" style="font-weight:600;margin-top:6px;display:block">
-Shutdown Date <span style="color:red">*</span>
-</label>
-<input type="date" id="shutdownDate" placeholder="Select shutdown date">
+<input type="date" id="shutdownDate">
 
 <select id="shutdownType">
   <option value="">Select Shutdown Type</option>
@@ -152,7 +149,7 @@ Shutdown Date <span style="color:red">*</span>
 </div>
 
 <button onclick="addWell()">+ Add Well</button>
-<button class="btn-success" id="submitBtn" onclick="submitRequest()">Submit</button>
+<button class="btn-success" onclick="submitRequest()">Submit</button>
 </div>
 
 <div class="card">
@@ -172,7 +169,7 @@ function formatDateDMY(dateStr){
   return dd+"-"+mm+"-"+yy;
 }
 
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzn7RKXugXZvtQPhf16BjVadBAnIrIIL2lJAFSrFFutaXMwU6227qEBuoIwX6cYBaGcWA/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz7Vpccy3z7T92GucyEX1fgwjTVJYQrdrKdakr-RdO9DC1hUb75nGRw2nqOjtnPTDEr/exec";
 
 // USERS
 const USERS=[
@@ -237,141 +234,82 @@ function addWell(){
  wells.appendChild(d);
 }
 
-/***************** VALIDATION FUNCTIONS *****************/
-
-// Allow only A-Z a-z 0-9 space # . -
-function validateText(str){
-  let regex = /^[a-zA-Z0-9 #.\-]+$/;
-  return regex.test(str);
-}
-
-// Check mandatory
-function isEmpty(v){
-  return !v || v.trim()=="";
-}
-
-/***************** SUBMIT REQUEST WITH FULL SECURITY *****************/
-
 function submitRequest(){
 
- // Wells Array
- let arr=[];
- document.querySelectorAll(".well-row").forEach(r=>{
-   // 🚫 SAME FORM DUPLICATE WELL CHECK
-let wellSet = new Set();
+  let arr = [];
+  let wellSet = new Set();
+  let duplicateWellFound = false; // ✅ FLAG
 
-for(let w of arr){
-  let key = w.well.toUpperCase().trim();
+  document.querySelectorAll(".well-row").forEach(r=>{
+    let i = r.querySelectorAll("input");
+    let well = i[0].value.trim();
+    let cap = i[1].value;
 
-  if(wellSet.has(key)){
-    alert("❌ Same Well Number twice allowed nahi hai in same request");
+    if(well && cap){
+
+      // ❌ Duplicate well check
+      if(wellSet.has(well)){
+        alert("❌ Duplicate Well No not allowed: " + well);
+        duplicateWellFound = true;
+      }
+      wellSet.add(well);
+
+      arr.push({well: well, cap: Number(cap)});
+    }
+  });
+
+  // 🚫 STOP FULL SUBMIT
+  if(duplicateWellFound){
     return;
   }
 
-  wellSet.add(key);
-}
-  let i=r.querySelectorAll("input");
-  if(i[0].value && i[1].value){
-    arr.push({well:i[0].value.trim(),cap:Number(i[1].value)});
-  }
- });
-
- // 🔴 Mandatory Checks
- if(isEmpty(shutdownDate.value)){
-  alert("❌ Shutdown Date Required"); return;
- }
- if(isEmpty(shutdownType.value)){
-  alert("❌ Shutdown Type Required"); return;
- }
- if(isEmpty(information.value)){
-  alert("❌ Information / Remarks Required"); return;
- }
- if(isEmpty(feeder.value)){
-  alert("❌ Feeder Required"); return;
- }
- if(!arr.length){
-  alert("❌ Add at least one well"); return;
- }
-
- // 🔒 Special Character Validation
- if(!validateText(information.value)){
-  alert("❌ Special characters not allowed in Information (Only # . - allowed)");
-  return;
- }
-
- arr.forEach(w=>{
-  if(!validateText(w.well)){
-    alert("❌ Special characters not allowed in Well No (Only # . - allowed)");
-    throw "Invalid Well No";
-  }
- });
-
-// 🔐 WELL-WISE DUPLICATE CHECK
-for(let w of arr){
-
-  let wellKey =
-    CURRENT_USER.inst + "_" +
-    shutdownDate.value + "_" +
-    feeder.value + "_" +
-    w.well.toUpperCase().trim();
-
-  if(localStorage.getItem(wellKey)){
-    alert("❌ Duplicate Well Entry Not Allowed\nSame Well + Date + Feeder already exists");
+  if(!arr.length){
+    alert("Add at least one well");
     return;
   }
-}
 
- // Final Request Object
- let req={
-  requestedBy:CURRENT_USER.name,
-  mobile:CURRENT_USER.mobile,
-  installation:CURRENT_USER.inst,
-  shutdownDate:shutdownDate.value,
-  shutdownType: shutdownType.value,
-  information: information.value.trim(),
-  feeder:feeder.value,
-  wells:arr
- };
+  // Duplicate feeder check
+  let duplicateFeeder = false;
 
- // Disable button to avoid double click
- submitBtn.disabled=true;
+  Object.values(window.LAST_REQUEST_DATA || {}).forEach(r=>{
+    if(
+      r.shutdownDate == shutdownDate.value &&
+      r.feeder == feeder.value &&
+      r.dgDeployStatus != "DE Assigned"
+    ){
+      duplicateFeeder = true;
+    }
+  });
 
- fetch(WEBAPP_URL+"?action=submitRequest&data="+encodeURIComponent(JSON.stringify(req)))
- .then(r=>r.json())
- .then(res=>{
+  if(duplicateFeeder){
+    alert("❌ DG already requested for this Feeder on same date.\nAllowed only after DE Assigned.");
+    return;
+  }
 
-   if(res.error){
-     alert("❌ "+res.error);
-     submitBtn.disabled=false;
-     return;
-   }
-  // Save well-wise keys
-arr.forEach(w=>{
-  let wellKey =
-    CURRENT_USER.inst + "_" +
-    shutdownDate.value + "_" +
-    feeder.value + "_" +
-    w.well.toUpperCase();
+  let req = {
+    requestedBy: CURRENT_USER.name,
+    mobile: CURRENT_USER.mobile,
+    installation: CURRENT_USER.inst,
+    shutdownDate: shutdownDate.value,
+    shutdownType: shutdownType.value,
+    information: information.value,
+    feeder: feeder.value,
+    wells: arr
+  };
 
-  localStorage.setItem(wellKey,res.requestId);
-});
+  fetch(WEBAPP_URL+"?action=submitRequest&data="+encodeURIComponent(JSON.stringify(req)))
+  .then(r=>r.json())
+  .then(res=>{
+    alert("Request ID " + res.requestId);
 
-   alert("✅ Request Submitted ID: "+res.requestId);
+    shutdownDate.value="";
+    shutdownType.value="";
+    information.value="";
+    feeder.value="";
 
-   // Reset Form
-   shutdownDate.value="";
-   shutdownType.value="";
-   information.value="";
-   feeder.value="";
-   wells.innerHTML='<div class="well-row"><input placeholder="Well No"><input placeholder="Capacity (Ton)" type="number"></div>';
+    loadMyRequests();
+  });
 
-   loadMyRequests();
-   submitBtn.disabled=false;
- })
- .catch(e=>{
-   alert("❌ Server Error");
-   submitBtn.disabled=false;
- });
 }
 
 // 🔥 WHATSAPP SHARE FUNCTION
@@ -420,49 +358,59 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
         shutdownDate: d.shutdownDate,
         shutdownType: d.shutdownType || "",
         information: d.information || "",
-        feeder: d.feeder,
-        requestedBy: d.requestedBy,
-        mobile: d.mobile,
-        installation: d.installation,
-        fmpStatus: d.fmpStatus || "Pending",
-        approverStatus: d.approverStatus || "Pending",
-
-        // ✅ CORRECT FIELDS
-        contractor: d.contractor || "NA",
-        dgDeployStatus: d.dgDeployStatus || "Pending",
-
+        feeder: d.feeder || "",
+        requestedBy: d.requestedBy || "",
+        mobile: d.mobile || "",
+        installation: d.installation || "",
+        fmpStatus: d.fmpStatus || d.FMP_Status || d["FMP Status"] || "Pending",
+        dgApprovalStatus: d.dgApprovalStatus || d.DG_Approval_Status || "Pending",
+        dgDeployStatus: d.dgDeployStatus || d.DG_Deploy_Status || "Pending",
+        operatorName: d.operatorName || "",
+        operatorMobile: d.operatorMobile || "",
+        contractor: d.contractor || "",
         wells: []
       };
     }
 
-    // WELL DATA
+    // WELL DATA PUSH
     map[d.requestId].wells.push({
       well: d.well || "NA",
       cap: Number(d.cap || 0),
-
-      // ✅ Operator fields corrected
-      operator: d.operator || "Not Assigned",
-      opMobile: d.operatorMobile || "-"
+      operator: d.operatorName || "",
+      opMobile: d.operatorMobile || ""
     });
 
   });
+
+  // 🔥 STORE GLOBAL FOR DUPLICATE FEEDER VALIDATION
+  window.LAST_REQUEST_DATA = map;
 
   let html="";
 
   Object.values(map).reverse().forEach(req=>{
 
-    let colorClass="card-red";
-    if(req.fmpStatus=="Forwarded") colorClass="card-orange";
-    if(req.approverStatus=="Approved") colorClass="card-green";
-    if(req.approverStatus=="Rejected") colorClass="card-reject";
+    // Default color
+    let colorClass = "card-orange";
+
+    if(req.fmpStatus == "Forwarded") colorClass = "card-orange";
+    if(req.dgApprovalStatus == "Approved") colorClass = "card-green";
+    if(req.dgApprovalStatus == "Rejected") colorClass = "card-reject";
 
     let wellsHtml="";
     let totalCap=0;
 
     req.wells.forEach(w=>{
       totalCap += w.cap;
-      wellsHtml += `<div>• ${w.well} - ${w.cap} Ton - 👷 ${w.operator} - 📞 ${w.opMobile}</div>`;
+      wellsHtml += `
+        <div style="margin-bottom:6px">
+          • ${w.well} - ${w.cap} Ton<br>
+          👷 Operator: ${w.operator || "Not Assigned"}<br>
+          📞 Mobile: ${w.opMobile || "-"}
+        </div>
+      `;
     });
+
+    let safeReq = encodeURIComponent(JSON.stringify(req));
 
     html += `
     <div class="status-card ${colorClass}">
@@ -475,7 +423,7 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
       <b>Information:</b> ${req.information}<br>
       <b>Feeder:</b> ${req.feeder}<br><br>
 
-      <b>Contractor:</b> ${req.contractor}<br><br>
+      <b>Contractor:</b> ${req.contractor || "-"}<br><br>
 
       <b>DG Requirements:</b><br>
       ${wellsHtml}
@@ -485,76 +433,55 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
       <b>Total Production:</b> ${totalCap} Ton<br><br>
 
       <b>FMP Status:</b> ${req.fmpStatus}<br>
-      <b>DG Approval Status:</b> ${req.approverStatus}<br>
-      <b>DG Deploy Status:</b> ${req.dgDeployStatus}<br>
-      <button class="dg-wa-btn" onclick='shareDGWhatsApp(${JSON.stringify(req)})'>
-📲 Share WhatsApp
-</button>
+      <b>DG Approval Status:</b> ${req.dgApprovalStatus}<br>
+      <b>DG Deploy Status:</b> ${req.dgDeployStatus}<br><br>
+
+      <button onclick="shareDGWhatsApp(JSON.parse(decodeURIComponent('${safeReq}')))" class="dg-wa-btn">
+        📲 Share WhatsApp
+      </button>
     </div>`;
-      });
+  });
 
   myRequests.innerHTML = html || "No Requests Found";
 
+})
+.catch(err=>{
+  console.error("Load Requests Error:", err);
+  myRequests.innerHTML = "Error loading requests";
 });
-}
 
+}
 function shareDGWhatsApp(req){
 
-  let wellsText = "";
+  let wellsText="";
   req.wells.forEach(w=>{
-    wellsText += `• ${w.well} | ${w.cap} Ton\n`;
+    wellsText += `• ${w.well} | ${w.cap} Ton | ${w.operator || "NA"} (${w.opMobile || "-"})\n`;
   });
 
   let msg =
-`⚡ *DG REQUIREMENT REQUEST* ⚡
+`⚡ DG REQUIREMENT REQUEST ⚡
 
-*Request ID: ${req.requestId}*
+Request ID: ${req.requestId}
 Installation: ${req.installation}
 Shutdown Date: ${formatDateDMY(req.shutdownDate)}
 Shutdown Type: ${req.shutdownType}
 Feeder: ${req.feeder}
 
-*Requested By: ${req.requestedBy}*
+Contractor: ${req.contractor || "-"}
+DG Status: ${req.dgDeployStatus}
+
+Requested By: ${req.requestedBy}
 Mobile: ${req.mobile}
 
-*Wells:*
+Wells:
 ${wellsText}
 
-*Total Wells: ${req.wells.length}*`;
+Total Wells: ${req.wells.length}`;
 
-  window.open("https://wa.me/?text=" + encodeURIComponent(msg));
+  window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
-window.onload = function(){
-  allowOnlySafeChars(document.getElementById("information"));
-
-  // Apply to text fields
-  document.querySelectorAll("input[type='text'], input[placeholder], textarea").forEach(el=>{
-    allowOnlySafeChars(el);
-  });
-
-  // Wells dynamic fields also
-  document.addEventListener("input", function(e){
-    if(e.target.placeholder=="Well No"){
-      e.target.value = e.target.value.replace(/[^a-zA-Z0-9 #.\-]/g,"");
-    }
-  });
-
-};
-function allowOnlySafeChars(input){
-  input.addEventListener("input", function(){
-    let clean = this.value.replace(/[^a-zA-Z0-9 #.\-]/g, "");
-    if(this.value !== clean){
-      this.value = clean;
-      console.warn("Special character blocked");
-    }
-  });
-}
 </script>
 
 </body>
 </html>
-
-
-
-
