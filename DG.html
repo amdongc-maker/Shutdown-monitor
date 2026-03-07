@@ -169,7 +169,7 @@ function formatDateDMY(dateStr){
   return dd+"-"+mm+"-"+yy;
 }
 
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxzOWoPTt-dvyhTcmZz49C2fvAoXiGun-_XEWFN-rb4rn6Q_mNO7wcYYXlVzZUhaiF_WQ/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwupek1DhAv96BCqg-uJNTBcGbY19Dc_0HkGLgue8uG1AJJFFgUfEiuzHEMOYQzbPrdyA/exec";
 
 // USERS
 const USERS=[
@@ -344,9 +344,33 @@ Kindly arrange DG support to maintain uninterrupted production.
 
 function loadMyRequests(){
 
-fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
-.then(r=>r.json())
-.then(data=>{
+fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date.now())
+
+.then(response => {
+  if (!response.ok) {
+    throw new Error("Network response was not OK");
+  }
+  return response.text();   // ✅ first get raw text
+})
+
+.then(text => {
+
+  console.log("RAW RESPONSE:", text);
+
+  let data;
+
+  try {
+    data = JSON.parse(text);   // ✅ safe parse
+  } catch(parseErr){
+    console.error("JSON Parse Error:", parseErr);
+    throw new Error("Invalid JSON received");
+  }
+
+  console.log("PARSED DATA:", data);
+
+  if(!Array.isArray(data)){
+    throw new Error("Data is not array");
+  }
 
   let map = {};
 
@@ -354,49 +378,46 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
 
     if(!map[d.requestId]){
       map[d.requestId] = {
-  requestId: d.requestId,
-  shutdownDate: d.shutdownDate,
-  shutdownType: d.shutdownType || "",
-  information: d.information || "",
-  feeder: d.feeder || "",
-  requestedBy: d.requestedBy || "",
-  mobile: d["requester mobile"] || d.mobile || "",
-  installation: d.installation || "",
 
-  // ✅ FIXED STATUS FIELDS
-  fmpStatus: d["fmp status"] || d.fmpStatus || "Pending",
-  dgApprovalStatus: d.approverStatus || "Pending",
-  dgDeployStatus: d.dgDeployStatus || "Pending",
-  contractor: d["contractor"] || d.Contractor || "",
-  operatorName: d["operator name"] || d["Operator Name"] || "",
-  operatorMobile: d["oprator mobile"] || d["Oprator Mobile"] || "",
+        requestId: d.requestId,
+        shutdownDate: d.shutdownDate,
+        shutdownType: d.shutdownType || "",
+        information: d.information || "",
+        feeder: d.feeder || "",
+        requestedBy: d.requestedBy || "",
+        mobile: d.mobile || "",
+        installation: d.installation || "",
 
-  wells: []
-};
+        fmpStatus: d.fmpStatus || "Pending",
+        dgApprovalStatus: d.approverStatus || "Pending",
+        dgDeployStatus: d.dgDeployStatus || "Pending",
+        contractor: d.contractor || "",
+        operatorName: d.operatorName || "",
+        operatorMobile: d.operatorMobile || "",
+
+        wells: []
+      };
     }
-    
-   map[d.requestId].wells.push({
-  well: d.well || "NA",
-  cap: Number(d.capacity || d.cap || 0),
-  operator: d["operator name"] || "",
-  opMobile: d["oprator mobile"] || ""
-});
 
+   map[d.requestId].wells.push({
+  well: d.well || d.Well || "NA",
+  cap: Number(d.capacity || d.Capacity || d["Capacity (Ton)"] || 0),
+  operator: String(d.operatorName ?? "").trim(),
+  opMobile: String(d.operatorMobile ?? "").trim()
+});
   });
 
-  // 🔥 STORE GLOBAL FOR DUPLICATE FEEDER VALIDATION
   window.LAST_REQUEST_DATA = map;
 
   let html="";
 
   Object.values(map).reverse().forEach(req=>{
 
-    // Default color
-    let colorClass = "card-orange";
+    let colorClass = "card-red";
 
-    if(req.fmpStatus == "Forwarded") colorClass = "card-orange";
-    if(req.dgApprovalStatus == "Approved") colorClass = "card-green";
-    if(req.dgApprovalStatus == "Rejected") colorClass = "card-reject";
+    if(req.fmpStatus === "Forwarded") colorClass = "card-orange";
+    if(req.dgApprovalStatus === "Approved") colorClass = "card-green";
+    if(req.dgApprovalStatus === "Rejected") colorClass = "card-reject";
 
     let wellsHtml="";
     let totalCap=0;
@@ -405,7 +426,8 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
       totalCap += w.cap;
       wellsHtml += `
         <div style="margin-bottom:6px">
-          • ${w.well} - ${w.cap} Ton<br> 👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}
+          • ${w.well} - ${w.cap} Ton<br>
+          👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}
         </div>
       `;
     });
@@ -445,12 +467,14 @@ fetch(WEBAPP_URL+"?action=myRequests&inst="+CURRENT_USER.inst+"&t="+Date.now())
   myRequests.innerHTML = html || "No Requests Found";
 
 })
+
 .catch(err=>{
   console.error("Load Requests Error:", err);
-  myRequests.innerHTML = "Error loading requests";
+  myRequests.innerHTML = "<span style='color:red'>Error loading requests</span>";
 });
 
 }
+
 function shareDGWhatsApp(req){
 
   let wellsText="";
