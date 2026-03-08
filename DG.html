@@ -403,7 +403,8 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
   well: d.well || d.Well || "NA",
   cap: Number(d.capacity || d.Capacity || d["Capacity (Ton)"] || 0),
   operator: String(d.operatorName ?? "").trim(),
-  opMobile: String(d.operatorMobile ?? "").trim()
+  opMobile: String(d.operatorMobile ?? "").trim(),
+  status: String(d.dgDeployStatus ?? "").trim()
 });
   });
 
@@ -425,11 +426,12 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
     req.wells.forEach(w=>{
       totalCap += w.cap;
       wellsHtml += `
-        <div style="margin-bottom:6px">
-          • ${w.well} - ${w.cap} Ton<br>
-          👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}
-        </div>
-      `;
+<div style="margin-bottom:6px">
+  • ${w.well} - ${w.cap} Ton<br>
+  👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}<br>
+  ⚡ DG Status: <b>${w.status || "Pending"}</b>
+</div>
+`;
     });
 
     let safeReq = encodeURIComponent(JSON.stringify(req));
@@ -456,8 +458,7 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
 
       <b>FMP Status:</b> ${req.fmpStatus}<br>
       <b>DG Approval Status:</b> ${req.dgApprovalStatus}<br>
-      <b>DG Deploy Status:</b> ${req.dgDeployStatus}<br><br>
-
+     
       <button onclick="shareDGWhatsApp(JSON.parse(decodeURIComponent('${safeReq}')))" class="dg-wa-btn">
         📲 Share WhatsApp
       </button>
