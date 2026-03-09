@@ -428,7 +428,7 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
       wellsHtml += `
 <div style="margin-bottom:6px">
   • ${w.well} - ${w.cap} Ton<br>
-  👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}<br>
+  👷 Operator: ${w.operator || "Not Assigned"}<br> 📞 Mobile: ${w.opMobile || "-"}<br>
   ⚡ DG Status: <b>${w.status || "Pending"}</b>
 </div>
 `;
@@ -509,4 +509,5 @@ Total Wells: ${req.wells.length}`;
 </script>
 
 </body>
+
 </html>
