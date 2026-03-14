@@ -169,7 +169,7 @@ function formatDateDMY(dateStr){
   return dd+"-"+mm+"-"+yy;
 }
 
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwupek1DhAv96BCqg-uJNTBcGbY19Dc_0HkGLgue8uG1AJJFFgUfEiuzHEMOYQzbPrdyA/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw0sDlTPWJa0H6Wj8ug6dGzttaWqIhW0X-B4MdwTfa_Q5Uw_YGS1qdkLAIznComZz5kRQ/exec";
 
 // USERS
 const USERS=[
@@ -403,8 +403,7 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
   well: d.well || d.Well || "NA",
   cap: Number(d.capacity || d.Capacity || d["Capacity (Ton)"] || 0),
   operator: String(d.operatorName ?? "").trim(),
-  opMobile: String(d.operatorMobile ?? "").trim(),
-  status: String(d.dgDeployStatus ?? "").trim()
+  opMobile: String(d.operatorMobile ?? "").trim()
 });
   });
 
@@ -426,12 +425,11 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
     req.wells.forEach(w=>{
       totalCap += w.cap;
       wellsHtml += `
-<div style="margin-bottom:6px">
-  • ${w.well} - ${w.cap} Ton<br>
-  👷 Operator: ${w.operator || "Not Assigned"}<br> 📞 Mobile: ${w.opMobile || "-"}<br>
-  ⚡ DG Status: <b>${w.status || "Pending"}</b>
-</div>
-`;
+        <div style="margin-bottom:6px">
+          • ${w.well} - ${w.cap} Ton<br>
+          👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}
+        </div>
+      `;
     });
 
     let safeReq = encodeURIComponent(JSON.stringify(req));
@@ -458,7 +456,8 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
 
       <b>FMP Status:</b> ${req.fmpStatus}<br>
       <b>DG Approval Status:</b> ${req.dgApprovalStatus}<br>
-     
+      <b>DG Deploy Status:</b> ${req.dgDeployStatus}<br><br>
+
       <button onclick="shareDGWhatsApp(JSON.parse(decodeURIComponent('${safeReq}')))" class="dg-wa-btn">
         📲 Share WhatsApp
       </button>
@@ -509,5 +508,4 @@ Total Wells: ${req.wells.length}`;
 </script>
 
 </body>
-
 </html>
