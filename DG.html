@@ -67,6 +67,10 @@ button{
 }
 .btn-primary{background:var(--primary);color:white}
 .btn-success{background:var(--success);color:white}
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
 
 .hidden{display:none}
 .well-row{display:flex;gap:8px;margin-top:8px}
@@ -149,7 +153,7 @@ Installation: <b id="userInst"></b>
 </div>
 
 <button onclick="addWell()">+ Add Well</button>
-<button class="btn-success" onclick="submitRequest()">Submit</button>
+<button id="submitBtn" class="btn-success" onclick="submitRequest()">Submit</button>
 </div>
 
 <div class="card">
@@ -236,9 +240,15 @@ function addWell(){
 
 function submitRequest(){
 
+  const btn = document.getElementById("submitBtn");
+
+  // 🔒 Disable button immediately
+  btn.disabled = true;
+  btn.innerText = "Submitting...";
+
   let arr = [];
   let wellSet = new Set();
-  let duplicateWellFound = false; // ✅ FLAG
+  let duplicateWellFound = false;
 
   document.querySelectorAll(".well-row").forEach(r=>{
     let i = r.querySelectorAll("input");
@@ -247,7 +257,6 @@ function submitRequest(){
 
     if(well && cap){
 
-      // ❌ Duplicate well check
       if(wellSet.has(well)){
         alert("❌ Duplicate Well No not allowed: " + well);
         duplicateWellFound = true;
@@ -258,17 +267,14 @@ function submitRequest(){
     }
   });
 
-  // 🚫 STOP FULL SUBMIT
-  if(duplicateWellFound){
+  // ❌ Validation fail → re-enable button
+  if(duplicateWellFound || !arr.length){
+    alert("Please fix errors before submit");
+    btn.disabled = false;
+    btn.innerText = "Submit";
     return;
   }
 
-  if(!arr.length){
-    alert("Add at least one well");
-    return;
-  }
-
-  // Duplicate feeder check
   let duplicateFeeder = false;
 
   Object.values(window.LAST_REQUEST_DATA || {}).forEach(r=>{
@@ -282,7 +288,9 @@ function submitRequest(){
   });
 
   if(duplicateFeeder){
-    alert("❌ DG already requested for this Feeder on same date.\nAllowed only after DE Assigned.");
+    alert("❌ DG already requested for this Feeder on same date.");
+    btn.disabled = false;
+    btn.innerText = "Submit";
     return;
   }
 
@@ -298,16 +306,45 @@ function submitRequest(){
   };
 
   fetch(WEBAPP_URL+"?action=submitRequest&data="+encodeURIComponent(JSON.stringify(req)))
-  .then(r=>r.json())
-  .then(res=>{
-    alert("Request ID " + res.requestId);
 
+  .then(r=>{
+    if(!r.ok) throw new Error("Server error");
+    return r.json();
+  })
+
+  .then(res=>{
+
+    // ✅ SUCCESS
+    alert("✅ Request Saved! ID: " + res.requestId);
+
+    // 🧹 FULL FORM RESET
     shutdownDate.value="";
     shutdownType.value="";
     information.value="";
     feeder.value="";
 
+    // Reset wells to single row
+    wells.innerHTML = `
+      <div class="well-row">
+        <input placeholder="Well No">
+        <input placeholder="Capacity (Ton)" type="number">
+      </div>
+    `;
+
     loadMyRequests();
+  })
+
+  .catch(err=>{
+    console.error(err);
+
+    // ❌ FAIL → enable again
+    alert("❌ Failed to save. Try again.");
+  })
+
+  .finally(()=>{
+    // 🔓 ALWAYS ENABLE BUTTON BACK
+    btn.disabled = false;
+    btn.innerText = "Submit";
   });
 
 }
@@ -403,7 +440,8 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
   well: d.well || d.Well || "NA",
   cap: Number(d.capacity || d.Capacity || d["Capacity (Ton)"] || 0),
   operator: String(d.operatorName ?? "").trim(),
-  opMobile: String(d.operatorMobile ?? "").trim()
+  opMobile: String(d.operatorMobile ?? "").trim(),
+  dgStatus: String(d.dgDeployStatus ?? d["DG Deploy Status"] ?? "Pending").trim() // ✅ KEY FIX
 });
   });
 
@@ -419,19 +457,38 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
     if(req.dgApprovalStatus === "Approved") colorClass = "card-green";
     if(req.dgApprovalStatus === "Rejected") colorClass = "card-reject";
 
-    let wellsHtml="";
-    let totalCap=0;
+    let wellsHtml = `
+<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px">
+<thead>
+<tr style="background:#2563eb;color:#fff">
+  <th style="border:1px solid #ccc;padding:6px">Sr</th>
+  <th style="border:1px solid #ccc;padding:6px">Well No</th>
+  <th style="border:1px solid #ccc;padding:6px">Cap (Ton)</th>
+  <th style="border:1px solid #ccc;padding:6px">Operator</th>
+  <th style="border:1px solid #ccc;padding:6px">Mobile</th>
+  <th style="border:1px solid #ccc;padding:6px">DG Status</th>
+</tr>
+</thead>
+<tbody>
+`;
 
-    req.wells.forEach(w=>{
-      totalCap += w.cap;
-      wellsHtml += `
-        <div style="margin-bottom:6px">
-          • ${w.well} - ${w.cap} Ton<br>
-          👷 Operator: ${w.operator || "Not Assigned"} - 📞 Mobile: ${w.opMobile || "-"}
-        </div>
-      `;
-    });
+let totalCap = 0;
 
+req.wells.forEach((w,i)=>{
+  totalCap += w.cap;
+
+  wellsHtml += `
+  <tr>
+    <td style="border:1px solid #ccc;padding:6px;text-align:center">${i+1}</td>
+    <td style="border:1px solid #ccc;padding:6px">${w.well}</td>
+    <td style="border:1px solid #ccc;padding:6px;text-align:center">${w.cap}</td>
+    <td style="border:1px solid #ccc;padding:6px">${w.operator || "Not Assigned"}</td>
+    <td style="border:1px solid #ccc;padding:6px">${w.opMobile || "-"}</td>
+    <td style="border:1px solid #ccc;padding:6px;text-align:center">${w.dgStatus}</td>
+  </tr>`;
+});
+
+wellsHtml += `</tbody></table>`;
     let safeReq = encodeURIComponent(JSON.stringify(req));
 
     html += `
@@ -455,9 +512,8 @@ fetch(WEBAPP_URL + "?action=myRequests&inst=" + CURRENT_USER.inst + "&t=" + Date
       <b>Total Production:</b> ${totalCap} Ton<br><br>
 
       <b>FMP Status:</b> ${req.fmpStatus}<br>
-      <b>DG Approval Status:</b> ${req.dgApprovalStatus}<br>
-      <b>DG Deploy Status:</b> ${req.dgDeployStatus}<br><br>
-
+      <b>DG Approval Status:</b> ${req.dgApprovalStatus}<br><br>
+      
       <button onclick="shareDGWhatsApp(JSON.parse(decodeURIComponent('${safeReq}')))" class="dg-wa-btn">
         📲 Share WhatsApp
       </button>
@@ -479,7 +535,7 @@ function shareDGWhatsApp(req){
 
   let wellsText="";
   req.wells.forEach(w=>{
-    wellsText += `• ${w.well} | ${w.cap} Ton | ${w.operator || "NA"} (${w.opMobile || "-"})\n`;
+    wellsText += `• ${w.well} | ${w.cap} Ton})\n`;
   });
 
   let msg =
@@ -490,9 +546,6 @@ Installation: ${req.installation}
 Shutdown Date: ${formatDateDMY(req.shutdownDate)}
 Shutdown Type: ${req.shutdownType}
 Feeder: ${req.feeder}
-
-Contractor: ${req.contractor || "-"}
-DG Status: ${req.dgDeployStatus}
 
 Requested By: ${req.requestedBy}
 Mobile: ${req.mobile}
