@@ -437,11 +437,14 @@ function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000)}
 setInterval(loadActiveShutdowns,30000);
 function shareWhatsApp(feeder, type, time, inst){
  const msg =
-  "⚡ *POWER SHUTDOWN ALERT* ⚡\n\n" +
-  "🔌 *Feeder:* " + feeder + "\n" +
-  "📝 *Type:* " + type + "\n" +
-  "⏰ *Shutdown Time:* " + time + "\n" +
-  "🏭 *Installation:* " + inst + "\n\n" +
+  "✅ *POWER RESUME UPDATE* ✅\n\n" +
+  "🔌 *Feeder:* " + d.feeder + "\n" +
+  "⏰ *Resume Time:* " + d.resumeTime + "\n" +
+  "📉 *Production Loss:* " + d.loss + "\n" +   // ✅ ADD THIS
+  "⚙️ *DG Deployed:* " + d.dg + "\n" +
+  "📝 *Reason:* " + d.reason + "\n" +
+  "👤 *Updated By:* " + d.user + "\n" +
+  "🏭 *Installation:* " + d.inst + "\n\n" +
   "— Area-IV Power Shutdown App";
 
  const url = "https://wa.me/?text=" + encodeURIComponent(msg);
