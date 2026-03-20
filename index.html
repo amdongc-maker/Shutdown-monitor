@@ -456,19 +456,18 @@ function shareResumeWhatsApp(){
  }
 
  const d = LAST_RESUME_DATA;
-
- const msg =
+  const msg =
   "✅ *POWER RESUME UPDATE* ✅\n\n" +
   "🔌 *Feeder:* " + d.feeder + "\n" +
   "⏰ *Resume Time:* " + d.resumeTime + "\n" +
-  "⏱️ *Total Shutdown:* " + d.duration Hrs + "\n"
-  "📉 *Production Loss:* " + d.loss Ton + "\n" +
+  "⏱️ *Total Shutdown:* " + d.duration + " Hrs\n" +
+  "📉 *Production Loss:* " + d.loss + " Ton\n" +
   "⚙️ *DG Deployed:* " + d.dg + "\n" +
   "📝 *Reason:* " + d.reason + "\n" +
   "👤 *Updated By:* " + d.user + "\n" +
   "🏭 *Installation:* " + d.inst + "\n\n" +
   "— Area-IV Power Shutdown App";
-
+  
  window.open(
   "https://wa.me/?text=" + encodeURIComponent(msg),
   "_blank"
