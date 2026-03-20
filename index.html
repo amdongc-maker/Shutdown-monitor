@@ -373,7 +373,7 @@ if(hasSpecialChar(rs_rem.value)){
   dg: rs_dg.value,
   reason: rs_rem.value,
   user: CURRENT_USER.n,
-  inst: CURRENT_USER.i
+  inst: CURRENT_USER.i,
   duration: duration 
  };
 
@@ -450,21 +450,6 @@ function shareWhatsApp(feeder, type, time, inst){
 }
 function shareResumeWhatsApp(){
  if(!LAST_RESUME_DATA){
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   showMsg("No Resume Data Found");
   return;
