@@ -355,18 +355,17 @@ if(hasSpecialChar(rs_rem.value)){
   return;
  }
 
- fetch(WEBAPP_URL+"?"+new URLSearchParams({
-  action:"resume",
+  fetch(WEBAPP_URL + "?" + new URLSearchParams({
+  action: "resume",
   feeder: rs_feeder.value,
   ResumeTime: rs_time.value.replace("T"," "),
   ResumeEntryBy: CURRENT_USER.n,
   TotalProdLoss: rs_loss.value,
   DGDeployed: rs_dg.value,
   Remarks: rs_rem.value
- }), { mode:"no-cors" });
+}));
 
- // ✅ STORE LAST RESUME DATA
- LAST_RESUME_DATA = {
+LAST_RESUME_DATA = {
   feeder: rs_feeder.value,
   resumeTime: rs_time.value.replace("T"," "),
   loss: rs_loss.value,
@@ -374,8 +373,8 @@ if(hasSpecialChar(rs_rem.value)){
   reason: rs_rem.value,
   user: CURRENT_USER.n,
   inst: CURRENT_USER.i,
-  duration: duration 
- };
+  duration: duration || 0   // safe fallback
+};
 
  // ✅ SHOW WHATSAPP BUTTON
  document.getElementById("resumeShareBtn").classList.remove("hidden");
