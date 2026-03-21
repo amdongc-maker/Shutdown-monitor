@@ -378,12 +378,6 @@ label{
 </div>
 
 <script>
-  function parseCustomDate(val){
-  let m = val.match(/(\d{2})-(\d{2})-(\d{4})\s*(\d{2}):(\d{2})/);
-  if(!m) return null;
-
-  return new Date(m[3], m[2]-1, m[1], m[4], m[5]);
-}
   function parseDateManual(dt){
   if(!dt || dt==="NA") return null;
 
@@ -801,8 +795,8 @@ function exportPDF(){
     return;
   }
 
-  let fromD = new Date(from);
-  let toD   = new Date(to);
+  let fromD = parseDateManual(from.replace("T"," "));
+let toD   = parseDateManual(to.replace("T"," "));
 
   fetch(CSV_URL + "&t=" + Date.now())
   .then(r=>r.text())
@@ -869,11 +863,16 @@ function exportPDF(){
 
       // ✅ Hrs convert to minutes
       let totalMin = 0;
-      if(hrsStr && hrsStr.includes("Hrs")){
-        let h = parseInt(hrsStr.split("Hrs")[0]) || 0;
-        let m = parseInt(hrsStr.split("Min")[0].split("Hrs")[1]) || 0;
-        totalMin = (h*60) + m;
-      }
+
+if(hrsStr && hrsStr !== "NA"){
+  let match = hrsStr.match(/(\d+)\s*Hrs\s*(?:and)?\s*(\d+)\s*Min/i);
+
+  if(match){
+    let h = parseInt(match[1]) || 0;
+    let m = parseInt(match[2]) || 0;
+    totalMin = (h * 60) + m;
+  }
+}
 
       // ✅ FEEDER SUMMARY
       if(!summary[feeder]){
@@ -932,9 +931,12 @@ function exportPDF(){
 
     html += "</table>";
 
-    // ✅ GRAND TOTAL
-    let gHrs = Math.floor(grand.min/60);
-    let gMin = grand.min%60;
+    // ✅ SAFETY FIX (ADD THIS LINE)
+if(isNaN(grand.min)) grand.min = 0;
+
+// ✅ GRAND TOTAL
+let gHrs = Math.floor(grand.min/60);
+let gMin = grand.min%60;
 
     html += `
     <h3 style="text-align:center;margin-top:20px;">GRAND TOTAL</h3>
