@@ -274,6 +274,13 @@ label{
 <input id="loginUser" placeholder="Username">
 <input type="password" id="loginPass" placeholder="Password">
 <button class="btn-login" onclick="login()">Login</button>
+ <button onclick="window.location.href='plan.html'">
+ 📅 PLAN SHUTDOWN ENTRY
+</button>
+<button onclick="window.location.href='DG.html'">
+  ⚡ DG REQUIREMENT REQUEST
+</button>
+
 </div>
 
 <div class="card hidden" id="mainBox">
@@ -933,6 +940,45 @@ function exportPDF(){
     win.document.write(html);
     win.document.close();
     win.print();
+
+  });
+}
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx9evhP6t8S3dNKOXmd1B4eOFSgZGsYgsByt55PdxOky9UDvcm71T829UWnKlXbAQM9GQ/exec";
+
+window.onload=()=>{
+  checkTomorrowOnIndex();
+};
+
+function checkTomorrowOnIndex(){
+
+  fetch(SCRIPT_URL+"?action=getallplans&t="+Date.now())
+  .then(r=>r.json())
+  .then(data=>{
+
+    let today = new Date();
+    today.setHours(0,0,0,0);
+
+    let tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate()+1);
+
+    let reminders=[];
+
+    data.forEach(r=>{
+      let parts = r.date.split("-");
+      let d = new Date(parts[2], parts[1]-1, parts[0]);
+      d.setHours(0,0,0,0);
+
+      if(d.getTime() === tomorrow.getTime()){
+        reminders.push(
+          r.feeder+" ("+r.from+"-"+r.to+")"
+        );
+      }
+    });
+
+    if(reminders.length>0 && !sessionStorage.getItem("INDEX_REM")){
+      alert("⚠️ SHUTDOWN TOMORROW:\n\n" + reminders.join("\n"));
+      sessionStorage.setItem("INDEX_REM","1");
+    }
 
   });
 }
