@@ -274,13 +274,6 @@ label{
 <input id="loginUser" placeholder="Username">
 <input type="password" id="loginPass" placeholder="Password">
 <button class="btn-login" onclick="login()">Login</button>
- <button onclick="window.location.href='plan.html'">
- 📅 PLAN SHUTDOWN ENTRY
-</button>
-<button onclick="window.location.href='DG.html'">
-  ⚡ DG REQUIREMENT REQUEST
-</button>
-
 </div>
 
 <div class="card hidden" id="mainBox">
@@ -386,24 +379,40 @@ label{
 
 <script>
   function parseDateManual(dt){
-
   if(!dt || dt==="NA") return null;
 
-  // format: yyyy-mm-dd hh:mm
   let parts = dt.split(" ");
   if(parts.length < 2) return null;
 
-  let d = parts[0].split("-");
+  // ✅ Replace "/" with "-" (IMPORTANT FIX)
+  let datePart = parts[0].replace(/\//g, "-");
+
+  let d = datePart.split("-");
   let t = parts[1].split(":");
 
-  if(d.length<3 || t.length<2) return null;
+  if(d.length < 3 || t.length < 2) return null;
+
+  // ✅ Handle both formats: dd-mm-yyyy AND yyyy-mm-dd
+  let year, month, day;
+
+  if(d[0].length === 4){
+    // yyyy-mm-dd
+    year = d[0];
+    month = d[1];
+    day = d[2];
+  } else {
+    // dd-mm-yyyy
+    day = d[0];
+    month = d[1];
+    year = d[2];
+  }
 
   return new Date(
-    d[0],        // year ✅
-    d[1]-1,      // month
-    d[2],        // day
-    t[0],        // hour
-    t[1]         // minute
+    year,
+    month - 1,
+    day,
+    t[0],
+    t[1]
   );
 }
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
@@ -940,45 +949,6 @@ function exportPDF(){
     win.document.write(html);
     win.document.close();
     win.print();
-
-  });
-}
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx9evhP6t8S3dNKOXmd1B4eOFSgZGsYgsByt55PdxOky9UDvcm71T829UWnKlXbAQM9GQ/exec";
-
-window.onload=()=>{
-  checkTomorrowOnIndex();
-};
-
-function checkTomorrowOnIndex(){
-
-  fetch(SCRIPT_URL+"?action=getallplans&t="+Date.now())
-  .then(r=>r.json())
-  .then(data=>{
-
-    let today = new Date();
-    today.setHours(0,0,0,0);
-
-    let tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate()+1);
-
-    let reminders=[];
-
-    data.forEach(r=>{
-      let parts = r.date.split("-");
-      let d = new Date(parts[2], parts[1]-1, parts[0]);
-      d.setHours(0,0,0,0);
-
-      if(d.getTime() === tomorrow.getTime()){
-        reminders.push(
-          r.feeder+" ("+r.from+"-"+r.to+")"
-        );
-      }
-    });
-
-    if(reminders.length>0 && !sessionStorage.getItem("INDEX_REM")){
-      alert("⚠️ SHUTDOWN TOMORROW:\n\n" + reminders.join("\n"));
-      sessionStorage.setItem("INDEX_REM","1");
-    }
 
   });
 }
