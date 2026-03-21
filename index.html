@@ -324,9 +324,9 @@ label{
  </div></div>
  <h2>SHUTDOWN REPORT DOWNLOAD</h2>
  <label>FROM</label>
-<input type="datetime-local" id="fromDateTime" placeholder="FROM">
+<input type="datetime-local" id="fromDateTime" placeholder="DD-MM-YYYY HH:MM">
 <label>TO</label>
-<input type="datetime-local" id="toDateTime" placeholder="TO">
+<input type="datetime-local" id="toDateTime" placeholder="DD-MM-YYYY HH:MM">
 
   <button id="exportBtn" onclick="exportPDF()" style="background:#1f3a5f;color:#fff;" disabled>
     📄 Export PDF Report
@@ -378,6 +378,12 @@ label{
 </div>
 
 <script>
+  function parseCustomDate(val){
+  let m = val.match(/(\d{2})-(\d{2})-(\d{4})\s*(\d{2}):(\d{2})/);
+  if(!m) return null;
+
+  return new Date(m[3], m[2]-1, m[1], m[4], m[5]);
+}
   function parseDateManual(dt){
   if(!dt || dt==="NA") return null;
 
@@ -771,7 +777,7 @@ window.onload=()=>{
 
  document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
   el.addEventListener("input",()=>{
-   el.value = el.value.replace(/[^a-zA-Z0-9 .\-/]/g,"");
+   el.value = el.value.replace(/[^a-zA-Z0-9 .\-/]/g,""); 
   });
  });
 };
