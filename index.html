@@ -179,7 +179,7 @@ function login(){
 
       showMsg("Login Successful","success");
 
-      // ✅ IMPORTANT FIX (MATCH INDEX.HTML)
+      // ✅ IMPORTANT FIX (MATCH INSTALL.HTML)
       localStorage.setItem("CURRENT_USER", JSON.stringify({
         n: data.user.name,          // name
         i: data.user.installation,  // installation
@@ -187,7 +187,7 @@ function login(){
       }));
 
       setTimeout(()=>{
-        window.location.href = "install.html";
+        window.location.href = "INSTALL.html";
       },500);
 
     }else{
