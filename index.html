@@ -91,164 +91,26 @@ button{
   font-size:16px;
   font-weight:600;
   cursor:pointer;
+  background:#1f3a5f;color:#fff;
 }
 
 /* BUTTON COLORS */
 .btn-login{background:#1f3a5f;color:#fff;}
-.btn-shutdown{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;}
-.btn-resume{background:#27ae60;color:#fff;}
-.btn-back{background:#1addeb;color:#fff;}
+.btn-login:hover{background:#16304d;}
 
-/* ===== SMALL BUTTON ROW ===== */
-.action-row{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
-.small-btn{
-  flex:1;
-  padding:10px;
-  font-size:14px;
-  border-radius:10px;
-}
-
-/* ===== TABLE ===== */
-table{
-  width:100%;
-  min-width:1100px;
-  border-collapse:collapse;
-  background:#fff;
-  border-radius:10px;
-  overflow:hidden;
-}
-
-table th, table td{
-  padding:8px;
-  text-align:center;
-  white-space:nowrap;
-}
-
-table th{
-  font-size:13px;
-  background:#1f3a5f;
-  color:#fff;
-}
-
-table td{
-  font-size:12px;
-}
-
-/* ===== SHUTDOWN CARD ===== */
-.shutdown-item{
-  background:#fff;
-  border-radius:16px;
-  padding:18px;
-  margin-bottom:14px;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
-}
-
-.shutdown-row{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:8px;
-  font-size:14px;
-}
-
-.shutdown-label{
-  color:#6b7280;
-  font-weight:600;
-}
-
-.shutdown-value{
-  font-weight:700;
-}
-
-.install-badge{
-  padding:4px 12px;
-  border-radius:999px;
-  background:#e5f0ff;
-  color:#1f3a5f;
-  font-size:12px;
-  font-weight:700;
-}
-
-/* ===== SUMMARY BOX ===== */
-#summaryBox{
-  background:#fff;
-  padding:10px;
-  border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,.05);
-}
-
-/* ===== FILTER ===== */
-#historyFilter{
-  margin-top:8px;
-  font-size:14px;
-}
 
 /* ===== MESSAGE ===== */
 #msg{
   text-align:center;
   margin-top:10px;
   font-weight:600;
-}
-
-/* ===== HIDDEN ===== */
-.hidden{display:none}
-
-/* ===== LABEL ===== */
-label{
-  font-size:13px;
-  font-weight:600;
-  color:#374151;
-}
-
-/* ===== PRINT FIX ===== */
-@media print {
-  table {
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  th, td {
-    font-size: 12px;
-    padding: 6px;
-    word-break: break-word;
-  }
-
-  .dt-wrap {
-    white-space: normal;
-    line-height: 1.2;
-  }
-
-  .hrs-nowrap {
-    white-space: nowrap;
-  }
-}
-/* ✅ Export button disabled look */
-#exportBtn:disabled{
-  background:#9ca3af !important; /* grey */
-  cursor:not-allowed;
-}
-
-/* ✅ Enabled look */
-#exportBtn:not(:disabled){
-  background:#1f3a5f !important; /* original */
-  cursor:pointer;
+  color: red; 
 }
 </style>
 </head>
 
 <body>
 <header>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</header>
-<div id="userInfo" class="hidden" style="
-  background:#ffffff;
-  margin:10px 16px;
-  padding:10px 14px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.06);
-  text-align:center;
-">
   <div style="font-size:15px;font-weight:700;color:#1f3a5f" id="ui_name"></div>
   <div style="font-size:13px;color:#6b7280" id="ui_inst"></div>
 </div>
@@ -270,697 +132,75 @@ label{
       box-shadow:0 4px 10px rgba(0,0,0,.15);
     ">
 </div>
-<h3>USER LOGIN</h3>
-<input id="loginUser" placeholder="Username">
-<input type="password" id="loginPass" placeholder="Password">
-<button class="btn-login" onclick="login()">Login</button>
+<div class="card">
+  <h2>🔐 USER LOGIN</h2>
+
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="login()">LOGIN</button>
+
+  <div id="msg"></div>
 </div>
-
-<div class="card hidden" id="mainBox">
-<h2>ACTIVE SHUTDOWN FEEDERS</h2>
-<div id="activeShutdowns">Loading...</div>
-<div class="action-row">
-  <button class="btn-shutdown small-btn" onclick="openShutdown()">Shutdown</button>
-  <button class="btn-resume small-btn" onclick="openResume()">Resume</button>
-</div>
-  <div class="container">
-  
-    <div class="card hidden" id="historyBox">
-  <h2>📊 SHUTDOWN HISTORY</h2>
-<div style="margin-top:10px;">
-
- </div>
-  <!-- FILTER -->
-  <select id="historyFilter" onchange="loadHistory()">
-    <option value="ALL">ALL INSTALLATIONS</option>
-    <option>LIMBODARA-GGS-1</option>
-    <option>LIMBODARA-GGS-2</option>
-    <option>GAMIJ-GGS-1</option>
-    <option>GAMIJ-GGS-2</option>
-    <option>GAMIJ-GGS-3</option>
-    <option>MOTERA-GGS</option>
-  </select>
-
-  <!-- SUMMARY -->
-  <div id="summaryBox" style="margin-top:10px;font-size:13px;"></div>
-
-  <div style="overflow:auto;">
-    <table id="historyTable" style="width:100%; border-collapse:collapse; font-size:13px;">
-      <thead style="background:#1f3a5f;color:#fff;">
-        <tr>
-          <th>Feeder</th>
-          <th>Shutdown</th>
-          <th>Resume</th>
-          <th>Type</th>
-          <th>Hrs and Min</th>
-          <th>Loss - Ton</th>
-          <th>Installation</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
- </div></div>
- <h2>SHUTDOWN REPORT DOWNLOAD</h2>
- <label>FROM</label>
-<input type="datetime-local" id="fromDateTime" placeholder="DD-MM-YYYY HH:MM">
-<label>TO</label>
-<input type="datetime-local" id="toDateTime" placeholder="DD-MM-YYYY HH:MM">
-
-  <button id="exportBtn" onclick="exportPDF()" style="background:#1f3a5f;color:#fff;" disabled>
-    📄 Export PDF Report
-  </button>
-</div>
-
-<div class="card hidden" id="shutdownBox">
-<h2>SHUTDOWN ENTRY</h2>
-<label>Feeder</label>
-<select id="sd_feeder"></select>
-<label>Shutdown Time</label>
-<input type="datetime-local" id="sd_time">
-<label>Shutdown Type</label>
-<select id="sd_type">
-<option value="">Select Type</option>
-<option>PLAN PSD</option>
-<option>PARTIAL PLAN PSD</option>
-<option>UNPLAN PSD</option>
-<option>PARTIAL UNPLAN PSD</option>
-</select>
-<label>Information</label>
-<textarea id="sd_info" placeholder="Information"></textarea>
-<button class="btn-shutdown" onclick="submitShutdown()">Submit</button>
-<button class="btn-back" onclick="backToMain()">Back</button>
-  </div>
-
-<div class="card hidden" id="resumeBox">
-<h2>RESUME ENTRY</h2>
-<label>Feeder</label>
-<select id="rs_feeder"></select>
-<label>Resume Time</label>
-<input type="datetime-local" id="rs_time">
-<label>Production Loss</label>
-<input id="rs_loss" type="number" step="0.01" placeholder="Production Loss" >
-<label>DG Deployed</label>
-<input id="rs_dg" type="number" placeholder="DG Deployed" inputmode="numeric" min="0">
-<label>Remarks</label>
-<textarea id="rs_rem" placeholder="Actual Reason"></textarea>
-<button class="btn-resume" onclick="submitResume()">Submit</button>
-<button id="resumeShareBtn"
-  class="btn-resume hidden"
-  onclick="shareResumeWhatsApp()">
-  📲 Share Resume on WhatsApp
-</button>
-<button class="btn-back" onclick="backToMain()">Back</button>
-</div>
-
-<div id="msg"></div>
-</div>
-
 <script>
-  function parseDateManual(dt){
-  if(!dt || dt==="NA") return null;
 
-  let parts = dt.split(" ");
-  if(parts.length < 2) return null;
+// 🔴 YOUR WEB APP URL
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbypZ2rk0WUVi5Otfv5HSx8xHkvuxRO_4PpzruP8hi7JbGa2PWi9SvTBQ1IHTHF1cgu9mA/exec";
 
-  // ✅ Replace "/" with "-" (IMPORTANT FIX)
-  let datePart = parts[0].replace(/\//g, "-");
-
-  let d = datePart.split("-");
-  let t = parts[1].split(":");
-
-  if(d.length < 3 || t.length < 2) return null;
-
-  // ✅ Handle both formats: dd-mm-yyyy AND yyyy-mm-dd
-  let year, month, day;
-
-  if(d[0].length === 4){
-    // yyyy-mm-dd
-    year = d[0];
-    month = d[1];
-    day = d[2];
-  } else {
-    // dd-mm-yyyy
-    day = d[0];
-    month = d[1];
-    year = d[2];
-  }
-
-  return new Date(
-    year,
-    month - 1,
-    day,
-    t[0],
-    t[1]
-  );
-}
-const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
-const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
-const USERS=[
- {u:"121318",p:"admin123",n:"SYSTEM ADMIN",i:"ALL",admin:true},
- {u:"95606",p:"*ongc123",n:"SUDHIR SINGH",i:"ALL",admin:true},
- {u:"95843",p:"*ongc123",n:"DIPAK MEDAK",i:"ALL",admin:true},
- {u:"82653",p:"*ongc123",n:"SHANTILAL RATHWA",i:"ALL",admin:true},
- {u:"122125",p:"123",n:"JYOTISH GOGOI",i:"ALL",admin:true},
- {u:"82051",p:"*ongc123",n:"HEMENDRA KUMAR",i:"ALL",admin:true},
- {u:"96490",p:"*ongc123",n:"AVINAV KUMAR",i:"ALL",admin:true},
- {u:"124569",p:"1234",n:"KULDIP KHAROLIA",i:"LIMBODARA-GGS-1"},
- {u:"133668",p:"1234",n:"DIPAK MAURYA",i:"LIMBODARA-GGS-1"},
- {u:"124470",p:"1234",n:"SANDESH BHARDWAJ",i:"LIMBODARA-GGS-2"},
- {u:"135597",p:"1234",n:"KUNAL RANJAN",i:"LIMBODARA-GGS-2"},
- {u:"139938",p:"1234",n:"HAREKRISHNA",i:"LIMBODARA-GGS-2"},
- {u:"125223",p:"1234",n:"SUKUMAR LAHA",i:"GAMIJ-GGS-1"},
- {u:"139646",p:"1234",n:"RAVI KUMAR SHARMA",i:"GAMIJ-GGS-1"},
- {u:"137317",p:"1234",n:"SONUKUMAR SINGH",i:"GAMIJ-GGS-1"},
- {u:"121028",p:"1234",n:"ABHISHEK PATEL",i:"GAMIJ-GGS-2"},
- {u:"133181",p:"1234",n:"KETUL PATEL",i:"GAMIJ-GGS-2"},
- {u:"123310",p:"1234",n:"DHEERENDRA SINGH",i:"GAMIJ-GGS-3"},
- {u:"133643",p:"1234",n:"ASHUTOSH KUMAR SINGH",i:"GAMIJ-GGS-3"},
- {u:"135515",p:"1234",n:"ADITYA ARYA",i:"GAMIJ-GGS-3"},
- {u:"130594",p:"1234",n:"MAHESH GAJJAR",i:"MOTERA-GGS"}
-];
-
-const FEEDERS={
- "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
-"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
-"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
-"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
-"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
-"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
-"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
- "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
- "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
- "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
- "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
- "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
- "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
- "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
- "KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4",
- "SIHUNJ FEEDER","VANSOLI FEEDER",
- "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
-]
-};
-
-let CURRENT_USER={}, LAST_SHUTDOWN_TIME={}, LAST_RESUME_DATA=null;
-
-// ✅ SINGLE SPECIAL CHAR FUNCTION
-function hasSpecialChar(text){
-  return !/^[a-zA-Z0-9 .\-/]+$/.test(text);
-}
-
-// ✅ LOGIN
+// ========= LOGIN =========
 function login(){
- const u=USERS.find(x=>x.u===loginUser.value && x.p===loginPass.value);
- if(!u){showMsg("Invalid Login");return;}
 
- CURRENT_USER=u;
- localStorage.setItem("CURRENT_USER", JSON.stringify(CURRENT_USER));
-// ✅ ADMIN FILTER CONTROL
-if(!CURRENT_USER.admin){
-  document.getElementById("historyFilter").style.display = "none";
-}
- ui_name.innerText="👤 "+CURRENT_USER.n;
- ui_inst.innerText="Installation : "+CURRENT_USER.i;
+  let username = document.getElementById("username").value.trim();
+  let password = document.getElementById("password").value.trim();
 
- userInfo.classList.remove("hidden");
- loginBox.classList.add("hidden");
- mainBox.classList.remove("hidden");
- historyBox.classList.remove("hidden");
-
- populateFeeders();
- loadActiveShutdowns();
- setTimeout(loadHistory,500);
-}
-
-// ✅ FEEDER LOAD
-function populateFeeders(){
- sd_feeder.innerHTML=rs_feeder.innerHTML="";
- (FEEDERS[CURRENT_USER.i]||FEEDERS.ALL).forEach(f=>{
-  sd_feeder.innerHTML+=`<option>${f}</option>`;
-  rs_feeder.innerHTML+=`<option>${f}</option>`;
- });
-}
-
-// ✅ ACTIVE SHUTDOWN
-function loadActiveShutdowns(){
- LAST_SHUTDOWN_TIME={};
-
- fetch(CSV_URL+"&t="+Date.now())
- .then(r=>r.text())
- .then(t=>{
-  const rows=t.split("\n").map(r=>r.split(",").map(x=>x.replace(/"/g,"").trim()));
-  const h=rows.shift().map(x=>x.toUpperCase());
-
-  const i={
-   feeder:h.findIndex(x=>x.includes("FEEDER")),
-   sd:h.findIndex(x=>x.includes("SHUTDOWN")),
-   rs:h.findIndex(x=>x.includes("RESUME")),
-   inst:h.findIndex(x=>x.includes("INSTALL")),
-   type:h.findIndex(x=>x.includes("TYPE"))
-  };
-
-  activeShutdowns.innerHTML="";
-  let count=0;
-
-  rows.forEach(r=>{
-   const feeder=r[i.feeder];
-   const sdTime=r[i.sd];
-   const rsTime=r[i.rs];
-   const inst=r[i.inst];
-   const type=r[i.type];
-
-   if(!rsTime || rsTime==="NA"){
-    if(!CURRENT_USER.admin && inst!==CURRENT_USER.i) return;
-
-    LAST_SHUTDOWN_TIME[feeder]=sdTime;
-    count++;
-
-    activeShutdowns.innerHTML+=`
-<div class="shutdown-item">
-  <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${feeder}</span></div>
-  <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${type}</span></div>
-  <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${sdTime}</span></div>
-  <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${inst}</span></div>
-
-  <button style="margin-top:10px;width:100%;background:#25D366;color:#fff;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;"
-    onclick="shareWhatsApp('${feeder}','${type}','${sdTime}','${inst}')">
-    📲 Share on WhatsApp
-  </button>
-</div>`;
-   }
-  });
-
-  if(!count){
-   activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;color:#27ae60;font-weight:700">
-   ✅ All FEEDERS ARE HEALTHY</div>`;
-  }
- });
-}
-
-// ✅ SHUTDOWN
-function submitShutdown(){
- if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
-  showMsg("All Shutdown fields required");return;
- }
- if(hasSpecialChar(sd_info.value)){showMsg("❌ Invalid characters");return;}
- if(LAST_SHUTDOWN_TIME[sd_feeder.value]){showMsg("Already shutdown");return;}
-
- fetch(WEBAPP_URL+"?"+new URLSearchParams({
-  action:"shutdown",
-  feeder:sd_feeder.value,
-  ShutdownTime:sd_time.value.replace("T"," "),
-  ShutdownType:sd_type.value,
-  Information:sd_info.value.toUpperCase(),
-  ShutdownEntryBy:CURRENT_USER.n,
-  Installation:CURRENT_USER.i
- }),{mode:"no-cors"});
-
- showMsg("Shutdown Submitted");
- backToMain();
-}
-
-// ✅ RESUME
-function submitResume(){
- if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
-  showMsg("All fields required");return;
- }
- if(hasSpecialChar(rs_rem.value)){showMsg("❌ Invalid characters");return;}
-
- if(!LAST_SHUTDOWN_TIME[rs_feeder.value]){
-  showMsg("Feeder not found");return;
- }
-
- fetch(WEBAPP_URL+"?"+new URLSearchParams({
-  action:"resume",
-  feeder:rs_feeder.value,
-  ResumeTime:rs_time.value.replace("T"," "),
-  ResumeEntryBy:CURRENT_USER.n,
-  TotalProdLoss:rs_loss.value,
-  DGDeployed:rs_dg.value,
-  Remarks:rs_rem.value
- }),{mode:"no-cors"});
-
- LAST_RESUME_DATA={
-  feeder:rs_feeder.value,
-  resumeTime:rs_time.value,
-  dg:rs_dg.value,
-  reason:rs_rem.value,
-  user:CURRENT_USER.n,
-  inst:CURRENT_USER.i
- };
-
- document.getElementById("resumeShareBtn").classList.remove("hidden");
- showMsg("Resume Submitted");
-}
-
-// ✅ NAVIGATION
-function openShutdown(){mainBox.classList.add("hidden");shutdownBox.classList.remove("hidden");}
-function openResume(){mainBox.classList.add("hidden");resumeBox.classList.remove("hidden");}
-function backToMain(){
- shutdownBox.classList.add("hidden");
- resumeBox.classList.add("hidden");
- mainBox.classList.remove("hidden");
- historyBox.classList.remove("hidden");
- loadActiveShutdowns();
- loadHistory();
-}
-
-// ✅ MESSAGE
-function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000);}
-
-// ✅ WHATSAPP
-function shareWhatsApp(f,t,time,i){
- window.open("https://wa.me/?text="+encodeURIComponent(
-  `⚡ POWER SHUTDOWN\nFeeder: ${f}\nType: ${t}\nTime: ${time}\nInst: ${i}`
- ),"_blank");
-}
-
-function shareResumeWhatsApp(){
- if(!LAST_RESUME_DATA){showMsg("No data");return;}
- let d=LAST_RESUME_DATA;
- window.open("https://wa.me/?text="+encodeURIComponent(
-  `✅ RESUME\nFeeder: ${d.feeder}\nTime: ${d.resumeTime}\nDG: ${d.dg}\nReason: ${d.reason}`
- ),"_blank");
-}
-
-// ✅ HISTORY
-function formatDateTime(dt){
-  let d = parseDateManual(dt);
-  if(!d) return "-";
-
-  let day = String(d.getDate()).padStart(2,'0');
-  let mon = String(d.getMonth()+1).padStart(2,'0');
-  let yr  = d.getFullYear();
-  let hr  = String(d.getHours()).padStart(2,'0');
-  let min = String(d.getMinutes()).padStart(2,'0');
-
-  return `${day}-${mon}-${yr} ${hr}:${min}`;
-}
-function formatHrs(val){
-
-  if(!val || val === "NA") return "0 Hrs and 0 Min";
-
-  // agar already correct format hai
-  if(typeof val === "string" && val.includes("Hrs")){
-    return val;
-  }
-
-  return val; // fallback
-}
-
-function loadHistory(){
-
- fetch(CSV_URL + "&t=" + Date.now())
- .then(r => r.text())
- .then(t => {
-
-   const rows = t.split("\n").map(r => r.split(",").map(x => x.replace(/"/g,"").trim()));
-   const h = rows.shift().map(x => x.toUpperCase());
-
-   const i = {
-     feeder: h.findIndex(x => x.includes("FEEDER")),
-     sd:     h.findIndex(x => x.includes("SHUTDOWN")),
-     rs:     h.findIndex(x => x.includes("RESUME")),
-     type:   h.findIndex(x => x.includes("TYPE")),
-     inst:   h.findIndex(x => x.includes("INSTALL")),
-     hrs:    h.findIndex(x => x.includes("HRS")),
-     loss:   h.findIndex(x => x.includes("LOSS"))
-   };
-
-   let filter = document.getElementById("historyFilter").value;
-
-   let data = [];
-
-   let now = new Date();
-
-   // ✅ CURRENT MONTH 1st
-   let startCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-   // ✅ PREVIOUS MONTH 1st
-   let startPrevMonth = new Date(now.getFullYear(), now.getMonth()-1, 1);
-
-   // ✅ FILTER RANGE = previous month 1st se ab tak
-   let startDate = startPrevMonth;
-
-   rows.forEach(r => {
-
-     const feeder = r[i.feeder];
-     const sd     = r[i.sd];
-     const rs     = r[i.rs];
-     const type   = r[i.type];
-     const inst   = r[i.inst];
-    const hrs = r[i.hrs]; // direct string lo
-     const loss   = parseFloat(r[i.loss]) || 0;
-
-     if(!feeder || !sd) return;
-
-     let sdDate = new Date(sd);
-
-     // ✅ DATE FILTER (LAST 2 MONTH FROM 1st)
-     if(sdDate < startDate) return;
-
-     // ✅ INSTALLATION FILTER
-     if(filter !== "ALL" && inst !== filter) return;
-     if(!CURRENT_USER.admin && inst !== CURRENT_USER.i) return;
-
-     data.push({
-       feeder,
-       sdDate,
-       sd,
-       rs,
-       type,
-       inst,
-       hrs,
-       loss
-     });
-
-   });
-
-   // ✅ SORT LATEST FIRST (IMPORTANT FIX)
-   data.sort((a,b)=> b.sdDate - a.sdDate);
-
-   let html = "";
-
-   data.forEach(d=>{
-     html += `
-     <tr style="border-bottom:1px solid #ddd;">
-       <td>${d.feeder}</td>
-       <td>${formatDateTime(d.sd)}</td>
-       <td>${formatDateTime(d.rs)}</td>
-       <td>${d.type}</td>
-       <td>${formatHrs(d.hrs)}</td>
-       <td>${d.loss}</td>
-       <td>${d.inst}</td>
-     </tr>`;
-   });
-
-   document.querySelector("#historyTable tbody").innerHTML =
-     html || `<tr><td colspan="7">No Data (Last 2 Months)</td></tr>`;
-
- });
-}
-// ✅ AUTO REFRESH
-setInterval(()=>{
- loadActiveShutdowns();
- loadHistory();
-},30000);
-
-// ✅ ONLOAD FIXED (ONLY ONE)
-window.onload=()=>{
- checkTomorrowOnIndex();
-
- document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
-  el.addEventListener("input",()=>{
-   el.value = el.value.replace(/[^a-zA-Z0-9 .\-/]/g,""); 
-  });
- });
-};
-function checkExportButton(){
-  let from = document.getElementById("fromDateTime").value;
-  let to   = document.getElementById("toDateTime").value;
-
-  document.getElementById("exportBtn").disabled = !(from && to);
-}
-
-// ✅ Event listeners
-document.getElementById("fromDateTime").addEventListener("change", checkExportButton);
-document.getElementById("toDateTime").addEventListener("change", checkExportButton);
-function exportPDF(){
-
-  let from = document.getElementById("fromDateTime").value;
-  let to   = document.getElementById("toDateTime").value;
-
-  if(!from || !to){
-    showMsg("Select From & To Date Time");
+  if(!username || !password){
+    showMsg("Enter Username & Password","error");
     return;
   }
 
-  let fromD = parseDateManual(from.replace("T"," "));
-let toD   = parseDateManual(to.replace("T"," "));
+  showMsg("Checking...","");
 
-  fetch(CSV_URL + "&t=" + Date.now())
-  .then(r=>r.text())
-  .then(t=>{
+  fetch(WEBAPP_URL + "?" + new URLSearchParams({
+    username: username,
+    password: password
+  }))
+  .then(res => res.json())
+  .then(data => {
 
-    const rows = t.split("\n").map(r => r.split(",").map(x => x.replace(/"/g,"").trim()));
-    const h = rows.shift().map(x => x.toUpperCase());
+    if(data.status === "success"){
 
-    const i = {
-      feeder: h.findIndex(x => x.includes("FEEDER")),
-      sd:     h.findIndex(x => x.includes("SHUTDOWN")),
-      rs:     h.findIndex(x => x.includes("RESUME")),
-      type:   h.findIndex(x => x.includes("TYPE")),
-      inst:   h.findIndex(x => x.includes("INSTALL")),
-      hrs:    h.findIndex(x => x.includes("HRS")),
-      loss:   h.findIndex(x => x.includes("LOSS")),
-      dg:     h.findIndex(x => x.includes("DG")) // ✅ NEW
-    };
+      showMsg("Login Successful","success");
 
-    let filter = document.getElementById("historyFilter").value;
+      // ✅ IMPORTANT FIX (MATCH INSTALL.HTML)
+      localStorage.setItem("CURRENT_USER", JSON.stringify({
+        n: data.user.name,          // name
+        i: data.user.installation,  // installation
+        admin: data.user.admin 
+      }));
 
-    let summary = {};
-    let grand = {min:0, loss:0, dg:0}; // ✅ GRAND TOTAL
+      setTimeout(()=>{
+        window.location.href = "Install.html";
+      },500);
 
-    let html = `
-    <h2 style="text-align:center;">POWER SHUTDOWN REPORT</h2>
-    <p style="text-align:center;">
-      From ${formatDateTime(from.replace("T"," "))} 
-      To ${formatDateTime(to.replace("T"," "))}
-    </p>
+    }else{
+      showMsg(data.message || "Login Failed","error");
+    }
 
-    <table border="1" cellspacing="0" cellpadding="6" width="100%" style="text-align:center;">
-    <tr>
-      <th>Feeder</th>
-      <th>Shutdown</th>
-      <th>Resume</th>
-      <th>Type</th>
-      <th>Hrs and Min</th>
-      <th>Loss - Ton</th>
-      <th>DG Deployed</th>
-      <th>Installation</th>
-    </tr>`;
-
-    rows.forEach(r=>{
-
-      const feeder = r[i.feeder];
-      const sd     = r[i.sd];
-      const rs     = r[i.rs];
-      const type   = r[i.type];
-      const inst   = r[i.inst];
-      const hrsStr = r[i.hrs];
-      const loss   = parseFloat(r[i.loss]) || 0;
-      const dg     = parseFloat(r[i.dg]) || 0;
-
-      if(!feeder || !sd) return;
-
-      let sdDate = parseDateManual(sd);
-      if(!sdDate) return;
-
-      if(sdDate < fromD || sdDate > toD) return;
-
-      if(filter !== "ALL" && inst !== filter) return;
-      if(!CURRENT_USER.admin && inst !== CURRENT_USER.i) return;
-
-      // ✅ Hrs convert to minutes
-      let totalMin = 0;
-
-if(hrsStr && hrsStr !== "NA"){
-  let match = hrsStr.match(/(\d+)\s*Hrs\s*(?:and)?\s*(\d+)\s*Min/i);
-
-  if(match){
-    let h = parseInt(match[1]) || 0;
-    let m = parseInt(match[2]) || 0;
-    totalMin = (h * 60) + m;
-  }
-}
-
-      // ✅ FEEDER SUMMARY
-      if(!summary[feeder]){
-        summary[feeder] = {min:0, loss:0, dg:0};
-      }
-
-      summary[feeder].min += totalMin;
-      summary[feeder].loss += loss;
-      summary[feeder].dg += dg;
-
-      // ✅ GRAND TOTAL
-      grand.min += totalMin;
-      grand.loss += loss;
-      grand.dg += dg;
-
-      html += `
-      <tr>
-        <td>${feeder}</td>
-        <td>${formatDateTime(sd)}</td>
-        <td>${formatDateTime(rs)}</td>
-        <td>${type}</td>
-        <td>${formatHrs(hrsStr)}</td>
-        <td>${loss}</td>
-        <td>${dg}</td>
-        <td>${inst}</td>
-      </tr>`;
-    });
-
-    html += "</table>";
-
-    // ✅ FEEDER SUMMARY TABLE
-    html += `
-    <h3 style="text-align:center;margin-top:20px;">FEEDER WISE SUMMARY</h3>
-    <table border="1" cellspacing="0" cellpadding="6" width="100%" style="text-align:center;">
-    <tr>
-      <th>Feeder</th>
-      <th>Total Shutdown Hrs</th>
-      <th>Total Loss (Ton)</th>
-      <th>Total DG</th>
-    </tr>`;
-
-    Object.keys(summary).forEach(f=>{
-
-      let totalMin = summary[f].min;
-      let hrs = Math.floor(totalMin/60);
-      let min = totalMin%60;
-
-      html += `
-      <tr>
-        <td>${f}</td>
-        <td>${hrs} Hrs ${min} Min</td>
-        <td>${summary[f].loss.toFixed(2)}</td>
-        <td>${summary[f].dg}</td>
-      </tr>`;
-    });
-
-    html += "</table>";
-
-    // ✅ SAFETY FIX (ADD THIS LINE)
-if(isNaN(grand.min)) grand.min = 0;
-
-// ✅ GRAND TOTAL
-let gHrs = Math.floor(grand.min/60);
-let gMin = grand.min%60;
-
-    html += `
-    <h3 style="text-align:center;margin-top:20px;">GRAND TOTAL</h3>
-    <table border="1" cellspacing="0" cellpadding="6" width="100%" style="text-align:center;">
-    <tr>
-      <th>Total Shutdown</th>
-      <th>Total Loss (Ton)</th>
-      <th>Total DG</th>
-    </tr>
-    <tr>
-      <td>${gHrs} Hrs ${gMin} Min</td>
-      <td>${grand.loss.toFixed(2)}</td>
-      <td>${grand.dg}</td>
-    </tr>
-    </table>`;
-
-    let win = window.open("", "_blank");
-    win.document.write(html);
-    win.document.close();
-    win.print();
-
+  })
+  .catch(err=>{
+    console.error(err);
+    showMsg("Server Error","error");
   });
 }
+
+// ========= MESSAGE =========
+function showMsg(text,type){
+  let msg = document.getElementById("msg");
+  msg.innerText = text;
+  msg.className = type;
+}
+
 </script>
+
 </body>
 </html>
