@@ -632,7 +632,10 @@ function loadActiveShutdowns(){
  fetch(CSV_URL+"&t="+Date.now())
  .then(r=>r.text())
  .then(t=>{
-  const rows=t.split("\n").map(r=>r.split(",").map(x=>x.replace(/"/g,"").trim()));
+  const rows = t.split("\n").map(r => {
+  return r.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)
+          ?.map(x => x.replace(/"/g,"").trim()) || [];
+});
   const h=rows.shift().map(x=>x.toUpperCase());
 
   const i={
@@ -962,12 +965,12 @@ if(startDate && sdDate < startDate) return;
 
   // ✅ NON ADMIN → only own installation
 if(!CURRENT_USER.admin){
-  if(inst !== CURRENT_USER.i) return;
+  if(inst.trim().toUpperCase() !== CURRENT_USER.i.trim().toUpperCase()) return;
 }
 
 // ✅ ADMIN → apply dropdown filter
 if(CURRENT_USER.admin){
-  if(filter !== "ALL" && inst !== filter) return;
+  if(filter !== "ALL" && inst.trim().toUpperCase() !== filter.trim().toUpperCase()) return;
 }
 
      data.push({
