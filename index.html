@@ -183,7 +183,7 @@ function login(){
       localStorage.setItem("CURRENT_USER", JSON.stringify({
         n: data.user.name,          // name
         i: data.user.installation,  // installation
-        admin: data.user.admin === "YES"
+        admin: data.user.admin
       }));
 
       setTimeout(()=>{
