@@ -3,27 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <title>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</title>
+<div id="loader" style="
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+">
+  <div style="
+    background:#1181f8;
+    padding:20px 30px;
+    border-radius:12px;
+    font-weight:600;color: white
+    box-shadow:0 6px 18px rgba(207, 6, 20, 0.849);
+  ">
+    ⏳ Submitting...
+  </div>
+</div>
+<div id="toast" style="
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#2c1cd8;
+  color:#fff;
+  padding:12px 20px;
+  border-radius:10px;
+  font-weight:600;
+  box-shadow:0 4px 10px rgba(0,0,0,.2);
+  display:none;
+  z-index:9999;
+"></div>
 <style>
 /* ===== GLOBAL ===== */
 body{
   font-family:"Segoe UI",Roboto,Arial;
   background:#f1f3f6;
-  margin: 0;
-  }
+  margin:0;
+}
 
-/* ===== HEADER ===== */
-header{
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   background:#1f3a5f;
   color:#fff;
-  padding:14px 18px;
-  font-size:18px;
-  font-weight:600;
+  padding:12px 16px;
+}
+
+/* left empty space (balance ke liye) */
+.header-left{
+  width:40px;
+}
+
+/* center title */
+.header-title{
+  flex:1;
   text-align:center;
+  font-size:16px;
+  font-weight:600;
+}
+
+/* right logout */
+.header-right{
+  width:40px;
+  display:flex;
+  justify-content:flex-end;
+}
+
+/* logout button */
+.logout-btn{
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  border-radius:50%;
+  background:#e74c3c;
+  color:#fff;
+  cursor:pointer;
 }
 
 /* ===== CONTAINER ===== */
 .container{
-  max-width:820px;
+  max-width: 420px;
   margin:auto;
   padding:16px;
 }
@@ -31,7 +98,7 @@ header{
 /* ===== CARD ===== */
 .card{
   background:#fff;
-  padding:10px;
+  padding:20px;
   border-radius:16px;
   box-shadow:0 6px 18px rgba(0,0,0,0.08);
   margin-bottom:20px;
@@ -48,6 +115,39 @@ h3{
   color:#1f3a5f;
   text-align:center;
   margin-bottom:10px;
+}
+/* ===== SHUTDOWN CARD ===== */
+.shutdown-item{
+  background:#fff;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.shutdown-row{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.shutdown-label{
+  color:#6b7280;
+  font-weight:600;
+}
+
+.shutdown-value{
+  font-weight:700;
+}
+
+.install-badge{
+  padding:4px 12px;
+  border-radius:999px;
+  background:#e5f0ff;
+  color:#1f3a5f;
+  font-size:12px;
+  font-weight:700;
 }
 
 /* ===== INPUTS ===== */
@@ -137,29 +237,56 @@ table td{
   font-size:12px;
 }
 
-/* ===== SHUTDOWN CARD ===== */
-.shutdown-item{
-  background:#fff;
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:14px;
-  box-shadow:0 4px 10px rgba(0,0,0,.08);
+/* ✅ COMPACT FORM (Shutdown + Resume) */
+#shutdownBox .card,
+#resumeBox .card{
+  max-width:420px;
+  margin:auto;
+  padding:16px;
 }
 
-.shutdown-row{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:8px;
+/* Inputs small */
+#shutdownBox input,
+#shutdownBox select,
+#shutdownBox textarea,
+#resumeBox input,
+#resumeBox select,
+#resumeBox textarea{
+  height:38px;
   font-size:14px;
+  margin-top:6px;
+  border-radius:10px;
 }
 
-.shutdown-label{
-  color:#6b7280;
-  font-weight:600;
+/* textarea fix */
+#shutdownBox textarea,
+#resumeBox textarea{
+  height:70px;
+  padding:8px 12px;
 }
 
-.shutdown-value{
-  font-weight:700;
+/* labels tight */
+#shutdownBox label,
+#resumeBox label{
+  font-size:12px;
+  margin-top:6px;
+  display:block;
+}
+
+/* buttons compact */
+#shutdownBox button,
+#resumeBox button{
+  height:42px;
+  font-size:14px;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+/* headings compact */
+#shutdownBox h2,
+#resumeBox h2{
+  font-size:15px;
+  margin-bottom:8px;
 }
 
 .install-badge{
@@ -235,50 +362,19 @@ label{
   background:#1f3a5f !important; /* original */
   cursor:pointer;
 }
-/* RIGHT LOGOUT */
-.header-right{
-  display:flex;
-  justify-content:flex-end;
-}
-
-/* ===== LOGOUT ICON BUTTON ===== */
-.logout-btn{
-  width:34px;
-  height:34px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-  border:none;
-  border-radius:50%;
-  background:#e74c3c;
-  color:#fff;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-.logout-btn:hover{
-  background:#c0392b;
-  transform:scale(1.08);
-}
-
-.logout-btn:active{
-  transform:scale(0.95);
-}
-
-/* CENTER TITLE */
-.header-title{
-  flex:1;
-  text-align:center;
-}
 
 </style>
 
 </head>
 
 <body>
-<header>
-  <div class="header-title">⚡POWER SHUTDOWN MANAGEMENT APP AREA-IV</div>
+<header class="header">
+  <div class="header-left"></div>
+
+  <div class="header-title">
+    ⚡ POWER SHUTDOWN MANAGEMENT APP AREA-IV
+  </div>
+
   <div class="header-right">
     <button class="logout-btn" onclick="logout()" title="Logout">🔓</button>
   </div>
@@ -340,8 +436,8 @@ label{
   </div>
 
  </div></div>
- <div class="container">
- <h2>SHUTDOWN REPORT DOWNLOAD</h2>
+ <div class="container" id="reportBox">
+<h2>SHUTDOWN REPORT DOWNLOAD</h2>
  <label>FROM</label>
 <input type="datetime-local" id="fromDateTime" placeholder="DD-MM-YYYY HH:MM">
 <label>TO</label>
@@ -352,8 +448,8 @@ label{
   </button>
  </div></div>
 
-<div class="card hidden" id="shutdownBox">
-<h2>SHUTDOWN ENTRY</h2>
+<div class="card hidden" id="shutdownBox" style="max-width:420px;margin:auto;">
+<h2><b>SHUTDOWN ENTRY</b></h2>
 <label>Feeder</label>
 <select id="sd_feeder"></select>
 <label>Shutdown Time</label>
@@ -368,12 +464,12 @@ label{
 </select>
 <label>Information</label>
 <textarea id="sd_info" placeholder="Information"></textarea>
-<button class="btn-shutdown" onclick="submitShutdown()">Submit</button>
-<button class="btn-back" onclick="backToMain()">Back</button>
+<button class="btn-shutdown" onclick="submitShutdown()"><b>SUBMIT</b></button>
+<button class="btn-back" onclick="backToMain()"><b>BACK</b></button>
   </div>
 
-<div class="card hidden" id="resumeBox">
-<h2>RESUME ENTRY</h2>
+<div class="card hidden" id="resumeBox" style="max-width:420px;margin:auto;">
+<h2><b>RESUME ENTRY</b></h2>
 <label>Feeder</label>
 <select id="rs_feeder"></select>
 <label>Resume Time</label>
@@ -384,13 +480,13 @@ label{
 <input id="rs_dg" type="number" placeholder="DG Deployed" inputmode="numeric" min="0">
 <label>Remarks</label>
 <textarea id="rs_rem" placeholder="Actual Reason"></textarea>
-<button class="btn-resume" onclick="submitResume()">Submit</button>
+<button class="btn-resume" onclick="submitResume()"><b></b>SUBMIT</b></button>
 <button id="resumeShareBtn"
   class="btn-resume hidden"
   onclick="shareResumeWhatsApp()">
-  📲 Share Resume on WhatsApp
+  📲 SHARE RESUME ON WHATSAPP
 </button>
-<button class="btn-back" onclick="backToMain()">Back</button>
+<button class="btn-back" onclick="backToMain()"><b>BACK</b></button>
 </div>
 
 <div id="msg"></div>
@@ -505,6 +601,11 @@ const FEEDERS={
 
 let CURRENT_USER={}, LAST_SHUTDOWN_TIME={}, LAST_RESUME_DATA=null;
 
+// ✅ SPECIAL CHAR VALIDATION
+function hasSpecialChar(text){
+  return !/^[a-zA-Z0-9 .\-/]+$/.test(text);
+}
+
 // ================= FEEDERS =================
 function populateFeeders(){
   let list = FEEDERS[CURRENT_USER.i] || FEEDERS.ALL;
@@ -580,11 +681,26 @@ function loadActiveShutdowns(){
 
 // ✅ SHUTDOWN
 function submitShutdown(){
+
+ let btn = document.querySelector("#shutdownBox .btn-shutdown");
+
  if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
-  showMsg("All Shutdown fields required");return;
+  showToast("❌ All fields required","error");
+  return;
  }
- if(hasSpecialChar(sd_info.value)){showMsg("❌ Invalid characters");return;}
- if(LAST_SHUTDOWN_TIME[sd_feeder.value]){showMsg("Already shutdown");return;}
+
+ if(hasSpecialChar(sd_info.value)){
+  showToast("❌ Invalid characters","error");
+  return;
+ }
+
+ if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
+  showToast("⚠️ Already shutdown","error");
+  return;
+ }
+
+ showLoader();
+ disableBtn(btn);
 
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"shutdown",
@@ -594,22 +710,51 @@ function submitShutdown(){
   Information:sd_info.value.toUpperCase(),
   ShutdownEntryBy:CURRENT_USER.n,
   Installation:CURRENT_USER.i
- }),{mode:"no-cors"});
+ }),{mode:"no-cors"})
+ .then(()=>{
 
- showMsg("Shutdown Submitted");
- backToMain();
+   showToast("✅ Shutdown Submitted");
+
+   // reset form
+   sd_info.value="";
+   sd_type.value="";
+   sd_time.value="";
+
+   backToMain();
+
+ })
+ .catch(()=>{
+   showToast("❌ Failed to submit","error");
+ })
+ .finally(()=>{
+   hideLoader();
+   enableBtn(btn);
+ });
 }
 
 // ✅ RESUME
 function submitResume(){
+
+ let btn = document.querySelector("#resumeBox .btn-resume");
+
  if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
-  showMsg("All fields required");return;
+  showToast("❌ All fields required","error");
+  return;
  }
- if(hasSpecialChar(rs_rem.value)){showMsg("❌ Invalid characters");return;}
+
+ if(hasSpecialChar(rs_rem.value)){
+  showToast("❌ Invalid characters","error");
+  return;
+ }
 
  if(!LAST_SHUTDOWN_TIME[rs_feeder.value]){
-  showMsg("Feeder not found");return;
+  showToast("⚠️ Loading data, try again","error");
+  loadActiveShutdowns();
+  return;
  }
+
+ showLoader();
+ disableBtn(btn);
 
  fetch(WEBAPP_URL+"?"+new URLSearchParams({
   action:"resume",
@@ -619,47 +764,98 @@ function submitResume(){
   TotalProdLoss:rs_loss.value,
   DGDeployed:rs_dg.value,
   Remarks:rs_rem.value
- }),{mode:"no-cors"});
+ }),{mode:"no-cors"})
+ .then(()=>{
 
- LAST_RESUME_DATA={
-  feeder:rs_feeder.value,
-  resumeTime:rs_time.value,
-  dg:rs_dg.value,
-  reason:rs_rem.value,
-  user:CURRENT_USER.n,
-  inst:CURRENT_USER.i
- };
+   showToast("✅ Resume Submitted");
 
- document.getElementById("resumeShareBtn").classList.remove("hidden");
- showMsg("Resume Submitted");
+   LAST_RESUME_DATA={
+     feeder:rs_feeder.value,
+     resumeTime:rs_time.value,
+     dg:rs_dg.value,
+     reason:rs_rem.value
+   };
+
+   document.getElementById("resumeShareBtn").classList.remove("hidden");
+
+   // reset form
+   rs_rem.value="";
+   rs_loss.value="";
+   rs_dg.value="";
+
+ })
+ .catch(()=>{
+   showToast("❌ Failed to submit","error");
+ })
+ .finally(()=>{
+   hideLoader();
+   enableBtn(btn);
+ });
 }
 // ✅ NAVIGATION
 function openShutdown(){
-  document.querySelectorAll("#mainBox, #historyBox, #userInfo, .container").forEach(el=>{
-    el.classList.add("hidden");
-  });
-  shutdownBox.classList.remove("hidden");
+  document.getElementById("mainBox").classList.add("hidden");
+  document.getElementById("historyBox").classList.add("hidden");
+  document.getElementById("reportBox").classList.add("hidden");
+  document.getElementById("shutdownBox").classList.remove("hidden");
 }
 
 function openResume(){
-  document.querySelectorAll("#mainBox, #historyBox, #userInfo, .container").forEach(el=>{
-    el.classList.add("hidden");
-  });
-  resumeBox.classList.remove("hidden");
+  document.getElementById("mainBox").classList.add("hidden");
+  document.getElementById("historyBox").classList.add("hidden");
+  document.getElementById("reportBox").classList.add("hidden");
+  document.getElementById("resumeBox").classList.remove("hidden");
 }
 
 function backToMain(){
-  shutdownBox.classList.add("hidden");
-  resumeBox.classList.add("hidden");
+  document.getElementById("shutdownBox").classList.add("hidden");
+  document.getElementById("resumeBox").classList.add("hidden");
 
-  document.querySelectorAll("#mainBox, #historyBox, #userInfo, .container").forEach(el=>{
-    el.classList.remove("hidden");
-  });
+  document.getElementById("mainBox").classList.remove("hidden");
+  document.getElementById("historyBox").classList.remove("hidden");
+  document.getElementById("reportBox").classList.remove("hidden");
 
   loadActiveShutdowns();
   loadHistory();
 }
 
+// 🔄 LOADER CONTROL
+function showLoader(){
+  document.getElementById("loader").style.display = "flex";
+}
+
+function hideLoader(){
+  document.getElementById("loader").style.display = "none";
+}
+
+// 🔔 TOAST MESSAGE
+function showToast(msg, type="success"){
+  let t = document.getElementById("toast");
+
+  t.innerText = msg;
+
+  if(type==="error"){
+    t.style.background = "#e74c3c";
+  }else{
+    t.style.background = "#27ae60";
+  }
+
+  t.style.display = "block";
+
+  setTimeout(()=>{
+    t.style.display = "none";
+  },3000);
+}
+
+function disableBtn(btn){
+  btn.disabled = true;
+  btn.style.opacity = "0.6";
+}
+
+function enableBtn(btn){
+  btn.disabled = false;
+  btn.style.opacity = "1";
+}
 // ✅ MESSAGE
 function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000);}
 
