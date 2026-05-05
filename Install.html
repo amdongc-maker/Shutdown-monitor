@@ -745,12 +745,29 @@ function submitResume(){
  if(!rs_feeder.value||!rs_time.value||!rs_loss.value||!rs_dg.value||!rs_rem.value){
   showToast("❌ All fields required","error");
   return;
- }
+}
 
- if(hasSpecialChar(rs_rem.value)){
+// ✅ NEW VALIDATION HERE
+let shutdownTimeStr = LAST_SHUTDOWN_TIME[rs_feeder.value];
+
+let shutdownDate = parseDateManual(shutdownTimeStr);
+let resumeDate   = parseDateManual(rs_time.value.replace("T"," "));
+
+if(!shutdownDate || !resumeDate){
+  showToast("⚠️ Invalid date format","error");
+  return;
+}
+
+if(resumeDate < shutdownDate){
+  showToast("❌ Resume time cannot be before Shutdown time","error");
+  return;
+}
+
+// existing validation continues...
+if(hasSpecialChar(rs_rem.value)){
   showToast("❌ Invalid characters","error");
   return;
- }
+}
 
  if(!LAST_SHUTDOWN_TIME[rs_feeder.value]){
   showToast("⚠️ Loading data, try again","error");
