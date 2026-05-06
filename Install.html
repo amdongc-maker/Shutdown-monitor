@@ -789,24 +789,27 @@ if(hasSpecialChar(rs_rem.value)){
  }),{mode:"no-cors"})
  .then(()=>{
 
-   showToast("✅ Resume Submitted");
+  showToast("✅ Resume Submitted");
 
-  LAST_RESUME_DATA={
-  feeder:rs_feeder.value,
-  resumeTime:rs_time.value,
-  dg:rs_dg.value,
-  loss:rs_loss.value,   // ✅ ADD THIS
-  reason:rs_rem.value
-};
+  LAST_RESUME_DATA = {
+    feeder: rs_feeder.value,
+    resumeTime: rs_time.value,
+    dg: rs_dg.value,
+    loss: rs_loss.value,
+    reason: rs_rem.value
+  };
 
-   document.getElementById("resumeShareBtn").classList.remove("hidden");
+  // ✅ SAVE (important)
+  localStorage.setItem("LAST_RESUME_DATA", JSON.stringify(LAST_RESUME_DATA));
 
-   // reset form
-   rs_rem.value="";
-   rs_loss.value="";
-   rs_dg.value="";
+  // ✅ AUTO WHATSAPP OPEN
+  shareResumeWhatsApp();
 
- })
+  // reset form
+  rs_rem.value="";
+  rs_loss.value="";
+  rs_dg.value="";
+})
  .catch(()=>{
    showToast("❌ Failed to submit","error");
  })
@@ -899,19 +902,26 @@ function shareWhatsApp(feeder, type, time, inst){
 
   function shareResumeWhatsApp(){
 
- let d = LAST_RESUME_DATA;
+  let data = LAST_RESUME_DATA || JSON.parse(localStorage.getItem("LAST_RESUME_DATA"));
 
- const msg =
-   "✅ *POWER RESUME UPDATE* ✅\n\n" +
-   "🔌 *Feeder:* " + d.feeder + "\n" +
-   "⏰ *Resume Time:* " + formatDateTime(d.resumeTime.replace("T"," ")) + "\n" + // ✅ FIX
-   "📉 *Production Loss:* " + d.loss + " Ton\n" +
-   "⚡ *DG Deployed:* " + d.dg + "\n" +
-   "📝 *Reason:* " + d.reason + "\n\n" +
-   "— Area-IV Power Shutdown App";
-
- window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+  if(!data){
+    showMsg("⚠️ No resume data found");
+    return;
   }
+
+  let d = data;
+
+  const msg =
+    "✅ *POWER RESUME UPDATE* ✅\n\n" +
+    "🔌 *Feeder:* " + d.feeder + "\n" +
+    "⏰ *Resume Time:* " + formatDateTime(d.resumeTime.replace("T"," ")) + "\n" +
+    "📉 *Production Loss:* " + d.loss + " Ton\n" +
+    "⚡ *DG Deployed:* " + d.dg + "\n" +
+    "📝 *Reason:* " + d.reason + "\n\n" +
+    "— Area-IV Power Shutdown App";
+
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+}
 
 // ✅ HISTORY
 function formatDateTime(dt){
