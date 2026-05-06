@@ -882,29 +882,7 @@ function enableBtn(btn){
 // ✅ MESSAGE
 function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000);}
 
-  function getLatestHrsFromSheet(feeder){
-
-  return fetch(CSV_URL + "&t=" + Date.now())
-  .then(r=>r.text())
-  .then(t=>{
-
-    const rows = t.split("\n").map(r => r.split(",").map(x => x.replace(/"/g,"").trim()));
-    const h = rows.shift().map(x => x.toUpperCase());
-
-    const i = {
-      feeder: h.findIndex(x => x.includes("FEEDER")),
-      hrs:    h.findIndex(x => x.includes("TOTAL OFF HRS")) // ✅ FINAL FIX
-    };
-
-    for(let k = rows.length-1; k>=0; k--){
-      if(rows[k][i.feeder] === feeder){
-        return rows[k][i.hrs] || "0 Hrs 0 Min";
-      }
-    }
-
-    return "0 Hrs 0 Min";
-  });
-  }
+  
 // ✅ WHATSAPP
 function shareWhatsApp(feeder, type, time, inst){
 
@@ -927,7 +905,6 @@ function shareWhatsApp(feeder, type, time, inst){
    "✅ *POWER RESUME UPDATE* ✅\n\n" +
    "🔌 *Feeder:* " + d.feeder + "\n" +
    "⏰ *Resume Time:* " + formatDateTime(d.resumeTime.replace("T"," ")) + "\n" + // ✅ FIX
-   "⏳ *Total Shutdown:* " + hrs + "\n"
    "📉 *Production Loss:* " + d.loss + " Ton\n" +
    "⚡ *DG Deployed:* " + d.dg + "\n" +
    "📝 *Reason:* " + d.reason + "\n\n" +
