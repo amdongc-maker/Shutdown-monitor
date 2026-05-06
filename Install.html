@@ -799,8 +799,11 @@ if(hasSpecialChar(rs_rem.value)){
     reason: rs_rem.value
   };
 
-  // ✅ SAVE (important)
+  // ✅ SAVE (important for button reuse)
   localStorage.setItem("LAST_RESUME_DATA", JSON.stringify(LAST_RESUME_DATA));
+
+  // ✅ BUTTON SHOW
+  document.getElementById("resumeShareBtn").classList.remove("hidden");
 
   // ✅ AUTO WHATSAPP OPEN
   shareResumeWhatsApp();
