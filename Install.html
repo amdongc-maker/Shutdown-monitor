@@ -791,12 +791,13 @@ if(hasSpecialChar(rs_rem.value)){
 
    showToast("✅ Resume Submitted");
 
-   LAST_RESUME_DATA={
-     feeder:rs_feeder.value,
-     resumeTime:rs_time.value,
-     dg:rs_dg.value,
-     reason:rs_rem.value
-   };
+  LAST_RESUME_DATA={
+  feeder:rs_feeder.value,
+  resumeTime:rs_time.value,
+  dg:rs_dg.value,
+  loss:rs_loss.value,   // ✅ ADD THIS
+  reason:rs_rem.value
+};
 
    document.getElementById("resumeShareBtn").classList.remove("hidden");
 
@@ -882,18 +883,38 @@ function enableBtn(btn){
 function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000);}
 
 // ✅ WHATSAPP
-function shareWhatsApp(f,t,time,i){
- window.open("https://wa.me/?text="+encodeURIComponent(
-  `⚡ POWER SHUTDOWN\nFeeder: ${f}\nType: ${t}\nTime: ${time}\nInst: ${i}`
- ),"_blank");
+function shareWhatsApp(feeder, type, time, inst){
+
+  const msg =
+    "⚡ *POWER SHUTDOWN ALERT* ⚡\n\n" +
+    "🔌 *Feeder:* " + feeder + "\n" +
+    "📝 *Type:* " + type + "\n" +
+   "⏰ *Shutdown Time:* " + formatDateTime(time) + "\n"
+    "🏭 *Installation:* " + inst + "\n\n" +
+    "— Area-IV Power Shutdown App";
+
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
 }
 
 function shareResumeWhatsApp(){
- if(!LAST_RESUME_DATA){showMsg("No data");return;}
- let d=LAST_RESUME_DATA;
- window.open("https://wa.me/?text="+encodeURIComponent(
-  `✅ RESUME\nFeeder: ${d.feeder}\nTime: ${d.resumeTime}\nDG: ${d.dg}\nReason: ${d.reason}`
- ),"_blank");
+
+ if(!LAST_RESUME_DATA){
+   showMsg("No data");
+   return;
+ }
+
+ let d = LAST_RESUME_DATA;
+
+ const msg =
+   "✅ *POWER RESUME UPDATE* ✅\n\n" +
+   "🔌 *Feeder:* " + d.feeder + "\n" +
+  "⏰ *Resume Time:* " + formatDateTime(d.resumeTime.replace("T"," ")) + "\n"
+   "📉 *Production Loss:* " + d.loss + " Ton\n" +   // ✅ ADDED
+   "⚡ *DG Deployed:* " + d.dg + "\n" +
+   "📝 *Reason:* " + d.reason + "\n\n" +
+   "— Area-IV Power Shutdown App";
+
+ window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
 }
 
 // ✅ HISTORY
