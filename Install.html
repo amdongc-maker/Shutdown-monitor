@@ -497,6 +497,13 @@ label{
 window.onload = function(){
 
   let user = localStorage.getItem("CURRENT_USER");
+  // ✅ Restore Resume Share Button after refresh
+let savedResume = localStorage.getItem("LAST_RESUME_DATA");
+
+if(savedResume){
+  LAST_RESUME_DATA = JSON.parse(savedResume);
+  document.getElementById("resumeShareBtn").classList.remove("hidden");
+}
 
   if(!user){
     window.location.href = "index.html";
