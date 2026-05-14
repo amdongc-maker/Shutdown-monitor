@@ -710,7 +710,20 @@ function submitShutdown(){
   showToast("⚠️ Already shutdown","error");
   return;
  }
+// ✅ CHECK: Shutdown time < Current time
+let selectedTime = new Date(sd_time.value);
+let currentTime  = new Date();
 
+if(selectedTime < currentTime){
+
+  let confirmSave = confirm(
+    "⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?"
+  );
+
+  if(!confirmSave){
+    return; // ❌ STOP if user clicks NO
+  }
+}
  showLoader();
  disableBtn(btn);
 
