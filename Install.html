@@ -714,14 +714,14 @@ function submitShutdown(){
 let selectedTime = new Date(sd_time.value);
 let currentTime  = new Date();
 
-if(selectedTime < currentTime){
+if(selectedTime.getTime() < currentTime.getTime()){
 
   let confirmSave = confirm(
     "⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?"
   );
 
   if(!confirmSave){
-    return; // ❌ STOP if user clicks NO
+    return;
   }
 }
  showLoader();
