@@ -710,11 +710,14 @@ function submitShutdown(){
   showToast("⚠️ Already shutdown","error");
   return;
  }
-// ✅ CHECK: Shutdown time < Current time
+// ✅ CHECK: Only if selected time is older than current minute
 let selectedTime = new Date(sd_time.value);
 let currentTime  = new Date();
 
-if(selectedTime.getTime() < currentTime.getTime()){
+// remove seconds & milliseconds
+currentTime.setSeconds(0,0);
+
+if(selectedTime < currentTime){
 
   let confirmSave = confirm(
     "⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?"
