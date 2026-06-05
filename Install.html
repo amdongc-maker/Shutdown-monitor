@@ -430,6 +430,7 @@ label{
           <th>HRS AND MIN</th>
           <th>LOSS - TON</th>
           <th>INSTALLATION</th>
+          <th>ACTION</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -584,8 +585,8 @@ if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
     t[1]
   );
 }
-const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
-const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycbzOR1J4qbEdY7flZ8LU9AfE1EIRXfjvu0IMHjZJKsLxkSq8kTf_8__PHACxVeWhdNno/exec";
+const CSV_URL="https://docs.google.com/spreadsheets/d/1Gz-mXiZpRIc6zYNPD115tY-VRtnwGgOGjlY1QUtENeQ/export?format=csv";
 
 const FEEDERS={
  "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
@@ -609,6 +610,9 @@ const FEEDERS={
 };
 
 let CURRENT_USER={}, LAST_SHUTDOWN_TIME={}, LAST_RESUME_DATA=null;
+
+let EDIT_MODE = false;
+let EDIT_ROW = null;
 
 // ✅ SPECIAL CHAR VALIDATION
 function hasSpecialChar(text){
@@ -673,7 +677,8 @@ function loadActiveShutdowns(){
 <div class="shutdown-item">
   <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${feeder}</span></div>
   <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${type}</span></div>
-  <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${sdTime}</span></div>
+  <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${formatDateTime(sdTime)}</span>
+</div>
   <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${inst}</span></div>
 
   <button style="margin-top:10px;width:100%;background:#25D366;color:#fff;border:collapse;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;"
@@ -762,6 +767,10 @@ if(selectedTime < currentTime){
 
 // ✅ RESUME
 function submitResume(){
+if(EDIT_MODE){
+  updateResume();
+  return;
+}
 
  let btn = document.querySelector("#resumeBox .btn-resume");
 
@@ -841,6 +850,65 @@ if(hasSpecialChar(rs_rem.value)){
    enableBtn(btn);
  });
 }
+function updateResume(){
+
+  let btn = document.querySelector("#resumeBox .btn-resume");
+
+  if(!rs_time.value || !rs_loss.value || !rs_dg.value || !rs_rem.value){
+    showToast("❌ All fields required","error");
+    return;
+  }
+
+  showLoader();
+  disableBtn(btn);
+
+  fetch(
+    WEBAPP_URL + "?" + new URLSearchParams({
+      action: "editresume",
+      feeder: EDIT_ROW.feeder,
+      ShutdownTime: EDIT_ROW.shutdownRaw,
+      ResumeTime: rs_time.value.replace("T"," "),
+      ResumeEntryBy: CURRENT_USER.n,
+      TotalProdLoss: rs_loss.value,
+      DGDeployed: rs_dg.value,
+      Remarks: rs_rem.value
+    })
+  )
+  .then(res => res.text())
+  .then(msg => {
+
+    console.log("Server Response:", msg);
+
+    if(msg.includes("Resume Updated Successfully")){
+
+      showToast("✅ Resume Updated");
+
+      EDIT_MODE = false;
+      EDIT_ROW = null;
+
+      backToMain();
+
+    }else{
+
+      showToast("❌ " + msg, "error");
+
+    }
+
+  })
+  .catch(err => {
+
+    console.error(err);
+
+    showToast("❌ Update Failed","error");
+
+  })
+  .finally(() => {
+
+    hideLoader();
+    enableBtn(btn);
+
+  });
+}
 // ✅ NAVIGATION
 function openShutdown(){
   document.getElementById("mainBox").classList.add("hidden");
@@ -855,8 +923,45 @@ function openResume(){
   document.getElementById("reportBox").classList.add("hidden");
   document.getElementById("resumeBox").classList.remove("hidden");
 }
+function openResumeEdit(row){
 
+ EDIT_MODE = true;
+ EDIT_ROW = row;
+
+ openResume();
+
+ rs_feeder.value = row.feeder;
+
+ rs_time.value =
+   row.rs.replace(" ","T");
+
+ rs_loss.value = row.loss;
+
+ rs_dg.value = row.dg;
+
+ rs_rem.value = row.remarks;
+
+ document.querySelector(
+   "#resumeBox h2"
+ ).innerText = "EDIT RESUME ENTRY";
+
+ document.querySelector(
+   "#resumeBox .btn-resume"
+ ).innerText = "UPDATE";
+}
 function backToMain(){
+EDIT_MODE = false;
+EDIT_ROW = null;
+
+document.querySelector(
+ "#resumeBox h2"
+).innerText =
+"RESUME ENTRY";
+
+document.querySelector(
+ "#resumeBox .btn-resume"
+).innerText =
+"SUBMIT";
   document.getElementById("shutdownBox").classList.add("hidden");
   document.getElementById("resumeBox").classList.add("hidden");
 
@@ -970,6 +1075,40 @@ function formatHrs(val){
 
   return val; // fallback
 }
+function canEditResume(resumeTime){
+
+  if(!resumeTime || resumeTime==="NA") return false;
+
+  let rt = parseDateManual(resumeTime);
+  if(!rt) return false;
+
+  let now = new Date();
+
+  let cutoff;
+
+  // Resume before 07:00 AM
+  if(rt.getHours() < 6){
+
+    cutoff = new Date(
+      rt.getFullYear(),
+      rt.getMonth(),
+      rt.getDate(),
+      7,0,0
+    );
+
+  }else{
+
+    cutoff = new Date(
+      rt.getFullYear(),
+      rt.getMonth(),
+      rt.getDate()+1,
+      7,0,0
+    );
+
+  }
+
+  return now < cutoff;
+}
 
 function loadHistory(){
 
@@ -1048,7 +1187,11 @@ if(CURRENT_USER.admin){
        type,
        inst,
        hrs,
-       loss
+       loss,
+       remarks : r[8],
+       dg      : r[11],
+       resumeBy: r[7],
+       shutdownRaw : sd
      });
 
    });
@@ -1059,17 +1202,59 @@ if(CURRENT_USER.admin){
    let html = "";
 
    data.forEach(d=>{
-     html += `
-     <tr style="border-bottom:1px solid #ddd;">
-       <td>${d.feeder}</td>
-       <td>${formatDateTime(d.sd)}</td>
-       <td>${formatDateTime(d.rs)}</td>
-       <td>${d.type}</td>
-       <td>${formatHrs(d.hrs)}</td>
-       <td>${d.loss}</td>
-       <td>${d.inst}</td>
-     </tr>`;
-   });
+let actionBtn = "";
+
+// Active Shutdown → Delete
+if(!d.rs || d.rs === "NA"){
+
+  actionBtn = `
+  <button
+    style="
+    background:#e74c3c;
+    color:#fff;
+    border:none;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer"
+    onclick="deleteShutdownHistory(
+      '${d.feeder}',
+      '${d.shutdownRaw}'
+    )">
+    Delete
+  </button>`;
+
+}
+// Resume Done → Edit
+else if(canEditResume(d.rs)){
+
+  actionBtn = `
+  <button
+    style="
+    background:#f39c12;
+    color:#fff;
+    border:none;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer"
+    onclick='openResumeEdit(
+      ${JSON.stringify(d)}
+    )'>
+    Edit
+  </button>`;
+}
+
+html += `
+<tr style="border-bottom:1px solid #ddd;">
+ <td>${d.feeder}</td>
+ <td>${formatDateTime(d.sd)}</td>
+ <td>${formatDateTime(d.rs)}</td>
+ <td>${d.type}</td>
+ <td>${formatHrs(d.hrs)}</td>
+ <td>${d.loss}</td>
+ <td>${d.inst}</td>
+ <td>${actionBtn}</td>
+</tr>`;
+       });
 
    document.querySelector("#historyTable tbody").innerHTML =
      html || `<tr><td colspan="7">No Data (Last 2 Months)</td></tr>`;
@@ -1272,6 +1457,45 @@ let gMin = grand.min%60;
     win.document.write(html);
     win.document.close();
     win.print();
+
+  });
+}
+function deleteShutdownHistory(feeder, shutdownTime){
+
+  if(!confirm(
+    "Delete Shutdown Entry?\n\n" + feeder
+  )){
+    return;
+  }
+
+  showLoader();
+
+  fetch(
+    WEBAPP_URL + "?" + new URLSearchParams({
+      action: "deleteshutdown",
+      feeder: feeder,
+      ShutdownTime: shutdownTime
+    })
+  )
+  .then(r => r.text())
+  .then(msg => {
+
+    showToast("✅ Shutdown Deleted");
+
+    loadHistory();
+    loadActiveShutdowns();
+
+  })
+  .catch(err => {
+
+    console.error(err);
+
+    showToast("❌ Delete Failed","error");
+
+  })
+  .finally(() => {
+
+    hideLoader();
 
   });
 }
