@@ -549,40 +549,44 @@ if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
 
 };
   function parseDateManual(dt){
+
   if(!dt || dt==="NA") return null;
 
+  dt = dt.trim();
+
   let parts = dt.split(" ");
+
   if(parts.length < 2) return null;
 
-  // ✅ Replace "/" with "-" (IMPORTANT FIX)
-  let datePart = parts[0].replace(/\//g, "-");
+  let datePart = parts[0].replace(/\//g,"-");
+  let timePart = parts[1];
 
   let d = datePart.split("-");
-  let t = parts[1].split(":");
+  let t = timePart.split(":");
 
-  if(d.length < 3 || t.length < 2) return null;
-
-  // ✅ Handle both formats: dd-mm-yyyy AND yyyy-mm-dd
   let year, month, day;
 
   if(d[0].length === 4){
-    // yyyy-mm-dd
-    year = d[0];
-    month = d[1];
-    day = d[2];
-  } else {
-    // dd-mm-yyyy
-    day = d[0];
-    month = d[1];
-    year = d[2];
+    year  = Number(d[0]);
+    month = Number(d[1]);
+    day   = Number(d[2]);
+  }else{
+    day   = Number(d[0]);
+    month = Number(d[1]);
+    year  = Number(d[2]);
   }
+
+  let hour   = Number(t[0] || 0);
+  let minute = Number(t[1] || 0);
+  let second = Number(t[2] || 0);
 
   return new Date(
     year,
     month - 1,
     day,
-    t[0],
-    t[1]
+    hour,
+    minute,
+    second
   );
 }
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbzOR1J4qbEdY7flZ8LU9AfE1EIRXfjvu0IMHjZJKsLxkSq8kTf_8__PHACxVeWhdNno/exec";
@@ -593,7 +597,7 @@ const FEEDERS={
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
 "GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
 "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
-"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
+"GAMIJ-GGS-3":["CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
 "MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
 "ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
  "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
@@ -783,7 +787,19 @@ if(EDIT_MODE){
 let shutdownTimeStr = LAST_SHUTDOWN_TIME[rs_feeder.value];
 
 let shutdownDate = parseDateManual(shutdownTimeStr);
-let resumeDate   = parseDateManual(rs_time.value.replace("T"," "));
+
+// Resume datetime-local input
+let resumeDate = new Date(rs_time.value);
+
+if(!shutdownDate || isNaN(resumeDate.getTime())){
+  showToast("⚠️ Invalid date format","error");
+  return;
+}
+
+if(resumeDate < shutdownDate){
+  showToast("❌ Resume time cannot be before Shutdown time","error");
+  return;
+}
 
 if(!shutdownDate || !resumeDate){
   showToast("⚠️ Invalid date format","error");
