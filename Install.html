@@ -39,51 +39,7 @@ body{
   display:flex;
   justify-content:flex-end;
 }
-/* ===== ALL FEEDER LIST ===== */
 
-#allFeederBox{
-  display:none;
-  margin-top:10px;
-  border:1px solid #d1d5db;
-  border-radius:12px;
-  padding:12px;
-  max-height:280px;
-  overflow-y:auto;
-  background:#fff;
-}
-
-.feeder-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:8px 10px;
-  border-bottom:1px solid #f1f1f1;
-}
-
-.feeder-item:last-child{
-  border-bottom:none;
-}
-
-.feeder-item input[type="checkbox"]{
-  width:18px;
-  height:18px;
-  margin:0;
-  cursor:pointer;
-}
-
-.feeder-item span{
-  flex:1;
-  font-size:14px;
-  font-weight:500;
-  color:#374151;
-  line-height:1.3;
-}
-
-/* Hover Effect */
-.feeder-item:hover{
-  background:#f8fafc;
-  border-radius:8px;
-}
 /* logout button */
 .logout-btn{
   width:34px;
@@ -498,15 +454,6 @@ label{
 <h2><b>SHUTDOWN ENTRY</b></h2>
 <label>Feeder</label>
 <select id="sd_feeder"></select>
-<div id="allFeederBox"
-     style="display:none;
-            margin-top:10px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            padding:10px;
-            max-height:250px;
-            overflow:auto;">
-</div>
 <label>Shutdown Time</label>
 <input type="datetime-local" id="sd_time">
 <label>Shutdown Type</label>
@@ -678,17 +625,7 @@ function hasSpecialChar(text){
 
 // ================= FEEDERS =================
 function populateFeeders(){
-
-  let list;
-
-  // Admin ya ALL installation user
-  if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
-    list = FEEDERS.ALL;
-  }
-  // Normal installation user
-  else{
-    list = FEEDERS[CURRENT_USER.i] || [];
-  }
+  let list = FEEDERS[CURRENT_USER.i] || FEEDERS.ALL;
 
   let sd = document.getElementById("sd_feeder");
   let rs = document.getElementById("rs_feeder");
@@ -696,103 +633,13 @@ function populateFeeders(){
   sd.innerHTML = "";
   rs.innerHTML = "";
 
-  // Shutdown dropdown
   list.forEach(f=>{
-    sd.innerHTML += `<option value="${f}">${f}</option>`;
+    sd.innerHTML += `<option>${f}</option>`;
+    rs.innerHTML += `<option>${f}</option>`;
   });
-
-  // Resume dropdown
-  list.forEach(f=>{
-    rs.innerHTML += `<option value="${f}">${f}</option>`;
-  });
-
-  // ALL FEEDERS option
-  sd.innerHTML += `
-    <option value="ALL_FEEDERS">
-      ✅ ALL FEEDERS
-    </option>
-  `;
 }
-document.addEventListener("change", function(e){
 
-  if(e.target.id !== "sd_feeder") return;
 
-  let box = document.getElementById("allFeederBox");
-
-  if(e.target.value === "ALL_FEEDERS"){
-
-    let feeders;
-
-    if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
-      feeders = FEEDERS.ALL;
-    }else{
-      feeders = FEEDERS[CURRENT_USER.i] || [];
-    }
-
-    box.innerHTML = "";
-
-    feeders.forEach(f=>{
-
-      box.innerHTML += `
-      <div class="feeder-item">
-        <input type="checkbox"
-               class="multiFeeder"
-               value="${f}"
-               checked>
-        <span>${f}</span>
-      </div>`;
-    });
-
-    box.style.display = "block";
-
-  }else{
-
-    box.style.display = "none";
-    box.innerHTML = "";
-
-  }
-
-});
-document.addEventListener("change", function(e){
-
-  if(e.target.id !== "sd_feeder") return;
-
-  let box = document.getElementById("allFeederBox");
-
-  if(e.target.value === "ALL_FEEDERS"){
-
-    let feeders;
-
-    if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
-      feeders = FEEDERS.ALL;
-    }else{
-      feeders = FEEDERS[CURRENT_USER.i] || [];
-    }
-
-    box.innerHTML = "";
-
-    feeders.forEach(f=>{
-
-      box.innerHTML += `
-      <div class="feeder-item">
-        <input type="checkbox"
-               class="multiFeeder"
-               value="${f}"
-               checked>
-        <span>${f}</span>
-      </div>`;
-    });
-
-    box.style.display = "block";
-
-  }else{
-
-    box.style.display = "none";
-    box.innerHTML = "";
-
-  }
-
-});
 // ✅ ACTIVE SHUTDOWN
 function loadActiveShutdowns(){
  LAST_SHUTDOWN_TIME={};
@@ -854,64 +701,74 @@ function loadActiveShutdowns(){
 }
 
 // ✅ SHUTDOWN
-async function submitShutdown(){
+function submitShutdown(){
 
-  let feeders = [];
+ let btn = document.querySelector("#shutdownBox .btn-shutdown");
 
-  if(sd_feeder.value === "ALL_FEEDERS"){
+ if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
+  showToast("❌ All fields required","error");
+  return;
+ }
 
-    document
-      .querySelectorAll(".multiFeeder:checked")
-      .forEach(cb => feeders.push(cb.value));
+ if(hasSpecialChar(sd_info.value)){
+  showToast("❌ Invalid characters","error");
+  return;
+ }
 
-  }else{
-    feeders.push(sd_feeder.value);
+ if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
+  showToast("⚠️ Already shutdown","error");
+  return;
+ }
+// ✅ CHECK: Only if selected time is older than current minute
+let selectedTime = new Date(sd_time.value);
+let currentTime  = new Date();
+
+// remove seconds & milliseconds
+currentTime.setSeconds(0,0);
+
+if(selectedTime < currentTime){
+
+  let confirmSave = confirm(
+    "⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?"
+  );
+
+  if(!confirmSave){
+    return;
   }
-
-  showLoader();
-
-  try{
-
-  for(const feeder of feeders){
-
-    await fetch(
-      WEBAPP_URL + "?" + new URLSearchParams({
-        action:"shutdown",
-        feeder: feeder,
-        ShutdownTime: sd_time.value.replace("T"," "),
-        ShutdownType: sd_type.value,
-        Information: sd_info.value.toUpperCase(),
-        ShutdownEntryBy: CURRENT_USER.n,
-        Installation: CURRENT_USER.i
-      }),
-      {mode:"no-cors"}
-    );
-
-    console.log("Saved:", feeder);
-  }
-
-  showToast(`✅ ${feeders.length} Feeder Shutdown Submitted`);
-
-  // ✅ FORM RESET
-  document.getElementById("sd_time").value = "";
-  document.getElementById("sd_type").value = "";
-  document.getElementById("sd_info").value = "";
-
-  // ✅ MAIN PAGE OPEN
-  setTimeout(()=>{
-    backToMain();
-  },1000);
-
-}catch(err){
-
-  console.error(err);
-  showToast("❌ Failed");
-
-}finally{
-
-  hideLoader();
 }
+ showLoader();
+ disableBtn(btn);
+
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"shutdown",
+  feeder:sd_feeder.value,
+  ShutdownTime:sd_time.value.replace("T"," "),
+  ShutdownType:sd_type.value,
+  Information:sd_info.value.toUpperCase(),
+  ShutdownEntryBy:CURRENT_USER.n,
+  Installation:CURRENT_USER.i
+ }),{mode:"no-cors"})
+ .then(()=>{
+
+   showToast("✅ Shutdown Submitted");
+
+   // reset form
+   sd_info.value="";
+   sd_type.value="";
+   sd_time.value="";
+
+   backToMain();
+
+ })
+ .catch(()=>{
+   showToast("❌ Failed to submit","error");
+ })
+ .finally(()=>{
+   hideLoader();
+   enableBtn(btn);
+ });
 }
+
 // ✅ RESUME
 function submitResume(){
 if(EDIT_MODE){
@@ -1011,10 +868,21 @@ if(hasSpecialChar(rs_rem.value)){
 }
 function updateResume(){
 
-  let btn = document.querySelector("#resumeBox .btn-resume");
+  let btn =
+    document.querySelector(
+      "#resumeBox .btn-resume"
+    );
 
-  if(!rs_time.value || !rs_loss.value || !rs_dg.value || !rs_rem.value){
-    showToast("❌ All fields required","error");
+  if(
+    !rs_time.value ||
+    !rs_loss.value ||
+    !rs_dg.value ||
+    !rs_rem.value
+  ){
+    showToast(
+      "❌ All fields required",
+      "error"
+    );
     return;
   }
 
@@ -1023,24 +891,44 @@ function updateResume(){
 
   fetch(
     WEBAPP_URL + "?" + new URLSearchParams({
+
       action: "editresume",
-      feeder: EDIT_ROW.feeder,
-      ShutdownTime: EDIT_ROW.shutdownRaw,
-      ResumeTime: rs_time.value.replace("T"," "),
-      ResumeEntryBy: CURRENT_USER.n,
-      TotalProdLoss: rs_loss.value,
-      DGDeployed: rs_dg.value,
-      Remarks: rs_rem.value
+
+      uniqueId:
+        EDIT_ROW.uniqueId,
+
+      ResumeTime:
+        rs_time.value.replace(
+          "T",
+          " "
+        ),
+
+      ResumeEntryBy:
+        CURRENT_USER.n,
+
+      TotalProdLoss:
+        rs_loss.value,
+
+      DGDeployed:
+        rs_dg.value,
+
+      Remarks:
+        rs_rem.value
+
     })
   )
-  .then(res => res.text())
+  .then(r => r.text())
   .then(msg => {
 
-    console.log("Server Response:", msg);
+    if(
+      msg.includes(
+        "Resume Updated Successfully"
+      )
+    ){
 
-    if(msg.includes("Resume Updated Successfully")){
-
-      showToast("✅ Resume Updated");
+      showToast(
+        "✅ Resume Updated"
+      );
 
       EDIT_MODE = false;
       EDIT_ROW = null;
@@ -1049,16 +937,22 @@ function updateResume(){
 
     }else{
 
-      showToast("❌ " + msg, "error");
+      showToast(
+        "❌ " + msg,
+        "error"
+      );
 
     }
 
   })
   .catch(err => {
 
-    console.error(err);
+    console.log(err);
 
-    showToast("❌ Update Failed","error");
+    showToast(
+      "❌ Update Failed",
+      "error"
+    );
 
   })
   .finally(() => {
@@ -1236,37 +1130,22 @@ function formatHrs(val){
 }
 function canEditResume(resumeTime){
 
-  if(!resumeTime || resumeTime==="NA") return false;
+  if(!resumeTime || resumeTime === "NA"){
+    return false;
+  }
 
   let rt = parseDateManual(resumeTime);
-  if(!rt) return false;
+
+  if(!rt){
+    return false;
+  }
 
   let now = new Date();
 
-  let cutoff;
+  // Resume ke baad 24 hours tak edit allowed
+  let expiryTime = new Date(rt.getTime() + (24 * 60 * 60 * 1000));
 
-  // Resume before 07:00 AM
-  if(rt.getHours() < 6){
-
-    cutoff = new Date(
-      rt.getFullYear(),
-      rt.getMonth(),
-      rt.getDate(),
-      7,0,0
-    );
-
-  }else{
-
-    cutoff = new Date(
-      rt.getFullYear(),
-      rt.getMonth(),
-      rt.getDate()+1,
-      7,0,0
-    );
-
-  }
-
-  return now < cutoff;
+  return now <= expiryTime;
 }
 
 function loadHistory(){
@@ -1285,7 +1164,10 @@ function loadHistory(){
      type:   h.findIndex(x => x.includes("TYPE")),
      inst:   h.findIndex(x => x.includes("INSTALL")),
      hrs:    h.findIndex(x => x.includes("HRS")),
-     loss:   h.findIndex(x => x.includes("LOSS"))
+     loss:   h.findIndex(x => x.includes("LOSS")),
+     uniqueId: h.findIndex(
+  x => x.includes("UNIQUE")
+)
    };
 
   let filterEl = document.getElementById("historyFilter");
@@ -1339,33 +1221,26 @@ if(CURRENT_USER.admin){
 }
 
      data.push({
-       feeder,
-       sdDate,
-       sd,
-       rs,
-       type,
-       inst,
-       hrs,
-       loss,
-       remarks : r[8],
-       dg      : r[11],
-       resumeBy: r[7],
-       shutdownRaw : sd
-     });
+  feeder,
+  sdDate,
+  sd,
+  rs,
+  type,
+  inst,
+  hrs,
+  loss,
+  remarks : r[8],
+  dg      : r[11],
+  resumeBy: r[7],
+  shutdownRaw : sd,
+
+  uniqueId : r[i.uniqueId]
+});
 
    });
 
-  
-   // ✅ Latest Shutdown Entry Top
-// Latest Shutdown Time First
-data.sort((a,b) => {
-
-  let da = parseDateManual(a.sd);
-  let db = parseDateManual(b.sd);
-
-  return db.getTime() - da.getTime();
-
-});
+   // ✅ SORT LATEST FIRST (IMPORTANT FIX)
+   data.sort((a,b)=> b.sdDate - a.sdDate);
 
    let html = "";
 
@@ -1385,9 +1260,8 @@ if(!d.rs || d.rs === "NA"){
     border-radius:6px;
     cursor:pointer"
     onclick="deleteShutdownHistory(
-      '${d.feeder}',
-      '${d.shutdownRaw}'
-    )">
+'${d.uniqueId}'
+)">
     Delete
   </button>`;
 
@@ -1411,22 +1285,14 @@ else if(canEditResume(d.rs)){
   </button>`;
 }
 
-let rowColor = "#ffffff";
-
-// Active Shutdown
-if(!d.rs || d.rs === "NA"){
-  rowColor = "#ffe5e5";   // light red
-}
-// Resume Completed
-else{
-  rowColor = "#e8f8e8";   // light green
-}
+// ✅ Active Shutdown = Light Red
+// ✅ Resume Done = Light Green
+let rowColor = (!d.rs || d.rs === "NA")
+  ? "#ffe5e5"
+  : "#e8fbe8";
 
 html += `
-<tr style="
-  border-bottom:1px solid #ddd;
-  background:${rowColor};
-">
+<tr style="border-bottom:1px solid #ddd;background:${rowColor};">
  <td>${d.feeder}</td>
  <td>${formatDateTime(d.sd)}</td>
  <td>${formatDateTime(d.rs)}</td>
@@ -1487,7 +1353,8 @@ let toD   = parseDateManual(to.replace("T"," "));
       inst:   h.findIndex(x => x.includes("INSTALL")),
       hrs:    h.findIndex(x => x.includes("HRS")),
       loss:   h.findIndex(x => x.includes("LOSS")),
-      dg:     h.findIndex(x => x.includes("DG")) // ✅ NEW
+      dg:     h.findIndex(x => x.includes("DG")),
+      uniqueId: h.findIndex(x => x.includes("UNIQUE"))
     };
 
    let filter = "ALL";
@@ -1642,10 +1509,10 @@ let gMin = grand.min%60;
 
   });
 }
-function deleteShutdownHistory(feeder, shutdownTime){
+function deleteShutdownHistory(uniqueId){
 
   if(!confirm(
-    "Delete Shutdown Entry?\n\n" + feeder
+    "Delete Shutdown Entry?"
   )){
     return;
   }
@@ -1655,22 +1522,29 @@ function deleteShutdownHistory(feeder, shutdownTime){
   fetch(
     WEBAPP_URL + "?" + new URLSearchParams({
       action: "deleteshutdown",
-      feeder: feeder,
-      ShutdownTime: shutdownTime
+      uniqueId: uniqueId
     })
   )
   .then(r => r.text())
   .then(msg => {
 
-    showToast("✅ Shutdown Deleted");
+    if(msg.includes("Deleted")){
 
-    loadHistory();
-    loadActiveShutdowns();
+      showToast("✅ Shutdown Deleted");
+
+      loadHistory();
+      loadActiveShutdowns();
+
+    }else{
+
+      showToast("❌ " + msg,"error");
+
+    }
 
   })
   .catch(err => {
 
-    console.error(err);
+    console.log(err);
 
     showToast("❌ Delete Failed","error");
 
