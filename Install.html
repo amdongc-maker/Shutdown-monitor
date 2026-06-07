@@ -39,7 +39,50 @@ body{
   display:flex;
   justify-content:flex-end;
 }
+/* ===== MULTI FEEDER LIST ===== */
 
+#allFeederBox{
+    background:#fff;
+    border:1px solid #d6dce5;
+    border-radius:12px;
+    padding:8px;
+    max-height:250px;
+    overflow-y:auto;
+    margin-top:8px;
+}
+
+.feeder-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    border-bottom:1px solid #edf1f5;
+    transition:.2s;
+    cursor:pointer;
+}
+
+.feeder-item:last-child{
+    border-bottom:none;
+}
+
+.feeder-item:hover{
+    background:#f4f8fc;
+}
+
+.feeder-item input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    margin:0;
+    cursor:pointer;
+    accent-color:#1f3a5f;
+    flex-shrink:0;
+}
+
+.feeder-item span{
+    font-size:14px;
+    font-weight:500;
+    color:#1f3a5f;
+}
 /* logout button */
 .logout-btn{
   width:34px;
@@ -454,6 +497,15 @@ label{
 <h2><b>SHUTDOWN ENTRY</b></h2>
 <label>Feeder</label>
 <select id="sd_feeder"></select>
+<div id="allFeederBox"
+     style="display:none;
+            margin-top:10px;
+            border:1px solid #ddd;
+            border-radius:10px;
+            padding:10px;
+            max-height:250px;
+            overflow:auto;">
+</div>
 <label>Shutdown Time</label>
 <input type="datetime-local" id="sd_time">
 <label>Shutdown Type</label>
@@ -603,7 +655,7 @@ const FEEDERS={
  "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
  "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
  "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
- "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
+ "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER",
  "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
  "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
  "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
@@ -625,20 +677,72 @@ function hasSpecialChar(text){
 
 // ================= FEEDERS =================
 function populateFeeders(){
-  let list = FEEDERS[CURRENT_USER.i] || FEEDERS.ALL;
+
+  let list;
+
+  if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
+    list = FEEDERS.ALL;
+  }else{
+    list = FEEDERS[CURRENT_USER.i] || [];
+  }
 
   let sd = document.getElementById("sd_feeder");
   let rs = document.getElementById("rs_feeder");
 
-  sd.innerHTML = "";
-  rs.innerHTML = "";
+  sd.innerHTML = '<option value="">Select Feeder</option>';
+  rs.innerHTML = '<option value="">Select Feeder</option>';
 
-  list.forEach(f=>{
-    sd.innerHTML += `<option>${f}</option>`;
-    rs.innerHTML += `<option>${f}</option>`;
+  list.forEach(function(f){
+    sd.innerHTML += `<option value="${f}">${f}</option>`;
+    rs.innerHTML += `<option value="${f}">${f}</option>`;
   });
-}
 
+  // ✅ Select All Option
+  sd.innerHTML += `
+    <option value="ALL_FEEDERS">
+      ✅ SELECT ALL FEEDERS
+    </option>
+  `;
+}
+document.getElementById("sd_feeder").addEventListener("change", function(){
+
+    let box = document.getElementById("allFeederBox");
+
+    if(this.value == "ALL_FEEDERS"){
+
+        let feeders;
+
+        if(CURRENT_USER.admin || CURRENT_USER.i=="ALL"){
+            feeders = FEEDERS.ALL;
+        }else{
+            feeders = FEEDERS[CURRENT_USER.i] || [];
+        }
+
+        box.innerHTML = "";
+
+        feeders.forEach(function(f){
+
+            box.innerHTML += `
+            <div class="feeder-item">
+                <input
+                    type="checkbox"
+                    class="multiFeeder"
+                    value="${f}"
+                    checked>
+                <span>${f}</span>
+            </div>`;
+        });
+
+        box.style.display = "block";
+
+    }else{
+
+        box.style.display = "none";
+        box.innerHTML = "";
+
+    }
+
+});
 
 // ✅ ACTIVE SHUTDOWN
 function loadActiveShutdowns(){
@@ -705,7 +809,7 @@ function submitShutdown(){
 
  let btn = document.querySelector("#shutdownBox .btn-shutdown");
 
- if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
+ if(!sd_feeder.value || !sd_time.value || !sd_type.value || !sd_info.value){
   showToast("❌ All fields required","error");
   return;
  }
@@ -715,58 +819,80 @@ function submitShutdown(){
   return;
  }
 
- if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
-  showToast("⚠️ Already shutdown","error");
-  return;
+ let feederList = [];
+
+ // ✅ Multi feeder
+ if(sd_feeder.value === "ALL_FEEDERS"){
+
+   document.querySelectorAll(".multiFeeder:checked")
+   .forEach(cb=>{
+      feederList.push(cb.value);
+   });
+
+   if(feederList.length === 0){
+      showToast("⚠️ Select at least one feeder","error");
+      return;
+   }
+
+ }else{
+
+   feederList.push(sd_feeder.value);
+
+   if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
+      showToast("⚠️ Already shutdown","error");
+      return;
+   }
  }
-// ✅ CHECK: Only if selected time is older than current minute
-let selectedTime = new Date(sd_time.value);
-let currentTime  = new Date();
 
-// remove seconds & milliseconds
-currentTime.setSeconds(0,0);
+ let selectedTime = new Date(sd_time.value);
+ let currentTime = new Date();
+ currentTime.setSeconds(0,0);
 
-if(selectedTime < currentTime){
+ if(selectedTime < currentTime){
+    if(!confirm("⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?")){
+      return;
+    }
+ }
 
-  let confirmSave = confirm(
-    "⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?"
-  );
-
-  if(!confirmSave){
-    return;
-  }
-}
  showLoader();
  disableBtn(btn);
 
- fetch(WEBAPP_URL+"?"+new URLSearchParams({
-  action:"shutdown",
-  feeder:sd_feeder.value,
-  ShutdownTime:sd_time.value.replace("T"," "),
-  ShutdownType:sd_type.value,
-  Information:sd_info.value.toUpperCase(),
-  ShutdownEntryBy:CURRENT_USER.n,
-  Installation:CURRENT_USER.i
- }),{mode:"no-cors"})
+ // ✅ Har checked feeder ki alag entry
+ fetch(
+ WEBAPP_URL + "?" + new URLSearchParams({
+   action:"shutdown",
+   feeder: feederList.join(","),
+   ShutdownTime: sd_time.value.replace("T"," "),
+   ShutdownType: sd_type.value,
+   Information: sd_info.value.toUpperCase(),
+   ShutdownEntryBy: CURRENT_USER.n,
+   Installation: CURRENT_USER.i
+ }),
+ {mode:"no-cors"}
+)
  .then(()=>{
 
-   showToast("✅ Shutdown Submitted");
+    showToast("✅ Shutdown Submitted");
 
-   // reset form
-   sd_info.value="";
-   sd_type.value="";
-   sd_time.value="";
+    sd_feeder.value = "";
+    sd_info.value = "";
+    sd_type.value = "";
+    sd_time.value = "";
 
-   backToMain();
+    document.getElementById("allFeederBox").style.display = "none";
+    document.getElementById("allFeederBox").innerHTML = "";
+
+    backToMain();
 
  })
  .catch(()=>{
-   showToast("❌ Failed to submit","error");
+    showToast("❌ Failed to submit","error");
  })
  .finally(()=>{
-   hideLoader();
-   enableBtn(btn);
+    hideLoader();
+    enableBtn(btn);
  });
+
 }
 
 // ✅ RESUME
