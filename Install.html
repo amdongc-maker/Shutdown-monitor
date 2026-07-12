@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</title>
+<style>
 /* ===== GLOBAL ===== */
 body{
   font-family:"Segoe UI",Roboto,Arial;
@@ -38,50 +39,7 @@ body{
   display:flex;
   justify-content:flex-end;
 }
-/* ===== MULTI FEEDER LIST ===== */
 
-#allFeederBox{
-    background:#fff;
-    border:1px solid #d6dce5;
-    border-radius:12px;
-    padding:8px;
-    max-height:250px;
-    overflow-y:auto;
-    margin-top:8px;
-}
-
-.feeder-item{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:10px 12px;
-    border-bottom:1px solid #edf1f5;
-    transition:.2s;
-    cursor:pointer;
-}
-
-.feeder-item:last-child{
-    border-bottom:none;
-}
-
-.feeder-item:hover{
-    background:#f4f8fc;
-}
-
-.feeder-item input[type="checkbox"]{
-    width:18px;
-    height:18px;
-    margin:0;
-    cursor:pointer;
-    accent-color:#1f3a5f;
-    flex-shrink:0;
-}
-
-.feeder-item span{
-    font-size:14px;
-    font-weight:500;
-    color:#1f3a5f;
-}
 /* logout button */
 .logout-btn{
   width:34px;
@@ -472,7 +430,6 @@ label{
           <th>HRS AND MIN</th>
           <th>LOSS - TON</th>
           <th>INSTALLATION</th>
-          <th>ACTION</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -496,15 +453,6 @@ label{
 <h2><b>SHUTDOWN ENTRY</b></h2>
 <label>Feeder</label>
 <select id="sd_feeder"></select>
-<div id="allFeederBox"
-     style="display:none;
-            margin-top:10px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            padding:10px;
-            max-height:250px;
-            overflow:auto;">
-</div>
 <label>Shutdown Time</label>
 <input type="datetime-local" id="sd_time">
 <label>Shutdown Type</label>
@@ -600,61 +548,57 @@ if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
 
 };
   function parseDateManual(dt){
-
   if(!dt || dt==="NA") return null;
 
-  dt = dt.trim();
-
   let parts = dt.split(" ");
-
   if(parts.length < 2) return null;
 
-  let datePart = parts[0].replace(/\//g,"-");
-  let timePart = parts[1];
+  // ✅ Replace "/" with "-" (IMPORTANT FIX)
+  let datePart = parts[0].replace(/\//g, "-");
 
   let d = datePart.split("-");
-  let t = timePart.split(":");
+  let t = parts[1].split(":");
 
+  if(d.length < 3 || t.length < 2) return null;
+
+  // ✅ Handle both formats: dd-mm-yyyy AND yyyy-mm-dd
   let year, month, day;
 
   if(d[0].length === 4){
-    year  = Number(d[0]);
-    month = Number(d[1]);
-    day   = Number(d[2]);
-  }else{
-    day   = Number(d[0]);
-    month = Number(d[1]);
-    year  = Number(d[2]);
+    // yyyy-mm-dd
+    year = d[0];
+    month = d[1];
+    day = d[2];
+  } else {
+    // dd-mm-yyyy
+    day = d[0];
+    month = d[1];
+    year = d[2];
   }
-
-  let hour   = Number(t[0] || 0);
-  let minute = Number(t[1] || 0);
-  let second = Number(t[2] || 0);
 
   return new Date(
     year,
     month - 1,
     day,
-    hour,
-    minute,
-    second
+    t[0],
+    t[1]
   );
 }
-const WEBAPP_URL="https://script.google.com/macros/s/AKfycbzOR1J4qbEdY7flZ8LU9AfE1EIRXfjvu0IMHjZJKsLxkSq8kTf_8__PHACxVeWhdNno/exec";
-const CSV_URL="https://docs.google.com/spreadsheets/d/1Gz-mXiZpRIc6zYNPD115tY-VRtnwGgOGjlY1QUtENeQ/export?format=csv";
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycbz1g6vziMziteLRvxrVRtVr-xUOFdLrpDN4OqoiaDEv-c2h1-fUHk9nq2LueN4XuHHsKQ/exec";
+const CSV_URL="https://docs.google.com/spreadsheets/d/12Vb60sr_ApZ6JBpE2D_nZweJhTk7DLDEf9XHfpIbJzQ/export?format=csv";
 
 const FEEDERS={
  "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
 "LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
 "GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
 "GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
-"GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
+"GAMIJ-GGS-3":["BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
 "MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
 "ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
  "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
  "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
  "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
- "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER",
+ "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FFEDER-GAMIJ-2","GADWEL FEEDER",
  "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
  "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
  "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
@@ -666,9 +610,6 @@ const FEEDERS={
 
 let CURRENT_USER={}, LAST_SHUTDOWN_TIME={}, LAST_RESUME_DATA=null;
 
-let EDIT_MODE = false;
-let EDIT_ROW = null;
-
 // ✅ SPECIAL CHAR VALIDATION
 function hasSpecialChar(text){
   return !/^[a-zA-Z0-9 .\-/]+$/.test(text);
@@ -676,72 +617,20 @@ function hasSpecialChar(text){
 
 // ================= FEEDERS =================
 function populateFeeders(){
-
-  let list;
-
-  if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
-    list = FEEDERS.ALL;
-  }else{
-    list = FEEDERS[CURRENT_USER.i] || [];
-  }
+  let list = FEEDERS[CURRENT_USER.i] || FEEDERS.ALL;
 
   let sd = document.getElementById("sd_feeder");
   let rs = document.getElementById("rs_feeder");
 
-  sd.innerHTML = '<option value="">Select Feeder</option>';
-  rs.innerHTML = '<option value="">Select Feeder</option>';
+  sd.innerHTML = "";
+  rs.innerHTML = "";
 
-  list.forEach(function(f){
-    sd.innerHTML += `<option value="${f}">${f}</option>`;
-    rs.innerHTML += `<option value="${f}">${f}</option>`;
+  list.forEach(f=>{
+    sd.innerHTML += `<option>${f}</option>`;
+    rs.innerHTML += `<option>${f}</option>`;
   });
-
-  // ✅ Select All Option
-  sd.innerHTML += `
-    <option value="ALL_FEEDERS">
-      ✅ SELECT ALL FEEDERS
-    </option>
-  `;
 }
-document.getElementById("sd_feeder").addEventListener("change", function(){
 
-    let box = document.getElementById("allFeederBox");
-
-    if(this.value == "ALL_FEEDERS"){
-
-        let feeders;
-
-        if(CURRENT_USER.admin || CURRENT_USER.i=="ALL"){
-            feeders = FEEDERS.ALL;
-        }else{
-            feeders = FEEDERS[CURRENT_USER.i] || [];
-        }
-
-        box.innerHTML = "";
-
-        feeders.forEach(function(f){
-
-            box.innerHTML += `
-            <div class="feeder-item">
-                <input
-                    type="checkbox"
-                    class="multiFeeder"
-                    value="${f}"
-                    checked>
-                <span>${f}</span>
-            </div>`;
-        });
-
-        box.style.display = "block";
-
-    }else{
-
-        box.style.display = "none";
-        box.innerHTML = "";
-
-    }
-
-});
 
 // ✅ ACTIVE SHUTDOWN
 function loadActiveShutdowns(){
@@ -784,8 +673,7 @@ function loadActiveShutdowns(){
 <div class="shutdown-item">
   <div class="shutdown-row"><span class="shutdown-label">FEEDER</span><span class="shutdown-value">${feeder}</span></div>
   <div class="shutdown-row"><span class="shutdown-label">TYPE</span><span class="shutdown-value">${type}</span></div>
-  <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${formatDateTime(sdTime)}</span>
-</div>
+  <div class="shutdown-row"><span class="shutdown-label">TIME</span><span class="shutdown-value">${sdTime}</span></div>
   <div class="shutdown-row"><span class="shutdown-label">INSTALLATION</span><span class="install-badge">${inst}</span></div>
 
   <button style="margin-top:10px;width:100%;background:#25D366;color:#fff;border:collapse;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;"
@@ -808,7 +696,7 @@ function submitShutdown(){
 
  let btn = document.querySelector("#shutdownBox .btn-shutdown");
 
- if(!sd_feeder.value || !sd_time.value || !sd_type.value || !sd_info.value){
+ if(!sd_feeder.value||!sd_time.value||!sd_type.value||!sd_info.value){
   showToast("❌ All fields required","error");
   return;
  }
@@ -818,88 +706,62 @@ function submitShutdown(){
   return;
  }
 
- let feederList = [];
-
- // ✅ Multi feeder
- if(sd_feeder.value === "ALL_FEEDERS"){
-
-   document.querySelectorAll(".multiFeeder:checked")
-   .forEach(cb=>{
-      feederList.push(cb.value);
-   });
-
-   if(feederList.length === 0){
-      showToast("⚠️ Select at least one feeder","error");
-      return;
-   }
-
- }else{
-
-   feederList.push(sd_feeder.value);
-
-   if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
-      showToast("⚠️ Already shutdown","error");
-      return;
-   }
+ if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
+  showToast("⚠️ Already shutdown","error");
+  return;
  }
+// ✅ CHECK: Only if selected time is older than current minute
+let selectedTime = new Date(sd_time.value);
+let currentTime  = new Date();
 
- let selectedTime = new Date(sd_time.value);
- let currentTime = new Date();
- currentTime.setSeconds(0,0);
+// remove seconds & milliseconds
+currentTime.setSeconds(0,0);
 
- if(selectedTime < currentTime){
-    if(!confirm("⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?")){
-      return;
-    }
- }
+if(selectedTime < currentTime){
 
+  let confirmSave = confirm(
+    "⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?"
+  );
+
+  if(!confirmSave){
+    return;
+  }
+}
  showLoader();
  disableBtn(btn);
 
- // ✅ Har checked feeder ki alag entry
- fetch(
- WEBAPP_URL + "?" + new URLSearchParams({
-   action:"shutdown",
-   feeder: feederList.join(","),
-   ShutdownTime: sd_time.value.replace("T"," "),
-   ShutdownType: sd_type.value,
-   Information: sd_info.value.toUpperCase(),
-   ShutdownEntryBy: CURRENT_USER.n,
-   Installation: CURRENT_USER.i
- }),
- {mode:"no-cors"}
-)
+ fetch(WEBAPP_URL+"?"+new URLSearchParams({
+  action:"shutdown",
+  feeder:sd_feeder.value,
+  ShutdownTime:sd_time.value.replace("T"," "),
+  ShutdownType:sd_type.value,
+  Information:sd_info.value.toUpperCase(),
+  ShutdownEntryBy:CURRENT_USER.n,
+  Installation:CURRENT_USER.i
+ }),{mode:"no-cors"})
  .then(()=>{
 
-    showToast("✅ Shutdown Submitted");
+   showToast("✅ Shutdown Submitted");
 
-    sd_feeder.value = "";
-    sd_info.value = "";
-    sd_type.value = "";
-    sd_time.value = "";
+   // reset form
+   sd_info.value="";
+   sd_type.value="";
+   sd_time.value="";
 
-    document.getElementById("allFeederBox").style.display = "none";
-    document.getElementById("allFeederBox").innerHTML = "";
-
-    backToMain();
+   backToMain();
 
  })
  .catch(()=>{
-    showToast("❌ Failed to submit","error");
+   showToast("❌ Failed to submit","error");
  })
  .finally(()=>{
-    hideLoader();
-    enableBtn(btn);
+   hideLoader();
+   enableBtn(btn);
  });
-
 }
 
 // ✅ RESUME
 function submitResume(){
-if(EDIT_MODE){
-  updateResume();
-  return;
-}
 
  let btn = document.querySelector("#resumeBox .btn-resume");
 
@@ -912,19 +774,7 @@ if(EDIT_MODE){
 let shutdownTimeStr = LAST_SHUTDOWN_TIME[rs_feeder.value];
 
 let shutdownDate = parseDateManual(shutdownTimeStr);
-
-// Resume datetime-local input
-let resumeDate = new Date(rs_time.value);
-
-if(!shutdownDate || isNaN(resumeDate.getTime())){
-  showToast("⚠️ Invalid date format","error");
-  return;
-}
-
-if(resumeDate < shutdownDate){
-  showToast("❌ Resume time cannot be before Shutdown time","error");
-  return;
-}
+let resumeDate   = parseDateManual(rs_time.value.replace("T"," "));
 
 if(!shutdownDate || !resumeDate){
   showToast("⚠️ Invalid date format","error");
@@ -991,102 +841,6 @@ if(hasSpecialChar(rs_rem.value)){
    enableBtn(btn);
  });
 }
-function updateResume(){
-
-  let btn =
-    document.querySelector(
-      "#resumeBox .btn-resume"
-    );
-
-  if(
-    !rs_time.value ||
-    !rs_loss.value ||
-    !rs_dg.value ||
-    !rs_rem.value
-  ){
-    showToast(
-      "❌ All fields required",
-      "error"
-    );
-    return;
-  }
-
-  showLoader();
-  disableBtn(btn);
-
-  fetch(
-    WEBAPP_URL + "?" + new URLSearchParams({
-
-      action: "editresume",
-
-      uniqueId:
-        EDIT_ROW.uniqueId,
-
-      ResumeTime:
-        rs_time.value.replace(
-          "T",
-          " "
-        ),
-
-      ResumeEntryBy:
-        CURRENT_USER.n,
-
-      TotalProdLoss:
-        rs_loss.value,
-
-      DGDeployed:
-        rs_dg.value,
-
-      Remarks:
-        rs_rem.value
-
-    })
-  )
-  .then(r => r.text())
-  .then(msg => {
-
-    if(
-      msg.includes(
-        "Resume Updated Successfully"
-      )
-    ){
-
-      showToast(
-        "✅ Resume Updated"
-      );
-
-      EDIT_MODE = false;
-      EDIT_ROW = null;
-
-      backToMain();
-
-    }else{
-
-      showToast(
-        "❌ " + msg,
-        "error"
-      );
-
-    }
-
-  })
-  .catch(err => {
-
-    console.log(err);
-
-    showToast(
-      "❌ Update Failed",
-      "error"
-    );
-
-  })
-  .finally(() => {
-
-    hideLoader();
-    enableBtn(btn);
-
-  });
-}
 // ✅ NAVIGATION
 function openShutdown(){
   document.getElementById("mainBox").classList.add("hidden");
@@ -1101,45 +855,8 @@ function openResume(){
   document.getElementById("reportBox").classList.add("hidden");
   document.getElementById("resumeBox").classList.remove("hidden");
 }
-function openResumeEdit(row){
 
- EDIT_MODE = true;
- EDIT_ROW = row;
-
- openResume();
-
- rs_feeder.value = row.feeder;
-
- rs_time.value =
-   row.rs.replace(" ","T");
-
- rs_loss.value = row.loss;
-
- rs_dg.value = row.dg;
-
- rs_rem.value = row.remarks;
-
- document.querySelector(
-   "#resumeBox h2"
- ).innerText = "EDIT RESUME ENTRY";
-
- document.querySelector(
-   "#resumeBox .btn-resume"
- ).innerText = "UPDATE";
-}
 function backToMain(){
-EDIT_MODE = false;
-EDIT_ROW = null;
-
-document.querySelector(
- "#resumeBox h2"
-).innerText =
-"RESUME ENTRY";
-
-document.querySelector(
- "#resumeBox .btn-resume"
-).innerText =
-"SUBMIT";
   document.getElementById("shutdownBox").classList.add("hidden");
   document.getElementById("resumeBox").classList.add("hidden");
 
@@ -1253,30 +970,6 @@ function formatHrs(val){
 
   return val; // fallback
 }
-function canEditResume(resumeTime){
-
-  if(!resumeTime || resumeTime === "NA"){
-    return false;
-  }
-
-  let rt = parseDateManual(resumeTime);
-
-  if(!rt){
-    return false;
-  }
-
-  let now = new Date();
-
-  // Next day 08:00 AM
-  let expiryTime = new Date(
-    rt.getFullYear(),
-    rt.getMonth(),
-    rt.getDate() + 1,
-    8, 0, 0, 0
-  );
-
-  return now < expiryTime;
-}
 
 function loadHistory(){
 
@@ -1294,10 +987,7 @@ function loadHistory(){
      type:   h.findIndex(x => x.includes("TYPE")),
      inst:   h.findIndex(x => x.includes("INSTALL")),
      hrs:    h.findIndex(x => x.includes("HRS")),
-     loss:   h.findIndex(x => x.includes("LOSS")),
-     uniqueId: h.findIndex(
-  x => x.includes("UNIQUE")
-)
+     loss:   h.findIndex(x => x.includes("LOSS"))
    };
 
   let filterEl = document.getElementById("historyFilter");
@@ -1351,21 +1041,15 @@ if(CURRENT_USER.admin){
 }
 
      data.push({
-  feeder,
-  sdDate,
-  sd,
-  rs,
-  type,
-  inst,
-  hrs,
-  loss,
-  remarks : r[8],
-  dg      : r[11],
-  resumeBy: r[7],
-  shutdownRaw : sd,
-
-  uniqueId : r[i.uniqueId]
-});
+       feeder,
+       sdDate,
+       sd,
+       rs,
+       type,
+       inst,
+       hrs,
+       loss
+     });
 
    });
 
@@ -1373,65 +1057,19 @@ if(CURRENT_USER.admin){
    data.sort((a,b)=> b.sdDate - a.sdDate);
 
    let html = "";
+
    data.forEach(d=>{
-let actionBtn = "";
-
-// Active Shutdown → Delete
-if(!d.rs || d.rs === "NA"){
-
-  actionBtn = `
-  <button
-    style="
-    background:#e74c3c;
-    color:#fff;
-    border:none;
-    padding:5px 10px;
-    border-radius:6px;
-    cursor:pointer"
-    onclick="deleteShutdownHistory(
-'${d.uniqueId}'
-)">
-    Delete
-  </button>`;
-
-}
-// Resume Done → Edit
-else if(canEditResume(d.rs)){
-
-  actionBtn = `
-  <button
-    style="
-    background:#f39c12;
-    color:#fff;
-    border:none;
-    padding:5px 10px;
-    border-radius:6px;
-    cursor:pointer"
-    onclick='openResumeEdit(
-      ${JSON.stringify(d)}
-    )'>
-    Edit
-  </button>`;
-}
-
-// ✅ Active Shutdown = Light Red
-// ✅ Resume Done = Light Green
-let rowColor = (!d.rs || d.rs === "NA")
-  ? "#ffe5e5"
-  : "#e8fbe8";
-
-html += `
-<tr style="border-bottom:1px solid #ddd;background:${rowColor};">
- <td>${d.feeder}</td>
- <td>${formatDateTime(d.sd)}</td>
- <td>${formatDateTime(d.rs)}</td>
- <td>${d.type}</td>
- <td>${formatHrs(d.hrs)}</td>
- <td>${d.loss}</td>
- <td>${d.inst}</td>
- <td>${actionBtn}</td>
-</tr>`;
-       });
+     html += `
+     <tr style="border-bottom:1px solid #ddd;">
+       <td>${d.feeder}</td>
+       <td>${formatDateTime(d.sd)}</td>
+       <td>${formatDateTime(d.rs)}</td>
+       <td>${d.type}</td>
+       <td>${formatHrs(d.hrs)}</td>
+       <td>${d.loss}</td>
+       <td>${d.inst}</td>
+     </tr>`;
+   });
 
    document.querySelector("#historyTable tbody").innerHTML =
      html || `<tr><td colspan="7">No Data (Last 2 Months)</td></tr>`;
@@ -1482,8 +1120,7 @@ let toD   = parseDateManual(to.replace("T"," "));
       inst:   h.findIndex(x => x.includes("INSTALL")),
       hrs:    h.findIndex(x => x.includes("HRS")),
       loss:   h.findIndex(x => x.includes("LOSS")),
-      dg:     h.findIndex(x => x.includes("DG")),
-      uniqueId: h.findIndex(x => x.includes("UNIQUE"))
+      dg:     h.findIndex(x => x.includes("DG")) // ✅ NEW
     };
 
    let filter = "ALL";
@@ -1635,52 +1272,6 @@ let gMin = grand.min%60;
     win.document.write(html);
     win.document.close();
     win.print();
-
-  });
-}
-function deleteShutdownHistory(uniqueId){
-
-  if(!confirm(
-    "Delete Shutdown Entry?"
-  )){
-    return;
-  }
-
-  showLoader();
-
-  fetch(
-    WEBAPP_URL + "?" + new URLSearchParams({
-      action: "deleteshutdown",
-      uniqueId: uniqueId
-    })
-  )
-  .then(r => r.text())
-  .then(msg => {
-
-    if(msg.includes("Deleted")){
-
-      showToast("✅ Shutdown Deleted");
-
-      loadHistory();
-      loadActiveShutdowns();
-
-    }else{
-
-      showToast("❌ " + msg,"error");
-
-    }
-
-  })
-  .catch(err => {
-
-    console.log(err);
-
-    showToast("❌ Delete Failed","error");
-
-  })
-  .finally(() => {
-
-    hideLoader();
 
   });
 }
