@@ -1250,6 +1250,100 @@ button:active{
 }
 
 }
+/* =========================================
+   FULL MOBILE WIDTH FIX
+========================================= */
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+    margin:0;
+    padding:0;
+}
+
+.container{
+    width:100%;
+    max-width:100%;
+    margin:0;
+    padding:12px;
+}
+
+/* All Main Cards */
+
+.card,
+#shutdownBox,
+#resumeBox,
+#historyBox,
+#mainBox{
+
+    width:100%;
+    max-width:100%;
+    margin:12px 0;
+    padding:20px;
+    border-radius:20px;
+    box-sizing:border-box;
+
+}
+
+/* User Card */
+
+#userInfo{
+
+    width:100%;
+    margin:12px 0;
+    border-radius:18px;
+
+}
+
+/* Inputs */
+
+input,
+select,
+textarea{
+
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+
+}
+
+/* Buttons */
+
+button{
+
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+
+}
+
+/* Mobile */
+
+@media only screen and (max-width:768px){
+
+.container{
+
+    padding:10px;
+
+}
+
+.card,
+#shutdownBox,
+#resumeBox{
+
+    padding:18px;
+
+    border-radius:18px;
+
+}
+
+}
 </style>
 
 </head>
