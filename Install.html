@@ -372,364 +372,107 @@ label{
   cursor:pointer;
 }
 /* ===========================
-   FULL SCREEN MOBILE UI
+   EXTRA BIG MOBILE UI
 =========================== */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html,
-body{
-    width:100%;
-    height:100%;
-    overflow-x:hidden;
-    font-family:"Segoe UI",Roboto,sans-serif;
-    background:#eef2f7;
-}
-
 /* Header */
-
 .header{
-    position:sticky;
-    top:0;
-    left:0;
-    width:100%;
-    height:60px;
-    background:#1f3a5f;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 16px;
-    z-index:999;
-    box-shadow:0 3px 10px rgba(0,0,0,.15);
+    height:80px;
 }
 
 .header-title{
-    flex:1;
-    text-align:center;
-    font-size:15px;
-    font-weight:700;
-}
-
-.header-left,
-.header-right{
-    width:42px;
-}
-
-/* Main Container */
-
-.container{
-    width:100%;
-    max-width:100%;
-    margin:0;
-    padding:12px;
-}
-
-/* Card */
-
-.card{
-    width:100%;
-    background:#fff;
-    border-radius:18px;
-    padding:16px;
-    margin-bottom:14px;
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
-}
-
-/* Shutdown & Resume */
-
-#shutdownBox,
-#resumeBox,
-#mainBox,
-#historyBox,
-#reportBox{
-    width:100%;
-    max-width:100%;
-    margin:0;
-    border-radius:18px;
-}
-
-/* Inputs */
-
-input,
-select,
-textarea{
-    width:100%;
-    font-size:16px;
-    padding:14px;
-    border-radius:12px;
-    border:1px solid #d6d6d6;
-    margin-top:8px;
-    margin-bottom:10px;
-    background:#fff;
-}
-
-textarea{
-    min-height:100px;
-}
-
-/* Buttons */
-
-button{
-    width:100%;
-    height:50px;
-    border:none;
-    border-radius:12px;
-    font-size:16px;
-    font-weight:600;
-    cursor:pointer;
-}
-
-/* Two Buttons */
-
-.action-row{
-    display:flex;
-    gap:10px;
-}
-
-.action-row button{
-    flex:1;
-}
-
-/* Active Shutdown Card */
-
-.shutdown-item{
-    width:100%;
-    border-radius:15px;
-    background:#fff;
-    padding:16px;
-    margin-bottom:14px;
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
-}
-
-.shutdown-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
-}
-
-.shutdown-label{
-    color:#666;
-    font-weight:600;
-}
-
-.shutdown-value{
-    font-weight:700;
-    text-align:right;
-}
-
-/* History Table */
-
-table{
-    width:100%;
-    min-width:850px;
-    border-collapse:collapse;
-}
-
-th{
-    background:#1f3a5f;
-    color:#fff;
-    padding:10px;
-}
-
-td{
-    padding:8px;
-    text-align:center;
-}
-
-/* Loader */
-
-#loader{
-    backdrop-filter:blur(4px);
-}
-
-/* Mobile */
-
-@media (max-width:768px){
-
-.header{
-    height:58px;
-}
-
-.header-title{
-    font-size:13px;
-}
-
-.container{
-    padding:8px;
-}
-
-.card{
-    padding:14px;
-    border-radius:14px;
-}
-
-input,
-select,
-textarea{
-    font-size:16px;
-}
-
-button{
-    height:48px;
-    font-size:15px;
-}
-
-.action-row{
-    flex-direction:row;
-}
-
-.shutdown-row{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:4px;
-}
-
-.shutdown-value{
-    text-align:left;
-}
-
-}
-/* ===========================
-   BIG FONT MOBILE UI
-=========================== */
-
-html{
-    font-size:18px;
-}
-
-body{
-    font-family:"Segoe UI",Roboto,Arial,sans-serif;
-    background:#eef3f8;
-    line-height:1.6;
-}
-
-/* Header */
-
-.header{
-    height:72px;
-    padding:0 18px;
-}
-
-.header-title{
-    font-size:24px;
-    font-weight:700;
-}
-
-.logout-btn{
-    width:50px;
-    height:50px;
-    font-size:24px;
-}
-
-/* Container */
-
-.container{
-    width:100%;
-    max-width:100%;
-    padding:18px;
+    font-size:28px;
+    font-weight:800;
 }
 
 /* Cards */
-
 .card{
-    width:100%;
-    border-radius:22px;
     padding:24px;
-    margin-bottom:20px;
+    border-radius:22px;
 }
 
 /* Headings */
-
 h2{
-    font-size:30px;
-    margin-bottom:18px;
+    font-size:34px;
+    font-weight:800;
 }
 
 h3{
-    font-size:24px;
+    font-size:28px;
+    font-weight:700;
 }
 
 /* Labels */
-
 label{
-    font-size:22px;
+    font-size:24px;
     font-weight:700;
 }
 
 /* Inputs */
-
 input,
 select,
 textarea{
-    height:64px;
-    font-size:22px;
-    padding:16px 18px;
+    height:68px;
+    font-size:24px;
+    padding:18px;
     border-radius:16px;
-    margin-top:12px;
-    margin-bottom:16px;
 }
 
 textarea{
-    min-height:150px;
+    min-height:160px;
 }
 
-/* Buttons */
-
-button{
-    height:64px;
-    font-size:22px;
-    font-weight:700;
-    border-radius:16px;
-}
-
-/* Action Buttons */
-
-.action-row{
-    display:flex;
-    gap:15px;
-}
-
-.small-btn{
-    font-size:22px;
-    height:64px;
-}
-
-/* Shutdown Cards */
-
+/* Active Shutdown Card */
 .shutdown-item{
-    padding:22px;
-    border-radius:18px;
-}
-
-.shutdown-row{
-    margin-bottom:12px;
+    padding:24px;
 }
 
 .shutdown-label{
-    font-size:20px;
+    font-size:22px;
     font-weight:700;
 }
 
 .shutdown-value{
-    font-size:22px;
-    font-weight:700;
+    font-size:24px;
+    font-weight:800;
 }
 
+/* Installation Badge */
 .install-badge{
-    font-size:18px;
-    padding:8px 16px;
+    font-size:20px;
+    padding:8px 18px;
 }
 
-/* Multi Feeder */
+/* ===========================
+   HALF WIDTH BUTTONS
+=========================== */
 
+.action-row{
+    display:flex;
+    gap:12px;
+}
+
+.action-row .small-btn{
+    width:50%;
+    flex:0 0 calc(50% - 6px);
+    height:64px;
+    font-size:22px;
+    font-weight:800;
+    border-radius:16px;
+}
+
+/* Submit / Back Buttons */
+.btn-shutdown,
+.btn-resume,
+.btn-back{
+    height:64px;
+    font-size:22px;
+    font-weight:800;
+}
+
+/* Dropdown List */
 .feeder-item{
-    padding:16px;
+    padding:18px;
 }
 
 .feeder-item span{
@@ -737,93 +480,74 @@ button{
 }
 
 .feeder-item input[type=checkbox]{
-    width:28px;
-    height:28px;
+    width:30px;
+    height:30px;
 }
 
-/* Table */
-
-table{
-    font-size:18px;
+/* User Info */
+#ui_name{
+    font-size:24px !important;
 }
 
-table th{
-    font-size:20px;
-    padding:14px;
-}
-
-table td{
-    font-size:18px;
-    padding:12px;
+#ui_inst{
+    font-size:20px !important;
 }
 
 /* Toast */
-
 #toast{
-    font-size:20px;
-    padding:16px 24px;
+    font-size:22px;
+    padding:18px 26px;
 }
 
 /* Loader */
-
 #loader div{
-    font-size:22px;
-}
-
-/* Mobile */
-
-@media (max-width:768px){
-
-.header{
-    height:68px;
-}
-
-.header-title{
-    font-size:20px;
-}
-
-.container{
-    padding:12px;
-}
-
-.card{
-    padding:18px;
-}
-
-h2{
     font-size:24px;
 }
 
+/* Mobile */
+@media(max-width:768px){
+
+.header-title{
+    font-size:22px;
+}
+
+h2{
+    font-size:28px;
+}
+
 label{
-    font-size:18px;
+    font-size:20px;
 }
 
 input,
 select,
 textarea{
-    height:58px;
-    font-size:18px;
+    height:60px;
+    font-size:20px;
 }
 
 textarea{
-    min-height:120px;
+    min-height:130px;
 }
 
-button{
+.shutdown-label{
+    font-size:18px;
+}
+
+.shutdown-value{
+    font-size:20px;
+}
+
+.action-row .small-btn{
     height:58px;
     font-size:18px;
 }
 
-.shutdown-label{
-    font-size:17px;
-}
-
-.shutdown-value{
-    font-size:18px;
-}
-
-.feeder-item span{
-    font-size:18px;
+.btn-shutdown,
+.btn-resume,
+.btn-back{
+    height:58px;
+    font-size:20px;
 }
 
 }
