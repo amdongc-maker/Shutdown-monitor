@@ -191,93 +191,83 @@ h3{
   text-align:center;
   margin-bottom:10px;
 }
-/* ===== SHUTDOWN CARD ===== */
+/* ==========================================
+   ACTIVE SHUTDOWN PROFESSIONAL UI
+========================================== */
+
 .shutdown-item{
-
     background:#ffffff;
-
-    border-radius:20px;
-
-    padding:22px;
-
-    margin-top:15px;
-
-    margin-bottom:18px;
-
+    border-radius:22px;
+    padding:18px;
+    margin:16px 0;
     box-shadow:0 8px 20px rgba(0,0,0,.10);
-
     border-left:6px solid #2e7d32;
-
-    transition:.3s;
-
-}
-
-.shutdown-item:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:0 12px 24px rgba(0,0,0,.15);
-
 }
 
 .shutdown-row{
-
-    display:flex;
-
-    justify-content:space-between;
-
+    display:grid;
+    grid-template-columns:120px 1fr;
     align-items:center;
-
-    padding:10px 0;
-
+    gap:12px;
+    padding:12px 0;
     border-bottom:1px solid #ececec;
-
 }
 
 .shutdown-row:last-child{
-
     border-bottom:none;
-
 }
 
 .shutdown-label{
-
-    font-size:21px;
-
+    font-size:18px;
     font-weight:700;
-
     color:#666;
-
+    text-transform:uppercase;
 }
 
 .shutdown-value{
-
-    font-size:22px;
-
+    font-size:20px;
     font-weight:800;
-
     color:#1f3a5f;
+    text-align:left;
+    line-height:1.35;
+    word-break:break-word;
+}
 
-    text-align:right;
+/* Installation Badge */
 
+.install-badge{
+    display:inline-block;
+    background:#dbeafe;
+    color:#1f3a5f;
+    padding:8px 16px;
+    border-radius:18px;
+    font-size:18px;
+    font-weight:700;
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.shutdown-row{
+    grid-template-columns:110px 1fr;
+    gap:10px;
+}
+
+.shutdown-label{
+    font-size:17px;
+}
+
+.shutdown-value{
+    font-size:18px;
 }
 
 .install-badge{
-
-    background:#e8f5e9;
-
-    color:#2e7d32;
-
-    padding:8px 18px;
-
-    border-radius:30px;
-
-    font-size:18px;
-
-    font-weight:700;
-
+    font-size:17px;
+    padding:6px 14px;
 }
 
+}
 /* ===== INPUTS ===== */
 input,
 select,
