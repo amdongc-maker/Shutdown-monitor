@@ -3,23 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <title>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
 /* ===== GLOBAL ===== */
 body{
-  font-family:"Segoe UI",Roboto,Arial;
-  background:#f1f3f6;
-  margin:0;
+    margin:0;
+    font-family:"Segoe UI",Roboto,sans-serif;
+    background:#eef3f8;
+    overflow-x:hidden;
 }
 
 .header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  background:#1f3a5f;
-  color:#fff;
-  padding:12px 16px;
+    position:sticky;
+    top:0;
+    left:0;
+    width:100%;
+    height:78px;
+    background:#1f3a5f;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    box-sizing:border-box;
+    z-index:999;
+    box-shadow:0 5px 20px rgba(0,0,0,.18);
 }
 
+.header-title{
+
+    flex:1;
+
+    text-align:center;
+
+    color:#fff;
+
+    font-size:24px;
+
+    font-weight:800;
+
+    line-height:30px;
+}
+
+.logout-btn{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:50%;
+
+    font-size:24px;
+}
+
+.header-left{
+
+    width:52px;
+}
+
+.header-right{
+
+    width:52px;
+}
 /* left empty space (balance ke liye) */
 .header-left{
   width:40px;
@@ -99,25 +143,47 @@ body{
 
 /* ===== CONTAINER ===== */
 .container{
-  max-width: 520px;
-  margin:auto;
-  padding:16px;
+
+    width:100%;
+
+    max-width:100%;
+
+    padding:18px;
+
+    margin:0;
+
+    box-sizing:border-box;
+
 }
 
 /* ===== CARD ===== */
 .card{
-  background:#fff;
-  padding:20px;
-  border-radius:16px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.08);
-  margin-bottom:20px;
+
+    background:#fff;
+
+    border-radius:22px;
+
+    padding:24px;
+
+    margin-bottom:22px;
+
+    box-shadow:0 8px 22px rgba(0,0,0,.10);
+
 }
 
 /* ===== HEADINGS ===== */
 h2{
-  font-size:16px;
-  color:#1f3a5f;
-  text-align:center;
+
+font-size:34px;
+
+font-weight:800;
+
+color:#1f3a5f;
+
+text-align:center;
+
+margin-bottom:22px;
+
 }
 h3{
   font-size:15px;
@@ -127,36 +193,89 @@ h3{
 }
 /* ===== SHUTDOWN CARD ===== */
 .shutdown-item{
-  background:#fff;
-  border-radius:16px;
-  padding:18px;
-  margin-bottom:14px;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    background:#ffffff;
+
+    border-radius:20px;
+
+    padding:22px;
+
+    margin-top:15px;
+
+    margin-bottom:18px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.10);
+
+    border-left:6px solid #2e7d32;
+
+    transition:.3s;
+
+}
+
+.shutdown-item:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 12px 24px rgba(0,0,0,.15);
+
 }
 
 .shutdown-row{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:8px;
-  font-size:14px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:10px 0;
+
+    border-bottom:1px solid #ececec;
+
+}
+
+.shutdown-row:last-child{
+
+    border-bottom:none;
+
 }
 
 .shutdown-label{
-  color:#6b7280;
-  font-weight:600;
+
+    font-size:21px;
+
+    font-weight:700;
+
+    color:#666;
+
 }
 
 .shutdown-value{
-  font-weight:700;
+
+    font-size:22px;
+
+    font-weight:800;
+
+    color:#1f3a5f;
+
+    text-align:right;
+
 }
 
 .install-badge{
-  padding:4px 12px;
-  border-radius:999px;
-  background:#e5f0ff;
-  color:#1f3a5f;
-  font-size:12px;
-  font-weight:700;
+
+    background:#e8f5e9;
+
+    color:#2e7d32;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    font-size:18px;
+
+    font-weight:700;
+
 }
 
 /* ===== INPUTS ===== */
@@ -203,31 +322,79 @@ button{
 
 /* BUTTON COLORS */
 .btn-login{background:#1f3a5f;color:#fff;}
-.btn-shutdown{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;}
-.btn-resume{background:#27ae60;color:#fff;}
-.btn-back{background:#1addeb;color:#fff;}
+.btn-shutdown{
+
+    background:linear-gradient(180deg,#ff5b47,#d63a2a);
+
+    color:#fff;
+
+}
+.btn-resume{
+
+    background:linear-gradient(180deg,#36c86b,#239b56);
+
+    color:#fff;
+
+}
+.btn-back{
+
+    background:#1976d2;
+
+    color:#fff;
+
+}
 
 /* ===== SMALL BUTTON ROW ===== */
 .action-row{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
+
+    display:flex;
+
+    gap:16px;
+
+    margin-top:20px;
+
+    width:100%;
+
 }
 .small-btn{
-  flex:1;
-  padding:10px;
-  font-size:14px;
-  border-radius:10px;
+
+    flex:1;
+
+    height:68px;
+
+    border:none;
+
+    border-radius:18px;
+
+    font-size:24px;
+
+    font-weight:800;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:0 6px 15px rgba(0,0,0,.25);
+
 }
 
 /* ===== TABLE ===== */
 table{
-  width:100%;
-  min-width:1100px;
-  border-collapse:collapse;
-  background:#fff;
-  border-radius:10px;
-  overflow:hidden;
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.10);
+
 }
 
 table th, table td{
@@ -237,13 +404,33 @@ table th, table td{
 }
 
 table th{
-  font-size:13px;
-  background:#1f3a5f;
-  color:#fff;
+
+    background:#1f3a5f;
+
+    color:#fff;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    padding:18px 10px;
+
+    text-align:center;
+
 }
 
 table td{
-  font-size:12px;
+
+    font-size:18px;
+
+    padding:16px 10px;
+
+    text-align:center;
+
+    font-weight:600;
+
+    border-bottom:1px solid #eeeeee;
+
 }
 
 /* ✅ COMPACT FORM (Shutdown + Resume) */
@@ -330,6 +517,51 @@ table td{
 
 /* ===== HIDDEN ===== */
 .hidden{display:none}
+/* ==========================
+   USER INFO CARD
+========================== */
+
+#userInfo{
+
+    width:100%;
+
+    max-width:100%;
+
+    background:#ffffff;
+
+    border-radius:22px;
+
+    padding:18px;
+
+    margin-bottom:20px;
+
+    box-shadow:0 8px 22px rgba(0,0,0,.08);
+
+    text-align:center;
+
+}
+
+#ui_name{
+
+    font-size:26px !important;
+
+    font-weight:800 !important;
+
+    color:#1f3a5f !important;
+
+    margin-bottom:8px;
+
+}
+
+#ui_inst{
+
+    font-size:21px !important;
+
+    color:#555 !important;
+
+    font-weight:600;
+
+}
 
 /* ===== LABEL ===== */
 label{
@@ -371,7 +603,653 @@ label{
   background:#1f3a5f !important; /* original */
   cursor:pointer;
 }
+/* ===========================
+   EXTRA BIG MOBILE UI
+=========================== */
 
+/* Header */
+.header{
+    height:80px;
+}
+
+.header-title{
+    font-size:28px;
+    font-weight:800;
+}
+
+/* Cards */
+.card{
+    padding:24px;
+    border-radius:22px;
+}
+
+/* Headings */
+h2{
+    font-size:34px;
+    font-weight:800;
+}
+
+h3{
+    font-size:28px;
+    font-weight:700;
+}
+
+/* Labels */
+label{
+    font-size:24px;
+    font-weight:700;
+}
+
+/* Inputs */
+input,
+select,
+textarea{
+    height:68px;
+    font-size:24px;
+    padding:18px;
+    border-radius:16px;
+}
+
+textarea{
+    min-height:160px;
+}
+
+/* Active Shutdown Card */
+.shutdown-item{
+    padding:24px;
+}
+
+.shutdown-label{
+    font-size:22px;
+    font-weight:700;
+}
+
+.shutdown-value{
+    font-size:24px;
+    font-weight:800;
+}
+
+/* Installation Badge */
+.install-badge{
+    font-size:20px;
+    padding:8px 18px;
+}
+
+/* ===========================
+   HALF WIDTH BUTTONS
+=========================== */
+
+.action-row{
+    display:flex;
+    gap:12px;
+}
+
+.action-row .small-btn{
+    width:50%;
+    flex:0 0 calc(50% - 6px);
+    height:64px;
+    font-size:22px;
+    font-weight:800;
+    border-radius:16px;
+}
+
+/* Submit / Back Buttons */
+.btn-shutdown,
+.btn-resume,
+.btn-back{
+    height:64px;
+    font-size:22px;
+    font-weight:800;
+}
+
+/* Dropdown List */
+.feeder-item{
+    padding:18px;
+}
+
+.feeder-item span{
+    font-size:22px;
+}
+
+.feeder-item input[type=checkbox]{
+    width:30px;
+    height:30px;
+}
+
+/* User Info */
+#ui_name{
+    font-size:24px !important;
+}
+
+#ui_inst{
+    font-size:20px !important;
+}
+
+/* Toast */
+#toast{
+    font-size:22px;
+    padding:18px 26px;
+}
+
+/* Loader */
+#loader div{
+    font-size:24px;
+}
+
+/* Mobile */
+@media(max-width:768px){
+
+.header-title{
+    font-size:22px;
+}
+
+h2{
+    font-size:28px;
+}
+
+label{
+    font-size:20px;
+}
+
+input,
+select,
+textarea{
+    height:60px;
+    font-size:20px;
+}
+
+textarea{
+    min-height:130px;
+}
+
+.shutdown-label{
+    font-size:18px;
+}
+
+.shutdown-value{
+    font-size:20px;
+}
+
+.action-row .small-btn{
+    height:58px;
+    font-size:18px;
+}
+
+.btn-shutdown,
+.btn-resume,
+.btn-back{
+    height:58px;
+    font-size:20px;
+}
+
+}
+/* ==========================
+   BUTTON EFFECT
+========================== */
+
+.small-btn:hover,
+.btn-shutdown:hover,
+.btn-resume:hover,
+.btn-back:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 22px rgba(0,0,0,.30);
+
+}
+
+.small-btn:active,
+.btn-shutdown:active,
+.btn-resume:active,
+.btn-back:active{
+
+    transform:scale(.97);
+
+}
+
+.small-btn{
+
+    letter-spacing:.5px;
+
+}
+/* ==========================
+   HISTORY TABLE STYLE
+========================== */
+
+#historyTable tr:nth-child(even){
+
+    background:#f8fbff;
+
+}
+
+#historyTable tr:hover{
+
+    background:#eaf4ff;
+
+}
+
+#historyTable{
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+}
+
+#historyBox h2{
+
+    font-size:32px;
+
+    font-weight:800;
+
+    color:#1f3a5f;
+
+}
+
+#summaryBox{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    margin:18px 0;
+
+    background:#f5f8fc;
+
+    border-left:6px solid #1f3a5f;
+
+}
+
+#historyFilter{
+
+    height:60px;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    border-radius:16px;
+
+    margin-bottom:20px;
+
+}
+/* ===========================================
+   SHUTDOWN & RESUME ENTRY - PREMIUM MOBILE UI
+=========================================== */
+
+/* Entry Card */
+
+#shutdownBox,
+#resumeBox{
+
+    width:100%;
+    max-width:100%;
+    margin:16px auto;
+    background:#fff;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 8px 25px rgba(0,0,0,.10);
+
+}
+
+/* Heading */
+
+#shutdownBox h2,
+#resumeBox h2{
+
+    text-align:center;
+    font-size:30px;
+    font-weight:800;
+    color:#1f3a5f;
+    margin-bottom:25px;
+
+}
+
+/* Labels */
+
+#shutdownBox label,
+#resumeBox label{
+
+    display:block;
+    font-size:22px;
+    font-weight:700;
+    color:#333;
+    margin-bottom:8px;
+    margin-top:15px;
+
+}
+
+/* Inputs */
+
+#shutdownBox input,
+#shutdownBox select,
+#resumeBox input,
+#resumeBox select{
+
+    width:100%;
+    height:58px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:0 18px;
+    font-size:20px;
+    background:#fafafa;
+    outline:none;
+    transition:.25s;
+
+}
+
+#shutdownBox textarea,
+#resumeBox textarea{
+
+    width:100%;
+    min-height:120px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:16px;
+    font-size:20px;
+    background:#fafafa;
+    resize:none;
+    outline:none;
+
+}
+
+#shutdownBox input:focus,
+#shutdownBox select:focus,
+#shutdownBox textarea:focus,
+#resumeBox input:focus,
+#resumeBox select:focus,
+#resumeBox textarea:focus{
+
+    border-color:#1f3a5f;
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(31,58,95,.12);
+
+}
+
+/* Submit Button */
+
+.btn-submit,
+#shutdownBox button:first-of-type{
+
+    width:100%;
+    height:60px;
+    border:none;
+    border-radius:16px;
+    margin-top:22px;
+    background:linear-gradient(180deg,#f04d3c,#d83a2c);
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+
+}
+
+/* Resume Submit */
+
+#resumeBox button:first-of-type{
+
+    background:linear-gradient(180deg,#31c065,#239b56);
+
+}
+
+/* Back Button */
+
+.btn-back,
+#shutdownBox button:last-of-type,
+#resumeBox button:last-of-type{
+
+    width:100%;
+    height:60px;
+    border:none;
+    border-radius:16px;
+    margin-top:14px;
+    background:#25c7db;
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+
+}
+
+/* Button Animation */
+
+button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+button:active{
+
+    transform:scale(.98);
+
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+#shutdownBox,
+#resumeBox{
+
+    padding:20px;
+    border-radius:20px;
+
+}
+
+#shutdownBox h2,
+#resumeBox h2{
+
+    font-size:24px;
+
+}
+
+#shutdownBox label,
+#resumeBox label{
+
+    font-size:18px;
+
+}
+
+#shutdownBox input,
+#shutdownBox select,
+#resumeBox input,
+#resumeBox select{
+
+    height:54px;
+    font-size:18px;
+
+}
+
+#shutdownBox textarea,
+#resumeBox textarea{
+
+    min-height:110px;
+    font-size:18px;
+
+}
+
+.btn-submit,
+.btn-back,
+#shutdownBox button,
+#resumeBox button{
+
+    height:56px;
+    font-size:20px;
+
+}
+
+}
+/* ======================================
+   EDIT RESUME PAGE - PREMIUM UI
+====================================== */
+
+#editResumeBox{
+
+    width:100%;
+    max-width:100%;
+    margin:16px auto;
+    background:#fff;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 8px 25px rgba(0,0,0,.10);
+
+}
+
+#editResumeBox h2{
+
+    text-align:center;
+    font-size:30px;
+    font-weight:800;
+    color:#1f3a5f;
+    margin-bottom:25px;
+
+}
+
+#editResumeBox label{
+
+    display:block;
+    font-size:22px;
+    font-weight:700;
+    color:#333;
+    margin-top:14px;
+    margin-bottom:8px;
+
+}
+
+#editResumeBox input,
+#editResumeBox select{
+
+    width:100%;
+    height:58px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:0 18px;
+    font-size:20px;
+    background:#fafafa;
+    outline:none;
+
+}
+
+#editResumeBox textarea{
+
+    width:100%;
+    min-height:120px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:16px;
+    font-size:20px;
+    background:#fafafa;
+    resize:none;
+
+}
+
+#editResumeBox input:focus,
+#editResumeBox select:focus,
+#editResumeBox textarea:focus{
+
+    border-color:#1f3a5f;
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(31,58,95,.12);
+
+}
+
+/* Update Button */
+
+.btn-update{
+
+    width:100%;
+    height:60px;
+    margin-top:20px;
+    border:none;
+    border-radius:16px;
+    background:linear-gradient(180deg,#ff9800,#f57c00);
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+
+}
+
+/* Cancel Button */
+
+.btn-cancel{
+
+    width:100%;
+    height:60px;
+    margin-top:14px;
+    border:none;
+    border-radius:16px;
+    background:#607d8b;
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+
+}
+
+.btn-update:hover,
+.btn-cancel:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.btn-update:active,
+.btn-cancel:active{
+
+    transform:scale(.98);
+
+}
+
+@media(max-width:768px){
+
+#editResumeBox{
+
+    padding:20px;
+
+}
+
+#editResumeBox h2{
+
+    font-size:24px;
+
+}
+
+#editResumeBox label{
+
+    font-size:18px;
+
+}
+
+#editResumeBox input,
+#editResumeBox select{
+
+    height:54px;
+    font-size:18px;
+
+}
+
+#editResumeBox textarea{
+
+    min-height:110px;
+    font-size:18px;
+
+}
+
+.btn-update,
+.btn-cancel{
+
+    height:56px;
+    font-size:20px;
+
+}
+
+}
 </style>
 
 </head>
@@ -423,14 +1301,8 @@ label{
     <button class="logout-btn" onclick="logout()" title="Logout">🔓</button>
   </div>
 </header>
-<div id="userInfo" class="hidden" style="
-  background:#ffffff;
-  margin:10px 16px;
-  padding:10px 14px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.06);
-  text-align:center;
-">  
+<div id="userInfo" class="hidden">
+  
   <div style="font-size:15px;font-weight:700;color:#1f3a5f" id="ui_name"></div>
   <div style="font-size:13px;color:#6b7280" id="ui_inst"></div>
  </div>
@@ -568,7 +1440,11 @@ if(CURRENT_USER.admin){
   document.getElementById("historyFilter").value = "ALL";
 }
   // ✅ UI SET
-  document.getElementById("ui_name").innerText = "👤 " + CURRENT_USER.n;
+ document.getElementById("ui_name").innerHTML =
+"👤 " + CURRENT_USER.n.toUpperCase();
+
+document.getElementById("ui_inst").innerHTML =
+"Installation : <b>" + CURRENT_USER.i + "</b>"; "👤 " + CURRENT_USER.n;
   document.getElementById("ui_inst").innerText = "Installation : " + CURRENT_USER.i;
   document.getElementById("userInfo").classList.remove("hidden");
   document.getElementById("historyBox").classList.remove("hidden");
@@ -798,8 +1674,18 @@ function loadActiveShutdowns(){
   });
 
   if(!count){
-   activeShutdowns.innerHTML=`<div class="shutdown-item" style="text-align:center;color:#27ae60;font-weight:700">
-   ✅ All FEEDERS ARE HEALTHY</div>`;
+  activeShutdowns.innerHTML=`
+<div class="shutdown-item"
+style="
+text-align:center;
+font-size:30px;
+font-weight:800;
+color:#2e7d32;
+">
+
+✅ ALL FEEDERS ARE HEALTHY
+
+</div>`;
   }
  });
 }
@@ -1386,7 +2272,10 @@ if(!d.rs || d.rs === "NA"){
     background:#e74c3c;
     color:#fff;
     border:none;
-    padding:5px 10px;
+    padding:10px 18px;
+font-size:18px;
+font-weight:700;
+border-radius:10px;
     border-radius:6px;
     cursor:pointer"
     onclick="deleteShutdownHistory(
@@ -1405,7 +2294,10 @@ else if(canEditResume(d.rs)){
     background:#f39c12;
     color:#fff;
     border:none;
-    padding:5px 10px;
+    padding:10px 18px;
+font-size:18px;
+font-weight:700;
+border-radius:10px;
     border-radius:6px;
     cursor:pointer"
     onclick='openResumeEdit(
