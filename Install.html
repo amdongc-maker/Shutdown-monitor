@@ -1725,6 +1725,18 @@ if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
   populateFeeders();
   loadActiveShutdowns();
   loadHistory();
+   // ================= TODAY'S HISTORY DATE =================
+let today = new Date();
+
+let day = String(today.getDate()).padStart(2,'0');
+let month = String(today.getMonth() + 1).padStart(2,'0');
+let year = today.getFullYear();
+
+document.getElementById("historyTitle").innerHTML =
+    "📅 Today's History — " + day + "-" + month + "-" + year;
+
+document.getElementById("historyToggleBtn").innerHTML =
+    "📅 Show Today's History";
 
   // ✅ INPUT VALIDATION
   document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
