@@ -3225,12 +3225,20 @@ function toggleHistory(){
         title.innerHTML = "📜 Last 2 Months History";
         btn.innerHTML = "📜 Show Last 2 Months History";
 
-    }else{
-         title.innerHTML ="📅 Today's History"; 
-        btn.innerHTML = "📅 Show Today's History";
-        
+ }else{
 
-    }
+    let today = new Date();
+
+    let day = String(today.getDate()).padStart(2,'0');
+    let month = String(today.getMonth() + 1).padStart(2,'0');
+    let year = today.getFullYear();
+
+    let todayDate = `${day}-${month}-${year}`;
+
+    title.innerHTML = "📅 Today's History — " + todayDate;
+
+    btn.innerHTML = "📅 Show Today's History";
+}
 
     loadHistory();
 
