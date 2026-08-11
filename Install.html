@@ -3735,67 +3735,67 @@ function logoutButtonClick(){
 // EVENTS
 // -----------------------------------------------------
 
-const logoutBtn =
-    document.getElementById("logoutBtn");
+// =====================================================
+// LOGOUT BUTTON EVENTS - FIXED
+// SHORT PRESS  = LOGOUT
+// 5 SECOND HOLD = SHOW TPD UPDATE BUTTON
+// =====================================================
 
+const logoutBtn = document.getElementById("logoutBtn");
 
 if(logoutBtn){
 
-    // Mouse
-    logoutBtn.addEventListener(
-        "mousedown",
-        startLogoutHold
-    );
+    // =========================
+    // MOUSE
+    // =========================
 
-    logoutBtn.addEventListener(
-        "mouseup",
-        endLogoutHold
-    );
+    logoutBtn.addEventListener("mousedown", function(){
+        startLogoutHold();
+    });
 
-    logoutBtn.addEventListener(
-        "mouseleave",
-        endLogoutHold
-    );
+    logoutBtn.addEventListener("mouseup", function(){
+        endLogoutHold();
+    });
 
-
-    // Touch / Mobile
-    logoutBtn.addEventListener(
-        "touchstart",
-        function(e){
-
-            e.preventDefault();
-
-            startLogoutHold();
-
-        },
-        {passive:false}
-    );
+    logoutBtn.addEventListener("mouseleave", function(){
+        endLogoutHold();
+    });
 
 
-    logoutBtn.addEventListener(
-        "touchend",
-        function(e){
+    // =========================
+    // MOBILE TOUCH
+    // =========================
 
-            e.preventDefault();
+    logoutBtn.addEventListener("touchstart", function(){
+        startLogoutHold();
+    }, {passive:true});
 
-            endLogoutHold();
+    logoutBtn.addEventListener("touchend", function(){
+        endLogoutHold();
+    }, {passive:true});
 
-        },
-        {passive:false}
-    );
-
-
-    logoutBtn.addEventListener(
-        "touchcancel",
-        endLogoutHold
-    );
+    logoutBtn.addEventListener("touchcancel", function(){
+        endLogoutHold();
+    }, {passive:true});
 
 
-    // Normal click
-    logoutBtn.addEventListener(
-        "click",
-        logoutButtonClick
-    );
+    // =========================
+    // NORMAL CLICK
+    // =========================
+
+    logoutBtn.addEventListener("click", function(){
+
+        if(logoutLongPress){
+
+            // 5 sec hold ke baad logout nahi hoga
+            logoutLongPress = false;
+            return;
+        }
+
+        // Normal one click = logout
+        logout();
+
+    });
 
 }
 </script>
