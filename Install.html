@@ -1414,6 +1414,169 @@ table td{
         font-size:15px;
     }
 }
+
+.tpd-required-modal{
+
+  display:none;
+
+  position:fixed;
+
+  inset:0;
+
+  background:rgba(0,0,0,0.55);
+
+  z-index:99999;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:20px;
+
+}
+
+
+.tpd-required-box{
+
+  width:100%;
+
+  max-width:360px;
+
+  background:#ffffff;
+
+  border-radius:16px;
+
+  padding:24px 22px 20px;
+
+  text-align:center;
+
+  box-shadow:0 15px 40px rgba(0,0,0,0.25);
+
+  border:1px solid #e5e7eb;
+
+  animation:tpdPopupIn 0.2s ease-out;
+
+}
+
+
+.tpd-required-icon{
+
+  width:58px;
+
+  height:58px;
+
+  margin:0 auto 12px;
+
+  border-radius:50%;
+
+  background:#fff7ed;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:30px;
+
+}
+
+
+.tpd-required-title{
+
+  font-size:20px;
+
+  font-weight:700;
+
+  color:#1f2937;
+
+  margin-bottom:10px;
+
+}
+
+
+.tpd-required-message{
+
+  font-size:14px;
+
+  line-height:1.5;
+
+  color:#4b5563;
+
+  margin-bottom:20px;
+
+}
+
+
+.tpd-required-ok{
+
+  width:100%;
+
+  border:none;
+
+  border-radius:10px;
+
+  padding:12px;
+
+  background:#1e3a8a;
+
+  color:#ffffff;
+
+  font-size:15px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+}
+
+
+.tpd-required-ok:active{
+
+  transform:scale(0.98);
+
+}
+
+
+@keyframes tpdPopupIn{
+
+  from{
+
+    opacity:0;
+
+    transform:scale(0.92);
+
+  }
+
+  to{
+
+    opacity:1;
+
+    transform:scale(1);
+
+  }
+
+}
+
+/* =========================================================
+   PRODUCTION LOSS IMPORTANT INFORMATION
+   ========================================================= */
+
+#productionLossNote{
+    margin-top:8px;
+    padding:10px 12px;
+    color:#b91c1c;
+    background:#fff7f7;
+    border-left:4px solid #dc2626;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    line-height:1.5;
+}
+
+#productionLossNote b{
+    font-weight:800;
+}
 </style>
 </head>
 
@@ -1659,6 +1822,15 @@ table td{
     </button>
 
 </div>
+
+<div id="productionLossNote">
+    ⚠️ <b>Important:</b> Auto-calculated Production Loss represents the
+    <b>full feeder power shutdown loss</b> based on the feeder's TPD value.
+    For <b>Partial Plan, Partial Unplan</b> or <b>Plan Shutdown</b> cases,
+    particularly when <b>DG is deployed</b>, please review and update the
+    Production Loss value accordingly before submitting Resume.
+</div>
+
 <label>DG Deployed</label>
 <input id="rs_dg" type="number" placeholder="DG Deployed" inputmode="numeric" min="0">
 <label>Remarks</label>
@@ -1681,6 +1853,7 @@ window.onload = function(){
   let user = localStorage.getItem("CURRENT_USER");
   // ✅ Restore Resume Share Button after refresh
 let savedResume = localStorage.getItem("LAST_RESUME_DATA");
+
 
 if(savedResume){
   LAST_RESUME_DATA = JSON.parse(savedResume);
@@ -1804,6 +1977,7 @@ let CURRENT_USER = {},
     LAST_RESUME_DATA = null;
 
 let EDIT_MODE = false;
+let resumeAfterTPDWarning = false;
 let SHOW_ALL_HISTORY = false;
 let EDIT_ROW = null;
 
@@ -2469,190 +2643,478 @@ function toggleLossEdit(){
     }
 
 }
+// =====================================================
 // ✅ RESUME
+// =====================================================
+
 function submitResume(){
 
-if(EDIT_MODE){
-    updateResume();
-    return;
-}
+    if(EDIT_MODE){
+        updateResume();
+        return;
+    }
 
-let btn=document.querySelector("#resumeBox .btn-resume");
 
-if(
-!rs_feeder.value||
-!rs_time.value||
-!rs_loss.value||
-!rs_dg.value||
-!rs_rem.value
-){
-    showToast("❌ All fields required","error");
-    return;
-}
+    // =====================================================
+    // RESUME BUTTON
+    // =====================================================
 
-let shutdownTimeStr=LAST_SHUTDOWN_TIME[rs_feeder.value];
+    let btn =
+        document.querySelector("#resumeBox .btn-resume");
 
-let shutdownDate=parseDateManual(shutdownTimeStr);
 
-let resumeDate=new Date(rs_time.value);
+    // =====================================================
+    // ALL FIELDS MUST BE FILLED
+    // =====================================================
 
-if(!shutdownDate||isNaN(resumeDate.getTime())){
-    showToast("⚠️ Invalid date format","error");
-    return;
-}
+    let resumeFeeder =
+        (rs_feeder.value || "").trim();
 
-if(resumeDate<shutdownDate){
-    showToast("❌ Resume time cannot be before Shutdown time","error");
-    return;
-}
+    let resumeTime =
+        (rs_time.value || "").trim();
 
-if(hasSpecialChar(rs_rem.value)){
-    showToast("❌ Invalid characters","error");
-    return;
-}
+    let productionLoss =
+        (rs_loss.value || "").trim();
 
-if(!LAST_SHUTDOWN_TIME[rs_feeder.value]){
-    showToast("⚠️ Loading data, try again","error");
-    loadActiveShutdowns();
-    return;
-}
+    let dgDeployed =
+        (rs_dg.value || "").trim();
 
-showLoader();
+    let remarks =
+        (rs_rem.value || "").trim();
 
-disableBtn(btn);
 
-lockButton("resumeBtn");
+    // =====================================================
+    // FEEDER VALIDATION
+    // =====================================================
 
-showLoading(
-"Submitting Resume...",
-"Please wait..."
-);
-
-speak(
-"Submitting resume entry."
-);
-
-fetch(
-
-WEBAPP_URL+"?"+new URLSearchParams({
-
-action:"resume",
-
-feeder:rs_feeder.value,
-
-ResumeTime:rs_time.value.replace("T"," "),
-
-ResumeEntryBy:CURRENT_USER.n,
-
-TotalProdLoss:rs_loss.value,
-
-DGDeployed:rs_dg.value,
-
-Remarks:rs_rem.value
-
-})
-
-)
-
-.then(res => res.text())
-.then(result => {
-
-    result = (result || "").trim();
-
-    hideLoading();
-    unlockButton("resumeBtn");
-
-    // Another user submitting
-    if (result.includes("Another user")) {
-
-        speak("Another user is submitting resume entry. Please wait.");
+    if(!resumeFeeder){
 
         showToast(
-            "⚠ Another user is submitting. Please wait...",
+            "❌ Please select Feeder",
             "error"
         );
 
         return;
     }
 
-    // Success
-    if (result.toLowerCase().includes("success")) {
 
-        speak("Resume submitted successfully.");
+    // =====================================================
+    // RESUME TIME VALIDATION
+    // =====================================================
 
-        LAST_RESUME_DATA = {
+    if(!resumeTime){
 
-            feeder: rs_feeder.value,
-            resumeTime: rs_time.value,
-            dg: rs_dg.value,
-            loss: rs_loss.value,
-            reason: rs_rem.value
-
-        };
-
-        localStorage.setItem(
-            "LAST_RESUME_DATA",
-            JSON.stringify(LAST_RESUME_DATA)
+        showToast(
+            "❌ Please enter Resume Time",
+            "error"
         );
-
-        document
-            .getElementById("resumeShareBtn")
-            .classList.remove("hidden");
-
-        // Show success popup
-        showResult(
-            "✅ Resume Submitted",
-            result
-        );
-
-        // Clear form
-        rs_feeder.value = "";
-        rs_time.value = "";
-        rs_loss.value = "";
-        rs_dg.value = "";
-        rs_rem.value = "";
-
-        loadActiveShutdowns();
-
-        // Go back after 2 seconds
-        setTimeout(function () {
-            backToMain();
-        }, 2000);
 
         return;
     }
 
-    // Other message
-    speak(result);
-    showToast(result, "error");
 
-})
+    // =====================================================
+    // PRODUCTION LOSS VALIDATION
+    // =====================================================
 
-.catch(err=>{
-
-    console.error(err);
-
-    hideLoading();
-
-    unlockButton("resumeBtn");
+    if(!productionLoss){
 
         showToast(
-        "❌ Server Error",
-        "error"
+            "❌ Please enter Production Loss",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // DG DEPLOYED VALIDATION
+    // =====================================================
+
+    if(!dgDeployed){
+
+        showToast(
+            "❌ Please select DG Deployed",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // REMARKS VALIDATION
+    // =====================================================
+
+    if(!remarks){
+
+        showToast(
+            "❌ Please enter Remarks",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // TPD WARNING
+    //
+    // TPD missing/0 ho to sirf message show hoga.
+    // Resume BLOCK nahi hoga.
+    // User OK karega → Resume automatically continue hoga.
+    // =====================================================
+
+    let resumeTPD =
+        parseFloat(LAST_TPD[resumeFeeder]) || 0;
+
+
+    if(
+        resumeTPD <= 0 &&
+        !resumeAfterTPDWarning
+    ){
+
+        resumeAfterTPDWarning = true;
+
+        showTPDRequiredMessage();
+
+        return;
+    }
+
+
+    // =====================================================
+    // TPD WARNING COMPLETE
+    // =====================================================
+
+    resumeAfterTPDWarning = false;
+
+
+    // =====================================================
+    // SHUTDOWN TIME
+    // =====================================================
+
+    let shutdownTimeStr =
+        LAST_SHUTDOWN_TIME[resumeFeeder];
+
+
+    let shutdownDate =
+        parseDateManual(shutdownTimeStr);
+
+
+    let resumeDate =
+        new Date(resumeTime);
+
+
+    // =====================================================
+    // DATE VALIDATION
+    // =====================================================
+
+    if(
+        !shutdownDate ||
+        isNaN(resumeDate.getTime())
+    ){
+
+        showToast(
+            "⚠️ Invalid date format",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // RESUME TIME VALIDATION
+    // =====================================================
+
+    if(resumeDate < shutdownDate){
+
+        showToast(
+            "❌ Resume time cannot be before Shutdown time",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // REMARKS VALIDATION
+    // =====================================================
+
+    if(hasSpecialChar(remarks)){
+
+        showToast(
+            "❌ Invalid characters",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // ACTIVE SHUTDOWN DATA CHECK
+    // =====================================================
+
+    if(!LAST_SHUTDOWN_TIME[resumeFeeder]){
+
+        showToast(
+            "⚠️ Loading data, try again",
+            "error"
+        );
+
+        loadActiveShutdowns();
+
+        return;
+    }
+
+
+    // =====================================================
+    // START SUBMIT
+    // =====================================================
+
+    showLoader();
+
+    disableBtn(btn);
+
+    lockButton("resumeBtn");
+
+
+    showLoading(
+        "Submitting Resume...",
+        "Please wait..."
     );
 
-})
 
-.finally(()=>{
+    speak(
+        "Submitting resume entry."
+    );
 
-    hideLoader();
 
-    enableBtn(btn);
+    // =====================================================
+    // SUBMIT RESUME
+    // =====================================================
 
-});
+    fetch(
+
+        WEBAPP_URL +
+        "?" +
+        new URLSearchParams({
+
+            action:"resume",
+
+            feeder:
+                resumeFeeder,
+
+            ResumeTime:
+                resumeTime.replace(
+                    "T",
+                    " "
+                ),
+
+            ResumeEntryBy:
+                CURRENT_USER.n,
+
+            TotalProdLoss:
+                productionLoss,
+
+            DGDeployed:
+                dgDeployed,
+
+            Remarks:
+                remarks
+
+        })
+
+    )
+
+
+    .then(res => res.text())
+
+
+    .then(result => {
+
+        result =
+            (result || "").trim();
+
+
+        hideLoading();
+
+        unlockButton("resumeBtn");
+
+
+        // =================================================
+        // ANOTHER USER SUBMITTING
+        // =================================================
+
+        if(result.includes("Another user")){
+
+            speak(
+                "Another user is submitting resume entry. Please wait."
+            );
+
+
+            showToast(
+                "⚠ Another user is submitting. Please wait...",
+                "error"
+            );
+
+
+            return;
+        }
+
+
+        // =================================================
+        // SUCCESS
+        // =================================================
+
+        if(
+            result
+                .toLowerCase()
+                .includes("success")
+        ){
+
+            speak(
+                "Resume submitted successfully."
+            );
+
+
+            LAST_RESUME_DATA = {
+
+                feeder:
+                    resumeFeeder,
+
+                resumeTime:
+                    resumeTime,
+
+                dg:
+                    dgDeployed,
+
+                loss:
+                    productionLoss,
+
+                reason:
+                    remarks
+
+            };
+
+
+            localStorage.setItem(
+                "LAST_RESUME_DATA",
+                JSON.stringify(
+                    LAST_RESUME_DATA
+                )
+            );
+
+
+            document
+                .getElementById(
+                    "resumeShareBtn"
+                )
+                .classList
+                .remove("hidden");
+
+
+            // =================================================
+            // SUCCESS POPUP
+            // =================================================
+
+            showResult(
+                "✅ Resume Submitted",
+                result
+            );
+
+
+            // =================================================
+            // CLEAR FORM
+            // =================================================
+
+            rs_feeder.value = "";
+
+            rs_time.value = "";
+
+            rs_loss.value = "";
+
+            rs_dg.value = "";
+
+            rs_rem.value = "";
+
+
+            // =================================================
+            // REFRESH ACTIVE SHUTDOWNS
+            // =================================================
+
+            loadActiveShutdowns();
+
+
+            // =================================================
+            // GO BACK TO MAIN
+            // =================================================
+
+            setTimeout(function(){
+
+                backToMain();
+
+            },2000);
+
+
+            return;
+        }
+
+
+        // =================================================
+        // OTHER SERVER MESSAGE
+        // =================================================
+
+        speak(result);
+
+
+        showToast(
+            result,
+            "error"
+        );
+
+    })
+
+
+    // =====================================================
+    // ERROR
+    // =====================================================
+
+    .catch(err => {
+
+        console.error(err);
+
+
+        hideLoading();
+
+
+        unlockButton("resumeBtn");
+
+
+        showToast(
+            "❌ Server Error",
+            "error"
+        );
+
+    })
+
+
+    // =====================================================
+    // FINALLY
+    // =====================================================
+
+    .finally(() => {
+
+        hideLoader();
+
+        enableBtn(btn);
+
+    });
 
 }
-
 // ================= UPDATE RESUME =================
 function updateResume(){
 
@@ -3225,8 +3687,8 @@ function toggleHistory(){
         btn.innerHTML = "📜 Show Last 2 Months History";
 
     }else{
-         title.innerHTML ="📜 Today's History"; 
-        btn.innerHTML = "📜 Show Today's History";
+         title.innerHTML ="📅 Today's History"; 
+        btn.innerHTML = "📅 Show Today's History";
         
 
     }
@@ -3795,6 +4257,49 @@ if(logoutBtn){
         logout();
 
     });
+
+}
+function showTPDRequiredMessage(){
+
+  var modal =
+    document.getElementById("tpdRequiredModal");
+
+  if(modal){
+
+    modal.style.display = "flex";
+
+  }
+
+}
+
+
+function closeTPDRequiredMessage(){
+
+    var modal =
+        document.getElementById(
+            "tpdRequiredModal"
+        );
+
+    if(modal){
+
+        modal.style.display = "none";
+
+    }
+
+
+    // =====================================================
+    // TPD WARNING KE BAAD RESUME CONTINUE
+    // =====================================================
+
+    if(resumeAfterTPDWarning){
+
+        setTimeout(function(){
+
+            submitResume();
+
+        },100);
+
+    }
 
 }
 </script>
@@ -4449,5 +4954,33 @@ document.getElementById(
 
 
 </script>
+<!-- TPD REQUIRED PROFESSIONAL POPUP -->
+<div id="tpdRequiredModal" class="tpd-required-modal">
+
+  <div class="tpd-required-box">
+
+    <div class="tpd-required-icon">
+      ⚠️
+    </div>
+
+    <div class="tpd-required-title">
+    TPD Required
+</div>
+
+<div class="tpd-required-message">
+    Please update the <b>Ton Per Day (TPD)</b> value for this feeder
+    before submitting the Resume entry.
+</div>
+
+    <button
+      type="button"
+      class="tpd-required-ok"
+      onclick="closeTPDRequiredMessage()">
+      OK
+    </button>
+
+  </div>
+
+</div>
 </body>
 </html>
