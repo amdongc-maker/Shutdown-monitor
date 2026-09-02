@@ -1,0 +1,7192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>POWER SHUTDOWN MANAGEMENT APP - AREA-IV</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    max-width:100%;
+    margin:0;
+    padding:0;
+    overflow-x:hidden;
+}
+
+body{
+    font-family:"Segoe UI",Roboto,sans-serif;
+    background:#eef3f8;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+    position:sticky;
+    top:0;
+    left:0;
+    width:100%;
+    height:80px;
+    background:#1f3a5f;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    z-index:999;
+    box-shadow:0 5px 20px rgba(0,0,0,.18);
+}
+
+.header-left{
+    width:40px;
+}
+
+.header-title{
+    flex:1;
+    text-align:center;
+    color:#fff;
+    font-size:28px;
+    font-weight:800;
+    line-height:30px;
+}
+
+.header-right{
+    width:40px;
+    display:flex;
+    justify-content:flex-end;
+}
+
+.logout-btn{
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    border-radius:50%;
+    background:#e74c3c;
+    color:#fff;
+    cursor:pointer;
+    font-size:24px;
+}
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container{
+    width:100%;
+    max-width:100%;
+    margin:0;
+    padding:12px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card{
+    width:100%;
+    max-width:100%;
+    background:#fff;
+    border-radius:22px;
+    padding:24px;
+    margin:12px 0 22px;
+    box-shadow:0 8px 22px rgba(0,0,0,.10);
+}
+
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+h2{
+    font-size:34px;
+    font-weight:800;
+    color:#1f3a5f;
+    text-align:center;
+    margin:0 0 22px;
+}
+
+h3{
+    font-size:28px;
+    font-weight:700;
+    color:#1f3a5f;
+    text-align:center;
+    margin-bottom:10px;
+}
+
+
+/* =========================================================
+   USER INFO
+========================================================= */
+
+#userInfo{
+    width:100%;
+    max-width:100%;
+    background:#fff;
+    border-radius:18px;
+    padding:18px;
+    margin:12px 0 20px;
+    box-shadow:0 8px 22px rgba(0,0,0,.08);
+    text-align:center;
+}
+
+#ui_name{
+    font-size:26px !important;
+    font-weight:800 !important;
+    color:#1f3a5f !important;
+    margin-bottom:8px;
+}
+
+#ui_inst{
+    font-size:21px !important;
+    color:#555 !important;
+    font-weight:600;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+label{
+    display:block;
+    font-size:24px;
+    font-weight:700;
+    color:#374151;
+}
+
+
+/* =========================================================
+   INPUT / SELECT / TEXTAREA
+========================================================= */
+
+input,
+select,
+textarea{
+    width:100%;
+    max-width:100%;
+    height:68px;
+    padding:18px;
+    margin-top:10px;
+    border-radius:16px;
+    border:1px solid #cfd1d4;
+    font-size:24px;
+    box-sizing:border-box;
+    outline:none;
+    background:#fafafa;
+    transition:.2s;
+}
+
+textarea{
+    min-height:160px;
+    padding:16px;
+    resize:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#1f3a5f;
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(31,58,95,.12);
+}
+
+
+/* =========================================================
+   MAIN BUTTON
+========================================================= */
+
+button{
+    width:100%;
+    max-width:100%;
+    height:50px;
+    margin-top:14px;
+    border:none;
+    border-radius:14px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    box-sizing:border-box;
+}
+
+.btn-login{
+    background:#1f3a5f;
+    color:#fff;
+}
+
+.btn-shutdown{
+    height:64px;
+    font-size:22px;
+    font-weight:800;
+    border-radius:16px;
+    background:linear-gradient(180deg,#ff5b47,#d63a2a);
+    color:#fff;
+}
+
+.btn-resume{
+    height:64px;
+    font-size:22px;
+    font-weight:800;
+    border-radius:16px;
+    background:linear-gradient(180deg,#36c86b,#239b56);
+    color:#fff;
+}
+
+.btn-back{
+    height:64px;
+    font-size:22px;
+    font-weight:800;
+    border-radius:16px;
+    background:#1976d2;
+    color:#fff;
+}
+
+
+/* =========================================================
+   BUTTON EFFECT
+========================================================= */
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.small-btn:hover,
+.btn-shutdown:hover,
+.btn-resume:hover,
+.btn-back:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 22px rgba(0,0,0,.30);
+}
+
+.small-btn:active,
+.btn-shutdown:active,
+.btn-resume:active,
+.btn-back:active{
+    transform:scale(.97);
+}
+
+
+/* =========================================================
+   SMALL BUTTON ROW
+========================================================= */
+
+.action-row{
+    display:flex;
+    gap:12px;
+    margin-top:20px;
+    width:100%;
+}
+
+.action-row .small-btn{
+    width:50%;
+    flex:0 0 calc(50% - 6px);
+    height:64px;
+    border:none;
+    border-radius:16px;
+    font-size:22px;
+    font-weight:800;
+    color:#fff;
+    cursor:pointer;
+    letter-spacing:.5px;
+    transition:.25s;
+    box-shadow:0 6px 15px rgba(0,0,0,.25);
+}
+
+
+/* =========================================================
+   MULTI FEEDER LIST
+========================================================= */
+
+#allFeederBox{
+    background:#fff;
+    border:1px solid #d6dce5;
+    border-radius:12px;
+    padding:8px;
+    max-height:250px;
+    overflow-y:auto;
+    margin-top:8px;
+}
+
+.feeder-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:18px;
+    border-bottom:1px solid #edf1f5;
+    transition:.2s;
+    cursor:pointer;
+}
+
+.feeder-item:last-child{
+    border-bottom:none;
+}
+
+.feeder-item:hover{
+    background:#f4f8fc;
+}
+
+.feeder-item input[type="checkbox"]{
+    width:30px;
+    height:30px;
+    margin:0;
+    cursor:pointer;
+    accent-color:#1f3a5f;
+    flex-shrink:0;
+}
+
+.feeder-item span{
+    font-size:22px;
+    font-weight:500;
+    color:#1f3a5f;
+}
+
+
+/* =========================================================
+   ACTIVE SHUTDOWN
+========================================================= */
+
+.shutdown-item{
+    background:#fff;
+    border-radius:22px;
+    padding:24px;
+    margin:16px 0;
+    box-shadow:0 8px 20px rgba(0,0,0,.10);
+    border-left:6px solid #2e7d32;
+}
+
+.shutdown-row{
+    display:grid;
+    grid-template-columns:120px 1fr;
+    align-items:center;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid #ececec;
+}
+
+.shutdown-row:last-child{
+    border-bottom:none;
+}
+
+.shutdown-label{
+    font-size:22px;
+    font-weight:700;
+    color:#666;
+    text-transform:uppercase;
+}
+
+.shutdown-value{
+    font-size:24px;
+    font-weight:800;
+    color:#1f3a5f;
+    text-align:left;
+    line-height:1.35;
+    word-break:break-word;
+}
+
+.install-badge{
+    display:inline-block;
+    padding:8px 18px;
+    border-radius:999px;
+    background:#e5f0ff;
+    color:#1f3a5f;
+    font-size:20px;
+    font-weight:700;
+}
+
+
+/* =========================================================
+   SHUTDOWN / RESUME ENTRY
+========================================================= */
+
+#shutdownBox,
+#resumeBox{
+    width:100%;
+    max-width:100%;
+    margin:16px 0;
+    background:#fff;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 8px 25px rgba(0,0,0,.10);
+}
+
+#shutdownBox h2,
+#resumeBox h2{
+    text-align:center;
+    font-size:30px;
+    font-weight:800;
+    color:#1f3a5f;
+    margin-bottom:25px;
+}
+
+#shutdownBox label,
+#resumeBox label{
+    display:block;
+    font-size:22px;
+    font-weight:700;
+    color:#333;
+    margin-top:15px;
+    margin-bottom:8px;
+}
+
+#shutdownBox input,
+#shutdownBox select,
+#resumeBox input,
+#resumeBox select{
+    width:100%;
+    height:58px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:0 18px;
+    font-size:20px;
+    background:#fafafa;
+    outline:none;
+    transition:.25s;
+}
+
+#shutdownBox textarea,
+#resumeBox textarea{
+    width:100%;
+    min-height:120px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:16px;
+    font-size:20px;
+    background:#fafafa;
+    resize:none;
+    outline:none;
+}
+
+#shutdownBox input:focus,
+#shutdownBox select:focus,
+#shutdownBox textarea:focus,
+#resumeBox input:focus,
+#resumeBox select:focus,
+#resumeBox textarea:focus{
+    border-color:#1f3a5f;
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(31,58,95,.12);
+}
+
+
+/* =========================================================
+   RESUME PRODUCTION LOSS
+   JS FUNCTION KE LIYE CSS ONLY
+========================================================= */
+
+#rs_loss{
+    background:#f1f5f9;
+    font-weight:800;
+}
+
+
+/* =========================================================
+   SUBMIT / BACK
+========================================================= */
+
+#shutdownBox button:first-of-type,
+#resumeBox button:first-of-type,
+.btn-submit{
+    width:100%;
+    height:60px;
+    border:none;
+    border-radius:16px;
+    margin-top:22px;
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+}
+
+#shutdownBox button:first-of-type,
+.btn-submit{
+    background:linear-gradient(180deg,#f04d3c,#d83a2c);
+}
+
+#resumeBox button:first-of-type{
+    background:linear-gradient(180deg,#31c065,#239b56);
+}
+
+.btn-back,
+#shutdownBox button:last-of-type,
+#resumeBox button:last-of-type{
+    width:100%;
+    height:60px;
+    border:none;
+    border-radius:16px;
+    margin-top:14px;
+    background:#25c7db;
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+}
+
+
+/* =========================================================
+   EDIT RESUME
+========================================================= */
+
+#editResumeBox{
+    width:100%;
+    max-width:100%;
+    margin:16px auto;
+    background:#fff;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 8px 25px rgba(0,0,0,.10);
+}
+
+#editResumeBox h2{
+    text-align:center;
+    font-size:30px;
+    font-weight:800;
+    color:#1f3a5f;
+    margin-bottom:25px;
+}
+
+#editResumeBox label{
+    display:block;
+    font-size:22px;
+    font-weight:700;
+    color:#333;
+    margin-top:14px;
+    margin-bottom:8px;
+}
+
+#editResumeBox input,
+#editResumeBox select{
+    width:100%;
+    height:58px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:0 18px;
+    font-size:20px;
+    background:#fafafa;
+    outline:none;
+}
+
+#editResumeBox textarea{
+    width:100%;
+    min-height:120px;
+    border:1px solid #d7d7d7;
+    border-radius:16px;
+    padding:16px;
+    font-size:20px;
+    background:#fafafa;
+    resize:none;
+}
+
+#editResumeBox input:focus,
+#editResumeBox select:focus,
+#editResumeBox textarea:focus{
+    border-color:#1f3a5f;
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(31,58,95,.12);
+}
+
+.btn-update{
+    width:100%;
+    height:60px;
+    margin-top:20px;
+    border:none;
+    border-radius:16px;
+    background:linear-gradient(180deg,#ff9800,#f57c00);
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+}
+
+.btn-cancel{
+    width:100%;
+    height:60px;
+    margin-top:14px;
+    border:none;
+    border-radius:16px;
+    background:#607d8b;
+    color:#fff;
+    font-size:24px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,.20);
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,.10);
+}
+
+table th,
+table td{
+    padding:8px;
+    text-align:center;
+    white-space:nowrap;
+}
+
+table th{
+    background:#1f3a5f;
+    color:#fff;
+    font-size:20px;
+    font-weight:700;
+    padding:18px 10px;
+}
+
+table td{
+    font-size:18px;
+    padding:16px 10px;
+    text-align:center;
+    font-weight:600;
+    border-bottom:1px solid #eee;
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+#historyTable{
+    border-radius:18px;
+    overflow:hidden;
+}
+
+#historyTable tr:nth-child(even){
+    background:#f8fbff;
+}
+
+#historyTable tr:hover{
+    background:#eaf4ff;
+}
+
+#historyBox h2{
+    font-size:32px;
+    font-weight:800;
+    color:#1f3a5f;
+}
+
+#summaryBox{
+    font-size:20px;
+    font-weight:700;
+    border-radius:18px;
+    padding:18px;
+    margin:18px 0;
+    background:#f5f8fc;
+    border-left:6px solid #1f3a5f;
+}
+
+#historyFilter{
+    height:60px;
+    font-size:20px;
+    font-weight:700;
+    border-radius:16px;
+    margin-bottom:20px;
+}
+
+
+/* =========================================================
+   EXPORT
+========================================================= */
+
+#exportBtn:disabled{
+    background:#9ca3af !important;
+    cursor:not-allowed;
+}
+
+#exportBtn:not(:disabled){
+    background:#1f3a5f !important;
+    cursor:pointer;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+#msg{
+    text-align:center;
+    margin-top:10px;
+    font-weight:600;
+}
+
+
+/* =========================================================
+   LOADING SCREEN
+========================================================= */
+
+#loadingScreen{
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.72);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:999999;
+    backdrop-filter:blur(4px);
+}
+
+.fireLoader{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    border:8px solid #ff6200;
+    border-top:8px solid yellow;
+    animation:
+        rotateLoader 1s linear infinite,
+        fireGlow .8s ease-in-out infinite;
+}
+
+#loadingTitle{
+    margin-top:22px;
+    font-size:24px;
+    font-weight:bold;
+    color:#fff;
+    text-shadow:
+        0 0 10px red,
+        0 0 20px orange,
+        0 0 35px yellow;
+}
+
+#loadingSub{
+    margin-top:8px;
+    font-size:17px;
+    color:#fff;
+    opacity:.9;
+}
+
+@keyframes rotateLoader{
+    100%{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes fireGlow{
+    0%{
+        box-shadow:
+            0 0 15px red,
+            0 0 30px orange,
+            0 0 45px yellow;
+    }
+
+    50%{
+        box-shadow:
+            0 0 30px red,
+            0 0 55px orange,
+            0 0 75px yellow;
+    }
+
+    100%{
+        box-shadow:
+            0 0 15px red,
+            0 0 30px orange,
+            0 0 45px yellow;
+    }
+}
+
+
+/* =========================================================
+   RESULT BOX
+========================================================= */
+
+.resultBox{
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.45);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999999;
+}
+
+.resultContent{
+    width:320px;
+    background:#fff;
+    border-radius:8px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+.resultContent button{
+    margin-top:20px;
+    width:120px;
+    height:42px;
+    border:none;
+    border-radius:6px;
+    background:#1f3a5f;
+    color:#fff;
+    font-size:16px;
+    cursor:pointer;
+}
+
+#resultTitle{
+    font-size:22px;
+    font-weight:bold;
+    color:#1f3a5f;
+    margin-bottom:15px;
+}
+
+#resultMessage{
+    font-size:17px;
+    white-space:pre-line;
+}
+
+
+/* =========================================================
+   HIDDEN
+========================================================= */
+
+.hidden{
+    display:none !important;
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print{
+
+    table{
+        width:100%;
+        table-layout:fixed;
+    }
+
+    th,
+    td{
+        font-size:12px;
+        padding:6px;
+        word-break:break-word;
+    }
+
+    .dt-wrap{
+        white-space:normal;
+        line-height:1.2;
+    }
+
+    .hrs-nowrap{
+        white-space:nowrap;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:768px){
+
+    .container{
+        padding:10px;
+    }
+
+    .header{
+        height:80px;
+    }
+
+    .header-title{
+        font-size:22px;
+    }
+
+    .card,
+    #shutdownBox,
+    #resumeBox{
+        padding:18px;
+        border-radius:18px;
+    }
+
+    h2{
+        font-size:28px;
+    }
+
+    h3{
+        font-size:24px;
+    }
+
+    label{
+        font-size:20px;
+    }
+
+    input,
+    select,
+    textarea{
+        height:60px;
+        font-size:20px;
+    }
+
+    textarea{
+        min-height:130px;
+    }
+
+    .shutdown-row{
+        grid-template-columns:110px 1fr;
+        gap:10px;
+    }
+
+    .shutdown-label{
+        font-size:18px;
+    }
+
+    .shutdown-value{
+        font-size:20px;
+    }
+
+    .install-badge{
+        font-size:17px;
+        padding:6px 14px;
+    }
+
+    .feeder-item{
+        padding:18px;
+    }
+
+    .feeder-item span{
+        font-size:20px;
+    }
+
+    .feeder-item input[type="checkbox"]{
+        width:30px;
+        height:30px;
+    }
+
+    .action-row .small-btn{
+        height:58px;
+        font-size:18px;
+    }
+
+    .btn-shutdown,
+    .btn-resume,
+    .btn-back{
+        height:58px;
+        font-size:20px;
+    }
+
+    #shutdownBox h2,
+    #resumeBox h2{
+        font-size:24px;
+    }
+
+    #shutdownBox label,
+    #resumeBox label{
+        font-size:18px;
+    }
+
+    #shutdownBox input,
+    #shutdownBox select,
+    #resumeBox input,
+    #resumeBox select{
+        height:54px;
+        font-size:18px;
+    }
+
+    #shutdownBox textarea,
+    #resumeBox textarea{
+        min-height:110px;
+        font-size:18px;
+    }
+
+    #shutdownBox button,
+    #resumeBox button,
+    .btn-submit,
+    .btn-back{
+        height:56px;
+        font-size:20px;
+    }
+
+    #editResumeBox{
+        padding:20px;
+    }
+
+    #editResumeBox h2{
+        font-size:24px;
+    }
+
+    #editResumeBox label{
+        font-size:18px;
+    }
+
+    #editResumeBox input,
+    #editResumeBox select{
+        height:54px;
+        font-size:18px;
+    }
+
+    #editResumeBox textarea{
+        min-height:110px;
+        font-size:18px;
+    }
+
+    .btn-update,
+    .btn-cancel{
+        height:56px;
+        font-size:20px;
+    }
+
+    #ui_name{
+        font-size:24px !important;
+    }
+
+    #ui_inst{
+        font-size:20px !important;
+    }
+
+    #toast{
+        font-size:22px;
+        padding:18px 26px;
+    }
+
+    #loader div{
+        font-size:24px;
+    }
+
+    #historyFilter{
+        height:60px;
+        font-size:20px;
+    }
+}
+/* =====================================================
+   SETTING / TPD UPDATE BUTTON
+   ONLY SYMBOL
+   ===================================================== */
+
+#tpdUpdateBtn{
+    display:none;
+    width:42px;
+    height:42px;
+
+    padding:0;
+    margin:0;
+
+    border:none;
+    outline:none;
+
+    background:transparent;
+    box-shadow:none;
+
+    color:inherit;
+
+    font-size:24px;
+    line-height:42px;
+    text-align:center;
+
+    cursor:pointer;
+
+    border-radius:50%;
+}
+
+
+/* Hover */
+#tpdUpdateBtn:hover{
+    background:rgba(255,255,255,0.12);
+}
+
+
+/* Press */
+#tpdUpdateBtn:active{
+    transform:scale(0.92);
+}
+/* ===== LOGOUT BUTTON - SAME AS SETTINGS ===== */
+.header-right .logout-btn{
+    width:40px !important;
+    height:40px !important;
+    margin:0 !important;
+    padding:0 !important;
+
+    background:#1f3a5f !important;
+    color:#fff !important;
+
+    border:none !important;
+    border-radius:50% !important;
+
+    font-size:24px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    box-shadow:none !important;
+    cursor:pointer;
+}
+
+/* Logout hover */
+.header-right .logout-btn:hover{
+    background:#1f3a5f !important;
+    transform:none !important;
+    box-shadow:none !important;
+}
+
+/* Logout press */
+.header-right .logout-btn:active{
+    background:#1f3a5f !important;
+    transform:scale(.92) !important;
+}
+/* =========================================================
+   COMPACT + PROFESSIONAL ACTIVE SHUTDOWN
+   FEEDER + INSTALLATION + TYPE + TIME + TPD + WHATSAPP
+   ========================================================= */
+
+.active-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+
+.active-title{
+    font-size:17px;
+    font-weight:800;
+    color:#1f3a5f;
+}
+
+.active-count{
+    min-width:30px;
+    height:30px;
+    padding:0 9px;
+    border-radius:50px;
+    background:#dc2626;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:800;
+    box-shadow:0 2px 6px rgba(220,38,38,.25);
+}
+
+.active-count.healthy{
+    background:#16a34a;
+}
+
+
+/* =========================================================
+   ACTIVE SHUTDOWN ROW
+   ========================================================= */
+
+.active-shutdown-row{
+    position:relative;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-left:4px solid #dc2626;
+    border-radius:10px;
+    padding:9px 10px;
+    margin-bottom:7px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+}
+
+
+/* =========================================================
+   FIRST LINE
+   ========================================================= */
+
+.active-main-row{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.active-dot{
+    width:9px;
+    height:9px;
+    min-width:9px;
+    background:#dc2626;
+    border-radius:50%;
+    box-shadow:0 0 0 3px rgba(220,38,38,.12);
+}
+
+.active-feeder{
+    flex:1;
+    min-width:0;
+    font-size:14px;
+    font-weight:800;
+    color:#1f2937;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+
+/* =========================================================
+   WHATSAPP BUTTON
+   ========================================================= */
+
+.active-share{
+    width:32px !important;
+    height:32px !important;
+
+    min-width:32px;
+    max-width:32px;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    border:none;
+    border-radius:8px;
+
+    background:#25D366;
+    color:#fff;
+
+    font-size:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.active-share:hover{
+    transform:scale(1.05);
+    background:#20bd5a;
+}
+
+.active-share:active{
+    transform:scale(.90);
+}
+
+
+/* =========================================================
+   SECOND LINE
+   ========================================================= */
+
+.active-details{
+    margin-left:16px;
+    margin-top:5px;
+
+    display:flex;
+    align-items:center;
+
+    gap:6px;
+    flex-wrap:wrap;
+
+    font-size:11px;
+    color:#6b7280;
+
+    font-weight:600;
+}
+
+
+/* TYPE */
+
+.active-type{
+    color:#b45309;
+    font-weight:800;
+}
+
+
+/* TIME */
+
+.active-time{
+    color:#374151;
+    font-weight:700;
+}
+
+
+/* TPD */
+
+.active-tpd{
+    color:#1f3a5f;
+    font-weight:800;
+}
+
+
+/* SEPARATOR */
+
+.active-separator{
+    color:#9ca3af;
+}
+
+
+/* =========================================================
+   INSTALLATION BADGE
+   ========================================================= */
+
+.active-install{
+    display:inline-flex;
+    align-items:center;
+
+    padding:3px 7px;
+
+    border-radius:6px;
+
+    background:#eaf2ff;
+    border:1px solid #c9dcfa;
+
+    color:#1f3a5f;
+
+    font-size:10px;
+    font-weight:800;
+
+    white-space:nowrap;
+}
+
+
+/* =========================================================
+   HEALTHY MESSAGE
+   ========================================================= */
+
+.active-healthy{
+    background:#f0fdf4;
+
+    border:1px solid #bbf7d0;
+    border-left:4px solid #16a34a;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    text-align:center;
+
+    color:#15803d;
+
+    font-size:14px;
+    font-weight:800;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:768px){
+
+    .active-title{
+        font-size:16px;
+    }
+
+    .active-count{
+        min-width:28px;
+        height:28px;
+        font-size:13px;
+    }
+
+    .active-feeder{
+        font-size:13px;
+    }
+
+    .active-details{
+        font-size:10px;
+        margin-left:16px;
+        gap:5px;
+    }
+
+    .active-install{
+        font-size:9px;
+        padding:3px 6px;
+    }
+
+    .active-share{
+        width:30px !important;
+        height:30px !important;
+        min-width:30px;
+        max-width:30px;
+        font-size:15px;
+    }
+}
+
+.tpd-required-modal{
+
+  display:none;
+
+  position:fixed;
+
+  inset:0;
+
+  background:rgba(0,0,0,0.55);
+
+  z-index:99999;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:20px;
+
+}
+
+
+.tpd-required-box{
+
+  width:100%;
+
+  max-width:360px;
+
+  background:#ffffff;
+
+  border-radius:16px;
+
+  padding:24px 22px 20px;
+
+  text-align:center;
+
+  box-shadow:0 15px 40px rgba(0,0,0,0.25);
+
+  border:1px solid #e5e7eb;
+
+  animation:tpdPopupIn 0.2s ease-out;
+
+}
+
+
+.tpd-required-icon{
+
+  width:58px;
+
+  height:58px;
+
+  margin:0 auto 12px;
+
+  border-radius:50%;
+
+  background:#fff7ed;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:30px;
+
+}
+
+
+.tpd-required-title{
+
+  font-size:20px;
+
+  font-weight:700;
+
+  color:#1f2937;
+
+  margin-bottom:10px;
+
+}
+
+
+.tpd-required-message{
+
+  font-size:14px;
+
+  line-height:1.5;
+
+  color:#4b5563;
+
+  margin-bottom:20px;
+
+}
+
+
+.tpd-required-ok{
+
+  width:100%;
+
+  border:none;
+
+  border-radius:10px;
+
+  padding:12px;
+
+  background:#1e3a8a;
+
+  color:#ffffff;
+
+  font-size:15px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+}
+
+
+.tpd-required-ok:active{
+
+  transform:scale(0.98);
+
+}
+
+
+@keyframes tpdPopupIn{
+
+  from{
+
+    opacity:0;
+
+    transform:scale(0.92);
+
+  }
+
+  to{
+
+    opacity:1;
+
+    transform:scale(1);
+
+  }
+
+}
+
+/* =========================================================
+   PRODUCTION LOSS IMPORTANT INFORMATION
+   ========================================================= */
+
+#productionLossNote{
+    margin-top:8px;
+    padding:10px 12px;
+    color:#b91c1c;
+    background:#fff7f7;
+    border-left:4px solid #dc2626;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    line-height:1.5;
+}
+
+#productionLossNote b{
+    font-weight:800;
+}
+/* =====================================================
+   3 DOT MENU
+   ===================================================== */
+
+.menu-wrapper{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+
+/* =====================================================
+   3 DOT BUTTON
+   ===================================================== */
+
+.menu-btn{
+
+  width:42px;
+  height:42px;
+
+  border:none;
+
+  background:transparent;
+
+  color:#ffffff;
+
+  font-size:30px;
+
+  font-weight:bold;
+
+  line-height:42px;
+
+  text-align:center;
+
+  cursor:pointer;
+
+  border-radius:50%;
+
+  padding:0;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+}
+
+.menu-btn:hover{
+
+  background:rgba(255,255,255,0.15);
+
+}
+
+.menu-btn:active{
+
+  background:rgba(255,255,255,0.25);
+
+}
+
+
+/* =====================================================
+   DROP DOWN MENU
+   ===================================================== */
+
+.app-menu{
+
+  position:absolute;
+
+  top:48px;
+
+  right:0;
+
+  width:195px;
+
+  background:#ffffff;
+
+  border-radius:12px;
+
+  border:1px solid #e5e7eb;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.25);
+
+  padding:6px;
+
+  display:none;
+
+  z-index:999999;
+
+}
+
+
+/* SHOW MENU */
+
+.app-menu.show{
+
+  display:block;
+
+}
+
+
+/* =====================================================
+   MENU ITEMS
+   ===================================================== */
+
+.app-menu button{
+
+  width:100%;
+
+  min-height:44px;
+
+  border:none;
+
+  background:#ffffff;
+
+  color:#1f2937;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:11px 13px;
+
+  border-radius:8px;
+
+  font-size:14px;
+
+  font-weight:600;
+
+  text-align:left;
+
+  cursor:pointer;
+
+  box-sizing:border-box;
+
+}
+
+
+/* HOVER */
+
+.app-menu button:hover{
+
+  background:#f1f5f9;
+
+}
+
+
+/* PRESS */
+
+.app-menu button:active{
+
+  background:#e2e8f0;
+
+}
+
+
+/* ICON */
+
+.menu-icon{
+
+  width:24px;
+
+  text-align:center;
+
+  font-size:17px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media(max-width:500px){
+
+  .app-menu{
+
+    right:0;
+
+    width:185px;
+
+  }
+
+}
+/* =====================================================
+   ABOUT DIALOG
+   ===================================================== */
+
+.about-dialog{
+
+  position:fixed;
+
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  background:rgba(0,0,0,0.55);
+
+  display:none;
+
+  align-items:center;
+
+  justify-content:center;
+
+  z-index:1000000;
+
+  padding:20px;
+
+  box-sizing:border-box;
+
+}
+
+
+.about-dialog.show{
+
+  display:flex;
+
+}
+
+
+/* =====================================================
+   ABOUT BOX
+   ===================================================== */
+
+.about-dialog-box{
+
+  width:100%;
+
+  max-width:360px;
+
+  background:#ffffff;
+
+  border-radius:18px;
+
+  padding:25px 22px 20px;
+
+  text-align:center;
+
+  box-sizing:border-box;
+
+  box-shadow:
+    0 15px 40px rgba(0,0,0,0.30);
+
+}
+
+
+/* ICON */
+
+.about-icon{
+
+  width:62px;
+
+  height:62px;
+
+  margin:0 auto 12px;
+
+  border-radius:50%;
+
+  background:#eff6ff;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:30px;
+
+}
+
+
+/* TITLE */
+
+.about-title{
+
+  font-size:17px;
+
+  font-weight:700;
+
+  color:#1e3a8a;
+
+  line-height:1.4;
+
+}
+
+
+/* LINE */
+
+.about-line{
+
+  width:80%;
+
+  height:1px;
+
+  background:#dbeafe;
+
+  margin:14px auto;
+
+}
+
+
+/* TEXT */
+
+.about-developed{
+
+  font-size:14px;
+
+  color:#64748b;
+
+  margin-bottom:5px;
+
+}
+
+
+.about-name{
+
+  font-size:18px;
+
+  font-weight:700;
+
+  color:#111827;
+
+  margin-bottom:4px;
+
+}
+
+
+.about-ongc{
+
+  font-size:15px;
+
+  font-weight:600;
+
+  color:#475569;
+
+}
+
+
+/* OK BUTTON */
+
+.about-close-btn{
+
+  margin-top:20px;
+
+  width:100%;
+
+  padding:11px 20px;
+
+  border:none;
+
+  border-radius:10px;
+
+  background:#1e3a8a;
+
+  color:#ffffff;
+
+  font-size:14px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+}
+/* =====================================================
+   CHANGE PASSWORD MODAL
+===================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+}
+
+.change-password-box {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.30);
+  overflow: hidden;
+}
+
+.change-password-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  font-size: 18px;
+  font-weight: 700;
+  background: #f5f5f5;
+}
+
+.close-modal-btn {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.cp-user-info {
+  margin: 18px 18px 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f3f4f6;
+}
+
+.cp-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.cp-user-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cp-field {
+  margin: 14px 18px;
+}
+
+.cp-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cp-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+.cp-field input:focus {
+  outline: none;
+  border-color: #555;
+}
+
+.change-password-submit {
+  width: calc(100% - 36px);
+  margin: 8px 18px 18px;
+  padding: 13px;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.change-password-message {
+  text-align: center;
+  padding: 0 18px 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+#changePasswordModal{
+  display:none;
+}
+</style>
+</head>
+
+<body>
+  <div id="loader" style="
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+">
+  <div style="
+    background:#2242d3;
+    padding:20px 30px;
+    border-radius:12px;
+    font-weight:600;color: #e5f0ff;
+    box-shadow:0 6px 18px rgba(231, 31, 158, 0.849);
+  ">
+    ⏳ Submitting...
+  </div>
+</div>
+<div id="toast" style="
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#ae2734;
+  color:#fff;
+  padding:12px 20px;
+  border-radius:10px;
+  font-weight:600;
+  box-shadow:0 4px 10px rgba(0,0,0,.2);
+  display:none;
+  z-index:9999;
+"></div>
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+  <!-- LEFT -->
+
+  <div class="header-left"></div>
+
+  <!-- CENTER -->
+
+  <div class="header-Center"></div>
+
+  <!-- TITLE -->
+
+  <div class="header-title">
+    ⚡ POWER SHUTDOWN MANAGEMENT APP AREA-IV
+  </div>
+
+  <!-- RIGHT -->
+
+  <div class="header-right">
+
+```
+<!-- ================= 3 DOT MENU ================= -->
+
+<div class="menu-wrapper">
+
+  <!-- 3 DOT BUTTON -->
+  <button
+    id="menuBtn"
+    class="menu-btn"
+    type="button"
+    title="Menu"
+    onclick="document.getElementById('appMenu').classList.toggle('show')">
+    ⋮
+  </button>
+
+
+  <!-- ================= DROP DOWN MENU ================= -->
+
+  <div
+    id="appMenu"
+    class="app-menu">
+
+    <!-- ABOUT THIS APP -->
+    <button
+      type="button"
+      onclick="showAboutApp()">
+
+      <span class="menu-icon">ℹ️</span>
+      <span>About This App</span>
+
+    </button>
+
+
+    <!-- SETTINGS -->
+    <button
+      type="button"
+      onclick="openSettingsMenu()">
+
+      <span class="menu-icon">⚙️</span>
+      <span>Settings</span>
+
+    </button>
+
+
+    <!-- CHANGE PASSWORD -->
+    <button
+      type="button"
+      onclick="openChangePassword()">
+
+      <span class="menu-icon">🔑</span>
+      <span>Change Password</span>
+
+    </button>
+
+
+    <!-- LOGOUT -->
+    <button
+      type="button"
+      onclick="menuLogout()">
+
+      <span class="menu-icon">🔓</span>
+      <span>Logout</span>
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================= HIDDEN TPD BUTTON ================= -->
+
+<!-- Existing TPD system ke liye hidden button -->
+<button
+  id="tpdUpdateBtn"
+  type="button"
+  onclick="openTPDUpdate()"
+  title="Update TPD Data"
+  style="display:none;">
+
+  ⚙️
+
+</button>
+
+
+<!-- ================= HIDDEN / EXISTING LOGOUT BUTTON ================= -->
+
+<!-- Existing logout function/listener ke liye -->
+<button
+  id="logoutBtn"
+  class="logout-btn"
+  type="button"
+  title="Logout"
+  style="display:none;">
+
+</button>
+```
+
+  </div>
+
+</header>
+<!-- =====================================================
+     CHANGE PASSWORD MODAL
+===================================================== -->
+
+<div id="changePasswordModal" class="modal-overlay" style="display:none;">
+
+  <div class="change-password-box">
+
+    <div class="change-password-header">
+      <span>🔑 Change Password</span>
+
+      <button
+        type="button"
+        class="close-modal-btn"
+        onclick="closeChangePassword()">
+        ×
+      </button>
+    </div>
+
+
+    <!-- USER NAME -->
+
+    <div class="cp-user-info">
+
+      <div class="cp-label">
+        User Name
+      </div>
+
+      <div
+        id="cpUserName"
+        class="cp-user-name">
+        -
+      </div>
+
+    </div>
+
+
+    <!-- OLD PASSWORD -->
+
+    <div class="cp-field">
+
+      <label>
+        Old Password
+      </label>
+
+      <input
+        type="password"
+        id="oldPassword"
+        placeholder="Enter old password"
+        autocomplete="current-password">
+
+    </div>
+
+
+    <!-- NEW PASSWORD -->
+
+    <div class="cp-field">
+
+      <label>
+        New Password
+      </label>
+
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter new password"
+        autocomplete="new-password">
+
+    </div>
+
+
+    <!-- CONFIRM PASSWORD -->
+
+    <div class="cp-field">
+
+      <label>
+        Confirm New Password
+      </label>
+
+      <input
+        type="password"
+        id="confirmPassword"
+        placeholder="Confirm new password"
+        autocomplete="new-password">
+
+    </div>
+
+
+    <!-- BUTTON -->
+
+    <button
+      type="button"
+      class="change-password-submit"
+      onclick="submitChangePassword()">
+
+      🔐 Change Password
+
+    </button>
+
+
+    <div
+      id="changePasswordMessage"
+      class="change-password-message">
+    </div>
+
+  </div>
+
+</div>
+<div id="userInfo" class="hidden">
+  
+  <div style="font-size:15px;font-weight:700;color:#1f3a5f" id="ui_name"></div>
+  <div style="font-size:13px;color:#6b7280" id="ui_inst"></div>
+ </div>
+<div class="container">
+
+<div class="card" id="mainBox">
+
+    <div class="active-header">
+
+        <div class="active-title">
+            🔴 ACTIVE SHUTDOWNS
+        </div>
+
+        <div id="activeCount" class="active-count">
+            0
+        </div>
+
+    </div>
+
+
+    <div id="activeShutdowns">
+        Loading...
+    </div>
+
+
+    <div class="action-row">
+
+        <button
+            class="btn-shutdown small-btn"
+            onclick="openShutdown()">
+            SHUTDOWN
+        </button>
+
+        <button
+            class="btn-resume small-btn"
+            onclick="openResume()">
+            RESUME
+        </button>
+
+    </div>
+
+</div>
+
+  <div class="container">
+  <div class="card hidden" id="historyBox">
+ <h2 id="historyTitle">
+    📊 SHUTDOWN HISTORY
+</h2>
+<div style="margin-top:10px;">
+ </div>
+  <!-- FILTER -->
+  <select id="historyFilter" onchange="loadHistory()">
+    <option value="ALL">ALL INSTALLATIONS</option>
+    <option>LIMBODARA-GGS-1</option>
+    <option>LIMBODARA-GGS-2</option>
+    <option>GAMIJ-GGS-1</option>
+    <option>GAMIJ-GGS-2</option>
+    <option>GAMIJ-GGS-3</option>
+    <option>MOTERA-GGS</option>
+  </select>
+
+  <!-- SUMMARY -->
+  <div id="summaryBox" style="margin-top:10px;font-size:13px;"></div>
+
+  <div style="overflow:auto;">
+   <button
+    id="historyToggleBtn"
+    class="btn-back"
+    onclick="toggleHistory()">
+
+    📜 Today's History
+
+</button>
+...
+    <table id="historyTable" style="width:100%; border-collapse:collapse; font-size:13px;">
+      <thead style="background:#1f3a5f;color:#fff;">
+        <tr>
+          <th>FEEDER</th>
+          <th>SHUTDOWN</th>
+          <th>RESUME</th>
+          <th>TYPE</th>
+          <th>HRS AND MIN</th>
+          <th>LOSS - TON</th>
+          <th>INSTALLATION</th>
+          <th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+ </div></div>
+ 
+ <div class="container" id="reportBox">
+<h2>SHUTDOWN REPORT DOWNLOAD</h2>
+ <label>FROM</label>
+<input type="datetime-local" id="fromDateTime" placeholder="DD-MM-YYYY HH:MM">
+<label>TO</label>
+<input type="datetime-local" id="toDateTime" placeholder="DD-MM-YYYY HH:MM">
+
+  <button id="exportBtn" onclick="exportPDF()" style="background:#1f3a5f;color:#fff;" disabled>
+    📄 Export PDF Report
+  </button>
+ </div></div>
+
+<div class="card hidden" id="shutdownBox" style="max-width:820px;margin:auto;">
+<h2><b>SHUTDOWN ENTRY</b></h2>
+<label>Feeder</label>
+<select id="sd_feeder"></select>
+<div id="allFeederBox"
+     style="display:none;
+            margin-top:10px;
+            border:1px solid #ddd;
+            border-radius:10px;
+            padding:10px;
+            max-height:250px;
+            overflow:auto;">
+</div>
+<label>Shutdown Time</label>
+<input type="datetime-local" id="sd_time">
+<label>Shutdown Type</label>
+<select id="sd_type">
+<option value="">Select Type</option>
+<option>PLAN PSD</option>
+<option>PARTIAL PLAN PSD</option>
+<option>UNPLAN PSD</option>
+<option>PARTIAL UNPLAN PSD</option>
+</select>
+<label>Information</label>
+<textarea id="sd_info" placeholder="Information"></textarea>
+<button class="btn-shutdown"id="shutdownBtn" onclick="submitShutdown()"><b>SUBMIT</b></button>
+<button class="btn-back" onclick="backToMain()"><b>BACK</b></button>
+  </div>
+
+<div class="card hidden" id="resumeBox" style="max-width:820px;margin:auto;">
+<h2><b>RESUME ENTRY</b></h2>
+<label>Feeder</label>
+<select id="rs_feeder"></select>
+<label>Resume Time</label>
+<input type="datetime-local" id="rs_time">
+<label>Production Loss</label>
+
+<div style="display:flex;gap:8px;align-items:center;">
+
+    <input
+        id="rs_loss"
+        type="number"
+        step="0.01"
+        placeholder="Auto Calculated"
+        readonly
+        style="flex:1;">
+
+    <button
+        type="button"
+        id="editLossBtn"
+        onclick="toggleLossEdit()"
+        style="
+            width:55px;
+            height:48px;
+            margin:0;
+            background:#ff9800;
+            color:#fff;
+            border:none;
+            border-radius:8px;
+            font-size:20px;
+            cursor:pointer;">
+        ✏️
+    </button>
+
+</div>
+
+<div id="productionLossNote">
+    ⚠️ <b>Important:</b> Auto-calculated Production Loss represents the
+    <b>full feeder power shutdown loss</b> based on the feeder's TPD value.
+    For <b>Partial Plan, Partial Unplan</b> or <b>Plan Shutdown</b> cases,
+    particularly when <b>DG is deployed</b>, please review and update the
+    Production Loss value accordingly before submitting Resume.
+</div>
+
+<label>DG Deployed</label>
+<input id="rs_dg" type="number" placeholder="DG Deployed" inputmode="numeric" min="0">
+<label>Remarks</label>
+<textarea id="rs_rem" placeholder="Actual Reason"></textarea>
+<button class="btn-resume"id="resumeBtn" onclick="submitResume()"><b>SUBMIT</b></button>
+<button id="resumeShareBtn"
+  class="btn-resume hidden"
+  onclick="shareResumeWhatsApp()">
+  📲 SHARE RESUME ON WHATSAPP
+</button>
+<button class="btn-back" onclick="backToMain()"><b>BACK</b></button>
+</div>
+
+<div id="msg"></div>
+
+<script>
+  // ✅ LOAD USER FROM LOCAL STORAGE
+window.onload = function(){
+
+  let user = localStorage.getItem("CURRENT_USER");
+  // ✅ Restore Resume Share Button after refresh
+let savedResume = localStorage.getItem("LAST_RESUME_DATA");
+
+
+if(savedResume){
+  LAST_RESUME_DATA = JSON.parse(savedResume);
+  document.getElementById("resumeShareBtn").classList.remove("hidden");
+}
+
+  if(!user){
+    window.location.href = "index.html";
+    return;
+  }
+
+  CURRENT_USER = JSON.parse(user);
+if(CURRENT_USER.admin){
+  document.getElementById("historyFilter").value = "ALL";
+}
+  // ✅ UI SET
+ document.getElementById("ui_name").innerHTML =
+"👤 " + CURRENT_USER.n.toUpperCase();
+
+document.getElementById("ui_inst").innerHTML =
+    "Installation : <b>" + CURRENT_USER.i + "</b>";
+   document.getElementById("userInfo").classList.remove("hidden");
+  document.getElementById("historyBox").classList.remove("hidden");
+
+  // ✅ ADMIN CONTROL
+ const filterEl = document.getElementById("historyFilter");
+
+if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
+  filterEl.style.display = "block";
+}else{
+  filterEl.style.display = "none";
+  filterEl.value = CURRENT_USER.i;
+
+  // force user installation filter
+  if(filterEl){
+    filterEl.value = CURRENT_USER.i;
+  }
+}
+  // ✅ LOAD DATA
+  populateFeeders();
+  loadActiveShutdowns();
+  loadHistory();
+
+  // ✅ INPUT VALIDATION
+  document.querySelectorAll("textarea, input[type=text]").forEach(el=>{
+    el.addEventListener("input",()=>{
+      el.value = el.value.replace(/[^a-zA-Z0-9 .\-/]/g,"");
+    });
+  });
+
+};
+  function parseDateManual(dt){
+
+  if(!dt || dt==="NA") return null;
+
+  dt = dt.trim();
+
+  let parts = dt.split(" ");
+
+  if(parts.length < 2) return null;
+
+  let datePart = parts[0].replace(/\//g,"-");
+  let timePart = parts[1];
+
+  let d = datePart.split("-");
+  let t = timePart.split(":");
+
+  let year, month, day;
+
+  if(d[0].length === 4){
+    year  = Number(d[0]);
+    month = Number(d[1]);
+    day   = Number(d[2]);
+  }else{
+    day   = Number(d[0]);
+    month = Number(d[1]);
+    year  = Number(d[2]);
+  }
+
+  let hour   = Number(t[0] || 0);
+  let minute = Number(t[1] || 0);
+  let second = Number(t[2] || 0);
+
+  return new Date(
+    year,
+    month - 1,
+    day,
+    hour,
+    minute,
+    second
+  );
+}
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycbzOR1J4qbEdY7flZ8LU9AfE1EIRXfjvu0IMHjZJKsLxkSq8kTf_8__PHACxVeWhdNno/exec";
+const CSV_URL="https://docs.google.com/spreadsheets/d/1Gz-mXiZpRIc6zYNPD115tY-VRtnwGgOGjlY1QUtENeQ/export?format=csv";
+
+const FEEDERS={
+ "LIMBODARA-GGS-1":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER"],
+"LIMBODARA-GGS-2":["ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER","MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER"],
+"GAMIJ-GGS-1":["BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER","VASNA RATHOD FEEDER"],
+"GAMIJ-GGS-2":["BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER","KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2"],
+"GAMIJ-GGS-3":["BARMUVADA FEEDER","CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER","GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4","KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4","SIHUNJ FEEDER","VANSOLI FEEDER"],
+"MOTERA-GGS":["PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"],
+"ALL":["AKASH CERAMIC FEEDER","ITLA ONGC FEEDER-LG1","MANSA CITY FEEDER","MANSA CIVIL FEEDER",
+ "ITLA ONGC FEEDER-LG2","KIRTIDHAM FEEDER","LISA FEEDER","MAHAKALI FEEDER",
+ "MUBARAKPUR FEEDER","NETRA FEEDER","ROYAL FEEDER","TIRUPATI FEEDER","VARDAYINI FEEDER",
+ "BAHIYAL ONGC FEEDER","RAM FEEDER-GAMIJ-1","SOMNATH JGY FEEDER","NAYRA JGY FEEDER",
+ "VASNA RATHOD FEEDER","BADARPUR FEEDER","CHAULAJ FEEDER-GAMIJ-2","GADWEL FEEDER",
+ "KASHTABHANJAN FEEDER","RAM FEEDR-GAMIJ-2","BARMUVADA FEEDER",
+ "CHAULAJ FEEDER-GAMIJ-3","FINAV FEEEDER","FUDAL MATA FEEDER","GAYATRI FEEDER",
+ "GINJAR FEEDER","HALDARWAS FEEDER-GAMIJ-3","HALDARWAS FEEDER-GAMIJ-4",
+ "KALPSAR FEEDER","SATRUNDA FEEDER-GAMIJ-3","SATRUNDA FEEDER-GAMIJ-4",
+ "SIHUNJ FEEDER","VANSOLI FEEDER",
+ "PREKSHA BHARTI INFOCITY FEEDER","TP-44 FEEDER","ZUNDAL AG FEEDER"
+]
+};
+
+let CURRENT_USER = {},
+    LAST_SHUTDOWN_TIME = {},
+    LAST_TPD = {},
+    LAST_RESUME_DATA = null;
+
+let EDIT_MODE = false;
+let resumeAfterTPDWarning = false;
+let SHOW_ALL_HISTORY = false;
+let EDIT_ROW = null;
+
+// ✅ SPECIAL CHAR VALIDATION
+function hasSpecialChar(text){
+  return !/^[a-zA-Z0-9 .\-/]+$/.test(text);
+}
+
+// ================= FEEDERS =================
+function populateFeeders(){
+
+  let list;
+
+  if(CURRENT_USER.admin || CURRENT_USER.i === "ALL"){
+    list = FEEDERS.ALL;
+  }else{
+    list = FEEDERS[CURRENT_USER.i] || [];
+  }
+
+  let sd = document.getElementById("sd_feeder");
+  let rs = document.getElementById("rs_feeder");
+
+  sd.innerHTML = '<option value="">Select Feeder</option>';
+  rs.innerHTML = '<option value="">Select Feeder</option>';
+
+  list.forEach(function(f){
+    sd.innerHTML += `<option value="${f}">${f}</option>`;
+    rs.innerHTML += `<option value="${f}">${f}</option>`;
+  });
+
+  // ✅ Select All Option
+  sd.innerHTML += `
+    <option value="ALL_FEEDERS">
+      ✅ SELECT ALL FEEDERS
+    </option>
+  `;
+}
+// Production Loss Auto Calculation
+document.getElementById("rs_feeder").addEventListener("change", function () {
+
+    if (!EDIT_MODE) {
+        calculateProductionLoss();
+    }
+
+});
+
+document.getElementById("rs_time").addEventListener("change", function () {
+
+    // New Resume
+    if (!EDIT_MODE) {
+        calculateProductionLoss();
+        return;
+    }
+
+    // Edit Resume
+    if (EDIT_MODE) {
+        calculateProductionLoss();
+    }
+
+});
+document.getElementById("sd_feeder").addEventListener("change", function(){
+
+    let box = document.getElementById("allFeederBox");
+
+    if(this.value == "ALL_FEEDERS"){
+
+        let feeders;
+
+        if(CURRENT_USER.admin || CURRENT_USER.i=="ALL"){
+            feeders = FEEDERS.ALL;
+        }else{
+            feeders = FEEDERS[CURRENT_USER.i] || [];
+        }
+
+        box.innerHTML = "";
+
+        feeders.forEach(function(f){
+
+            box.innerHTML += `
+            <div class="feeder-item">
+                <input
+                    type="checkbox"
+                    class="multiFeeder"
+                    value="${f}"
+                    checked>
+                <span>${f}</span>
+            </div>`;
+        });
+
+        box.style.display = "block";
+
+    }else{
+
+        box.style.display = "none";
+        box.innerHTML = "";
+
+    }
+
+});
+
+// ======================================================
+// COMPACT + PROFESSIONAL ACTIVE SHUTDOWNS
+// ======================================================
+
+function loadActiveShutdowns(){
+
+    LAST_SHUTDOWN_TIME = {};
+    LAST_TPD = {};
+
+    fetch(CSV_URL + "&t=" + Date.now())
+
+    .then(r => r.text())
+
+    .then(t => {
+
+        const rows = t.split("\n").map(r => {
+
+            return r.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)
+                ?.map(x => x.replace(/"/g, "").trim()) || [];
+
+        });
+
+        const h = rows.shift().map(x => x.toUpperCase());
+
+        const i = {
+
+            feeder : h.findIndex(x =>
+                x.includes("FEEDER")
+            ),
+
+            sd : h.findIndex(x =>
+                x.includes("SHUTDOWN")
+            ),
+
+            rs : h.findIndex(x =>
+                x.includes("RESUME")
+            ),
+
+            inst : h.findIndex(x =>
+                x.includes("INSTALL")
+            ),
+
+            type : h.findIndex(x =>
+                x.includes("TYPE")
+            ),
+
+            tpd : h.findIndex(x =>
+                x.includes("TON PER DAY") ||
+                x.includes("TPD") ||
+                x === "N"
+            )
+
+        };
+
+        console.log("TPD Column =", i.tpd);
+
+
+        // ==============================================
+        // ACTIVE SHUTDOWN CONTAINER
+        // ==============================================
+
+        const activeShutdowns =
+            document.getElementById("activeShutdowns");
+
+        const activeCount =
+            document.getElementById("activeCount");
+
+
+        if(!activeShutdowns){
+            console.error(
+                "activeShutdowns element not found"
+            );
+            return;
+        }
+
+
+        // Clear old data
+        activeShutdowns.innerHTML = "";
+
+        let count = 0;
+
+
+        // ==============================================
+        // READ ALL SHEET ROWS
+        // ==============================================
+
+        rows.forEach(r => {
+
+            const feeder = r[i.feeder];
+            const sdTime = r[i.sd];
+            const rsTime = r[i.rs];
+            const inst   = r[i.inst];
+            const type   = r[i.type];
+
+
+            // ==========================================
+            // ACTIVE SHUTDOWN
+            // Resume blank OR NA
+            // ==========================================
+
+            if(!rsTime || rsTime === "NA"){
+
+
+                // ======================================
+                // INSTALLATION FILTER
+                // ======================================
+
+                if(
+                    !CURRENT_USER.admin &&
+                    inst !== CURRENT_USER.i
+                ){
+                    return;
+                }
+
+
+                // ======================================
+                // STORE LAST SHUTDOWN TIME
+                // ======================================
+
+                LAST_SHUTDOWN_TIME[feeder] = sdTime;
+
+
+                // ======================================
+                // STORE TPD
+                // ======================================
+
+                if(i.tpd > -1){
+
+                    LAST_TPD[feeder] =
+                        parseFloat(r[i.tpd]) || 0;
+
+                }else{
+
+                    LAST_TPD[feeder] = 0;
+
+                }
+
+
+                count++;
+
+
+                // ======================================
+                // COMPACT ACTIVE SHUTDOWN ROW
+                // ======================================
+
+                activeShutdowns.innerHTML += `
+
+                <div class="active-shutdown-row">
+
+                    <!-- FIRST LINE -->
+
+                    <div class="active-main-row">
+
+                        <span class="active-dot"></span>
+
+                        <span
+                            class="active-feeder"
+                            title="${feeder}">
+                            ${feeder}
+                        </span>
+
+
+                        <!-- WHATSAPP -->
+
+                        <button
+                            type="button"
+                            class="active-share"
+                            title="Share on WhatsApp"
+                            onclick="shareWhatsApp(
+                                '${feeder}',
+                                '${type}',
+                                '${sdTime}',
+                                '${inst}'
+                            )">
+
+                            📲
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- SECOND LINE -->
+
+                    <div class="active-details">
+
+
+                        <!-- INSTALLATION -->
+
+                        <span class="active-install">
+
+                            📍 ${inst || "N/A"}
+
+                        </span>
+
+
+                        <span class="active-separator">
+                            •
+                        </span>
+
+
+                        <!-- TYPE -->
+
+                        <span class="active-type">
+
+                            ${type || "SHUTDOWN"}
+
+                        </span>
+
+
+                        <span class="active-separator">
+                            •
+                        </span>
+
+
+                        <!-- DATE / TIME -->
+
+                        <span class="active-time">
+
+                            ${formatDateTime(sdTime)}
+
+                        </span>
+
+
+                        <span class="active-separator">
+                            •
+                        </span>
+
+
+                        <!-- TPD -->
+
+                        <span class="active-tpd">
+
+                            ${LAST_TPD[feeder]} TPD
+
+                        </span>
+
+
+                    </div>
+
+                </div>
+
+                `;
+
+            }
+
+        });
+
+
+        // ==============================================
+        // UPDATE ACTIVE COUNT
+        // ==============================================
+
+        if(activeCount){
+
+            activeCount.textContent = count;
+
+
+            if(count === 0){
+
+                activeCount.classList.add("healthy");
+
+            }else{
+
+                activeCount.classList.remove("healthy");
+
+            }
+
+        }
+
+
+        // ==============================================
+        // NO ACTIVE SHUTDOWN
+        // ==============================================
+
+        if(!count){
+
+            activeShutdowns.innerHTML = `
+
+                <div class="active-healthy">
+
+                    ✓ ALL FEEDERS ARE HEALTHY
+
+                </div>
+
+            `;
+
+        }
+
+    })
+
+
+    // ==============================================
+    // ERROR HANDLING
+    // ==============================================
+
+    .catch(error => {
+
+        console.error(
+            "Active Shutdown Error:",
+            error
+        );
+
+
+        const activeShutdowns =
+            document.getElementById("activeShutdowns");
+
+        const activeCount =
+            document.getElementById("activeCount");
+
+
+        if(activeCount){
+
+            activeCount.textContent = "!";
+
+            activeCount.classList.remove(
+                "healthy"
+            );
+
+        }
+
+
+        if(activeShutdowns){
+
+            activeShutdowns.innerHTML = `
+
+                <div
+                    class="active-healthy"
+                    style="
+                        color:#b91c1c;
+                        background:#fef2f2;
+                        border-color:#fecaca;
+                        border-left-color:#dc2626;
+                    "
+                >
+
+                    ⚠️ Unable to load active shutdowns
+
+                </div>
+
+            `;
+
+        }
+
+    });
+
+}
+// ✅ SHUTDOWN
+function submitShutdown(){
+
+ let btn = document.querySelector("#shutdownBox .btn-shutdown");
+
+ if(!sd_feeder.value || !sd_time.value || !sd_type.value || !sd_info.value){
+  showToast("❌ All fields required","error");
+  return;
+ }
+
+ if(hasSpecialChar(sd_info.value)){
+  showToast("❌ Invalid characters","error");
+  return;
+ }
+
+ let feederList = [];
+
+ // ✅ Multi feeder
+ if(sd_feeder.value === "ALL_FEEDERS"){
+
+   document.querySelectorAll(".multiFeeder:checked")
+   .forEach(cb=>{
+      feederList.push(cb.value);
+   });
+
+   if(feederList.length === 0){
+      showToast("⚠️ Select at least one feeder","error");
+      return;
+   }
+
+ }else{
+
+   feederList.push(sd_feeder.value);
+
+   if(LAST_SHUTDOWN_TIME[sd_feeder.value]){
+      showToast("⚠️ Already shutdown","error");
+      return;
+   }
+ }
+
+ let selectedTime = new Date(sd_time.value);
+ let currentTime = new Date();
+ currentTime.setSeconds(0,0);
+
+ if(selectedTime < currentTime){
+    if(!confirm("⚠️ Selected shutdown time is less than current live time.\nDo you want to continue?")){
+      return;
+    }
+ }
+
+ showLoader();
+ disableBtn(btn);
+lockButton("shutdownBtn");
+
+showLoading(
+"Submitting Shutdown...",
+"Please wait..."
+);
+
+speak(
+"Submitting shutdown entry."
+);
+fetch(
+  WEBAPP_URL + "?" + new URLSearchParams({
+    action:"shutdown",
+    feeder: feederList.join(","),
+    ShutdownTime: sd_time.value.replace("T"," "),
+    ShutdownType: sd_type.value,
+    Information: sd_info.value.toUpperCase(),
+    ShutdownEntryBy: CURRENT_USER.n,
+    Installation: CURRENT_USER.i
+  })
+)
+.then(res => res.text())
+.then(result=>{
+
+    hideLoading();
+    unlockButton("shutdownBtn");
+
+    if(result.indexOf("Another user")>-1){
+
+        speak("Another user is submitting shutdown entry. Please wait.");
+
+        showToast(
+            "⚠ Another user is submitting. Please wait...",
+            "error"
+        );
+
+        return;
+    }
+
+    if(result.indexOf("Already Shutdown")>-1){
+
+        speak("Feeder already shutdown.");
+
+        showToast(result,"error");
+
+        return;
+    }
+
+    if(result.indexOf("Successfully")>-1){
+
+        speak("Shutdown submitted successfully.");
+
+        showResult(
+    "Success",
+    result
+);
+
+        sd_feeder.value="";
+        sd_info.value="";
+        sd_type.value="";
+        sd_time.value="";
+
+        document.getElementById("allFeederBox").style.display="none";
+        document.getElementById("allFeederBox").innerHTML="";
+
+        backToMain();
+
+        return;
+    }
+
+    speak(result);
+
+    showToast(result,"error");
+
+})
+
+   .catch(err=>{
+
+    console.error(err);
+
+    hideLoading();
+
+    unlockButton("shutdownBtn");
+
+    speak("Server error.");
+
+    showToast("❌ Server Error","error");
+
+})
+   .finally(()=>{
+    hideLoader();
+    enableBtn(btn);
+   });
+}
+function calculateProductionLoss(){
+    
+
+    let feeder = document.getElementById("rs_feeder").value;
+    let resume = document.getElementById("rs_time").value;
+
+    if(!feeder || !resume){
+        document.getElementById("rs_loss").value = "";
+        return;
+    }
+
+    let shutdownStr = LAST_SHUTDOWN_TIME[feeder];
+
+if(EDIT_MODE && EDIT_ROW){
+    shutdownStr = EDIT_ROW.shutdown;
+}
+
+let shutdown = parseDateManual(shutdownStr);
+    let resumeDate = new Date(resume);
+
+    if(!shutdown || isNaN(resumeDate.getTime())){
+        document.getElementById("rs_loss").value = "";
+        return;
+    }
+
+    if(resumeDate <= shutdown){
+        document.getElementById("rs_loss").value = "";
+        return;
+    }
+
+    // Ton Per Day from Sheet
+    let tpd = parseFloat(LAST_TPD[feeder]) || 0;
+
+if(EDIT_MODE && EDIT_ROW){
+    tpd = parseFloat(EDIT_ROW.tpd) || tpd;
+}
+
+    // Convert Ton Per Day to Ton Per Hour
+    let tph = tpd / 24;
+
+    // Total shutdown minutes
+    let minutes = (resumeDate - shutdown) / 60000;
+
+    // Convert minutes to hours
+    let hours = minutes / 60;
+
+    // Production Loss
+    let loss = (tph * hours).toFixed(2);
+
+    document.getElementById("rs_loss").value = loss;
+}
+function toggleLossEdit(){
+
+    let box=document.getElementById("rs_loss");
+    let btn=document.getElementById("editLossBtn");
+
+    if(box.readOnly){
+
+        box.readOnly=false;
+        box.focus();
+        btn.innerHTML="🔒";
+        btn.title="Lock";
+
+    }else{
+
+        box.readOnly=true;
+        btn.innerHTML="✏️";
+        btn.title="Edit";
+
+    }
+
+}
+// =====================================================
+// ✅ RESUME
+// =====================================================
+
+function submitResume(){
+
+    if(EDIT_MODE){
+        updateResume();
+        return;
+    }
+
+
+    // =====================================================
+    // RESUME BUTTON
+    // =====================================================
+
+    let btn =
+        document.querySelector("#resumeBox .btn-resume");
+
+
+    // =====================================================
+    // ALL FIELDS MUST BE FILLED
+    // =====================================================
+
+    let resumeFeeder =
+        (rs_feeder.value || "").trim();
+
+    let resumeTime =
+        (rs_time.value || "").trim();
+
+    let productionLoss =
+        (rs_loss.value || "").trim();
+
+    let dgDeployed =
+        (rs_dg.value || "").trim();
+
+    let remarks =
+        (rs_rem.value || "").trim();
+
+
+    // =====================================================
+    // FEEDER VALIDATION
+    // =====================================================
+
+    if(!resumeFeeder){
+
+        showToast(
+            "❌ Please select Feeder",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // RESUME TIME VALIDATION
+    // =====================================================
+
+    if(!resumeTime){
+
+        showToast(
+            "❌ Please enter Resume Time",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // PRODUCTION LOSS VALIDATION
+    // =====================================================
+
+    if(!productionLoss){
+
+        showToast(
+            "❌ Please enter Production Loss",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // DG DEPLOYED VALIDATION
+    // =====================================================
+
+    if(!dgDeployed){
+
+        showToast(
+            "❌ Please select DG Deployed",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // REMARKS VALIDATION
+    // =====================================================
+
+    if(!remarks){
+
+        showToast(
+            "❌ Please enter Remarks",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // TPD WARNING
+    //
+    // TPD missing/0 ho to sirf message show hoga.
+    // Resume BLOCK nahi hoga.
+    // User OK karega → Resume automatically continue hoga.
+    // =====================================================
+
+    let resumeTPD =
+        parseFloat(LAST_TPD[resumeFeeder]) || 0;
+
+
+    if(
+        resumeTPD <= 0 &&
+        !resumeAfterTPDWarning
+    ){
+
+        resumeAfterTPDWarning = true;
+
+        showTPDRequiredMessage();
+
+        return;
+    }
+
+
+    // =====================================================
+    // TPD WARNING COMPLETE
+    // =====================================================
+
+    resumeAfterTPDWarning = false;
+
+
+    // =====================================================
+    // SHUTDOWN TIME
+    // =====================================================
+
+    let shutdownTimeStr =
+        LAST_SHUTDOWN_TIME[resumeFeeder];
+
+
+    let shutdownDate =
+        parseDateManual(shutdownTimeStr);
+
+
+    let resumeDate =
+        new Date(resumeTime);
+
+
+    // =====================================================
+    // DATE VALIDATION
+    // =====================================================
+
+    if(
+        !shutdownDate ||
+        isNaN(resumeDate.getTime())
+    ){
+
+        showToast(
+            "⚠️ Invalid date format",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // RESUME TIME VALIDATION
+    // =====================================================
+
+    if(resumeDate < shutdownDate){
+
+        showToast(
+            "❌ Resume time cannot be before Shutdown time",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // REMARKS VALIDATION
+    // =====================================================
+
+    if(hasSpecialChar(remarks)){
+
+        showToast(
+            "❌ Invalid characters",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // ACTIVE SHUTDOWN DATA CHECK
+    // =====================================================
+
+    if(!LAST_SHUTDOWN_TIME[resumeFeeder]){
+
+        showToast(
+            "⚠️ Loading data, try again",
+            "error"
+        );
+
+        loadActiveShutdowns();
+
+        return;
+    }
+
+
+    // =====================================================
+    // START SUBMIT
+    // =====================================================
+
+    showLoader();
+
+    disableBtn(btn);
+
+    lockButton("resumeBtn");
+
+
+    showLoading(
+        "Submitting Resume...",
+        "Please wait..."
+    );
+
+
+    speak(
+        "Submitting resume entry."
+    );
+
+
+    // =====================================================
+    // SUBMIT RESUME
+    // =====================================================
+
+    fetch(
+
+        WEBAPP_URL +
+        "?" +
+        new URLSearchParams({
+
+            action:"resume",
+
+            feeder:
+                resumeFeeder,
+
+            ResumeTime:
+                resumeTime.replace(
+                    "T",
+                    " "
+                ),
+
+            ResumeEntryBy:
+                CURRENT_USER.n,
+
+            TotalProdLoss:
+                productionLoss,
+
+            DGDeployed:
+                dgDeployed,
+
+            Remarks:
+                remarks
+
+        })
+
+    )
+
+
+    .then(res => res.text())
+
+
+    .then(result => {
+
+        result =
+            (result || "").trim();
+
+
+        hideLoading();
+
+        unlockButton("resumeBtn");
+
+
+        // =================================================
+        // ANOTHER USER SUBMITTING
+        // =================================================
+
+        if(result.includes("Another user")){
+
+            speak(
+                "Another user is submitting resume entry. Please wait."
+            );
+
+
+            showToast(
+                "⚠ Another user is submitting. Please wait...",
+                "error"
+            );
+
+
+            return;
+        }
+
+
+        // =================================================
+        // SUCCESS
+        // =================================================
+
+        if(
+            result
+                .toLowerCase()
+                .includes("success")
+        ){
+
+            speak(
+                "Resume submitted successfully."
+            );
+
+
+            LAST_RESUME_DATA = {
+
+                feeder:
+                    resumeFeeder,
+
+                resumeTime:
+                    resumeTime,
+
+                dg:
+                    dgDeployed,
+
+                loss:
+                    productionLoss,
+
+                reason:
+                    remarks
+
+            };
+
+
+            localStorage.setItem(
+                "LAST_RESUME_DATA",
+                JSON.stringify(
+                    LAST_RESUME_DATA
+                )
+            );
+
+
+            document
+                .getElementById(
+                    "resumeShareBtn"
+                )
+                .classList
+                .remove("hidden");
+
+
+            // =================================================
+            // SUCCESS POPUP
+            // =================================================
+
+            showResult(
+                "✅ Resume Submitted",
+                result
+            );
+
+
+            // =================================================
+            // CLEAR FORM
+            // =================================================
+
+            rs_feeder.value = "";
+
+            rs_time.value = "";
+
+            rs_loss.value = "";
+
+            rs_dg.value = "";
+
+            rs_rem.value = "";
+
+
+            // =================================================
+            // REFRESH ACTIVE SHUTDOWNS
+            // =================================================
+
+            loadActiveShutdowns();
+
+
+            // =================================================
+            // GO BACK TO MAIN
+            // =================================================
+
+            setTimeout(function(){
+
+                backToMain();
+
+            },2000);
+
+
+            return;
+        }
+
+
+        // =================================================
+        // OTHER SERVER MESSAGE
+        // =================================================
+
+        speak(result);
+
+
+        showToast(
+            result,
+            "error"
+        );
+
+    })
+
+
+    // =====================================================
+    // ERROR
+    // =====================================================
+
+    .catch(err => {
+
+        console.error(err);
+
+
+        hideLoading();
+
+
+        unlockButton("resumeBtn");
+
+
+        showToast(
+            "❌ Server Error",
+            "error"
+        );
+
+    })
+
+
+    // =====================================================
+    // FINALLY
+    // =====================================================
+
+    .finally(() => {
+
+        hideLoader();
+
+        enableBtn(btn);
+
+    });
+
+}
+// ================= UPDATE RESUME =================
+function updateResume(){
+
+    let btn = document.querySelector("#resumeBox .btn-resume");
+
+    // ==========================================
+    // IMPORTANT:
+    // Agar user ne Production Loss manually edit kiya hai,
+    // to us value ko overwrite NAHI karna hai.
+    // Auto calculation sirf jab loss blank ho tab hoga.
+    // ==========================================
+
+    if(!rs_loss.value){
+        calculateProductionLoss();
+    }
+
+    // Required fields validation
+    if(
+        !rs_time.value ||
+        !rs_loss.value ||
+        !rs_dg.value ||
+        !rs_rem.value
+    ){
+        showToast("❌ All fields required","error");
+        return;
+    }
+
+    // Resume Time validation
+    let resumeDate = new Date(rs_time.value);
+
+    if(isNaN(resumeDate.getTime())){
+        showToast("⚠️ Invalid Resume Time","error");
+        return;
+    }
+
+    // Production Loss validation
+    let lossValue = parseFloat(rs_loss.value);
+
+    if(
+        isNaN(lossValue) ||
+        lossValue < 0
+    ){
+        showToast("⚠️ Invalid Production Loss","error");
+        return;
+    }
+
+    showLoader();
+
+    disableBtn(btn);
+
+    lockButton("resumeBtn");
+
+    showLoading(
+        "Updating Resume...",
+        "Please wait..."
+    );
+
+    speak("Updating resume.");
+
+    fetch(
+
+        WEBAPP_URL + "?" + new URLSearchParams({
+
+            action:"editresume",
+
+            uniqueId:EDIT_ROW.uniqueId,
+
+            ResumeTime:
+                rs_time.value.replace("T"," "),
+
+            ResumeEntryBy:
+                CURRENT_USER.n,
+
+            // IMPORTANT:
+            // Auto calculated OR manually edited value
+            // dono sheet me jayenge
+            TotalProdLoss:
+                rs_loss.value,
+
+            DGDeployed:
+                rs_dg.value,
+
+            Remarks:
+                rs_rem.value
+
+        })
+
+    )
+
+    .then(res=>res.text())
+
+    .then(result=>{
+
+        hideLoading();
+
+        unlockButton("resumeBtn");
+
+        if(result.indexOf("Another user")>-1){
+
+            speak(
+                "Another user is updating resume. Please wait."
+            );
+
+            showToast(
+                "⚠ Another user is updating Resume. Please wait...",
+                "error"
+            );
+
+            return;
+        }
+
+        if(result.indexOf("Resume Updated Successfully")>-1){
+
+            speak(
+                "Resume updated successfully."
+            );
+
+            showResult(
+                "Success",
+                result
+            );
+
+            EDIT_MODE=false;
+            EDIT_ROW=null;
+
+            rs_feeder.value="";
+            rs_time.value="";
+            rs_loss.value="";
+            rs_dg.value="";
+            rs_rem.value="";
+
+            loadActiveShutdowns();
+
+            backToMain();
+
+            return;
+        }
+
+        speak(result);
+
+        showToast(
+            result,
+            "error"
+        );
+
+    })
+
+    .catch(err=>{
+
+        console.error(err);
+
+        hideLoading();
+
+        unlockButton("resumeBtn");
+
+        speak(
+            "Update failed."
+        );
+
+        showToast(
+            "❌ Update Failed",
+            "error"
+        );
+
+    })
+
+    .finally(()=>{
+
+        hideLoader();
+
+        enableBtn(btn);
+
+    });
+
+}
+// ✅ NAVIGATION
+function openShutdown(){
+  document.getElementById("mainBox").classList.add("hidden");
+  document.getElementById("historyBox").classList.add("hidden");
+  document.getElementById("reportBox").classList.add("hidden");
+  document.getElementById("shutdownBox").classList.remove("hidden");
+}
+
+function openResume(){
+  document.getElementById("mainBox").classList.add("hidden");
+  document.getElementById("historyBox").classList.add("hidden");
+  document.getElementById("reportBox").classList.add("hidden");
+  document.getElementById("resumeBox").classList.remove("hidden");
+}
+function openResumeEdit(row){
+
+ EDIT_MODE = true;
+ EDIT_ROW = row;
+LAST_SHUTDOWN_TIME[row.feeder] = row.shutdown;
+LAST_TPD[row.feeder] = row.tpd;
+ openResume();
+
+ rs_feeder.value = row.feeder;
+
+ rs_time.value =
+   row.rs.replace(" ","T");
+
+ rs_loss.value = row.loss;
+
+ rs_dg.value = row.dg;
+
+ rs_rem.value = row.remarks;
+
+ document.querySelector(
+   "#resumeBox h2"
+ ).innerText = "EDIT RESUME ENTRY";
+
+ document.querySelector(
+   "#resumeBox .btn-resume"
+ ).innerText = "UPDATE";
+}
+function backToMain(){
+EDIT_MODE = false;
+EDIT_ROW = null;
+
+document.querySelector(
+ "#resumeBox h2"
+).innerText =
+"RESUME ENTRY";
+
+document.querySelector(
+ "#resumeBox .btn-resume"
+).innerText =
+"SUBMIT";
+  document.getElementById("shutdownBox").classList.add("hidden");
+  document.getElementById("resumeBox").classList.add("hidden");
+
+  document.getElementById("mainBox").classList.remove("hidden");
+  document.getElementById("historyBox").classList.remove("hidden");
+  document.getElementById("reportBox").classList.remove("hidden");
+
+  loadActiveShutdowns();
+  loadHistory();
+}
+
+// 🔄 LOADER CONTROL
+function showLoader(){
+  document.getElementById("loader").style.display = "flex";
+}
+
+function hideLoader(){
+  document.getElementById("loader").style.display = "none";
+}
+
+// 🔔 TOAST MESSAGE
+function showToast(msg, type="success"){
+  let t = document.getElementById("toast");
+
+  t.innerText = msg;
+
+  if(type==="error"){
+    t.style.background = "#e74c3c";
+  }else{
+    t.style.background = "#27ae60";
+  }
+
+  t.style.display = "block";
+
+  setTimeout(()=>{
+    t.style.display = "none";
+  },3000);
+}
+
+function disableBtn(btn){
+  btn.disabled = true;
+  btn.style.opacity = "0.6";
+}
+
+function enableBtn(btn){
+  btn.disabled = false;
+  btn.style.opacity = "1";
+}
+// ✅ MESSAGE
+function showMsg(t){msg.innerText=t;setTimeout(()=>msg.innerText="",3000);}
+
+  
+// ✅ WHATSAPP
+function shareWhatsApp(feeder, type, time, inst){
+
+  const msg =
+    "⚡ *POWER SHUTDOWN ALERT* ⚡\n\n" +
+    "🔌 *Feeder:* " + feeder + "\n" +
+    "📝 *Type:* " + type + "\n" +
+    "⏰ *Shutdown Time:* " + formatDateTime(time) + "\n" +   // ✅ FIX
+    "🏭 *Installation:* " + inst + "\n\n" +
+    "— Area-IV Power Shutdown App";
+
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+  }
+
+  function shareResumeWhatsApp(){
+
+  let data = LAST_RESUME_DATA || JSON.parse(localStorage.getItem("LAST_RESUME_DATA"));
+
+  if(!data){
+    showMsg("⚠️ No resume data found");
+    return;
+  }
+
+  let d = data;
+
+  const msg =
+    "✅ *POWER RESUME UPDATE* ✅\n\n" +
+    "🔌 *Feeder:* " + d.feeder + "\n" +
+    "⏰ *Resume Time:* " + formatDateTime(d.resumeTime.replace("T"," ")) + "\n" +
+    "📉 *Production Loss:* " + d.loss + " Ton\n" +
+    "⚡ *DG Deployed:* " + d.dg + "\n" +
+    "📝 *Reason:* " + d.reason + "\n\n" +
+    "— Area-IV Power Shutdown App";
+
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+}
+
+// ✅ HISTORY
+function formatDateTime(dt){
+  let d = parseDateManual(dt);
+  if(!d) return "-";
+
+  let day = String(d.getDate()).padStart(2,'0');
+  let mon = String(d.getMonth()+1).padStart(2,'0');
+  let yr  = d.getFullYear();
+  let hr  = String(d.getHours()).padStart(2,'0');
+  let min = String(d.getMinutes()).padStart(2,'0');
+
+  return `${day}-${mon}-${yr} ${hr}:${min}`;
+}
+function formatHrs(val){
+
+  if(!val || val === "NA") return "0 Hrs and 0 Min";
+
+  // agar already correct format hai
+  if(typeof val === "string" && val.includes("Hrs")){
+    return val;
+  }
+
+  return val; // fallback
+}
+function canEditResume(resumeTime){
+
+  if(!resumeTime || resumeTime === "NA"){
+    return false;
+  }
+
+  let rt = parseDateManual(resumeTime);
+
+  if(!rt){
+    return false;
+  }
+
+  let now = new Date();
+
+  // Next day 08:00 AM
+  let expiryTime = new Date(
+    rt.getFullYear(),
+    rt.getMonth(),
+    rt.getDate() + 1,
+    8, 0, 0, 0
+  );
+
+  return now < expiryTime;
+}
+
+function loadHistory(){
+
+ fetch(CSV_URL + "&t=" + Date.now())
+ .then(r => r.text())
+ .then(t => {
+
+   const rows = t.split("\n").map(r => r.split(",").map(x => x.replace(/"/g,"").trim()));
+   const h = rows.shift().map(x => x.toUpperCase());
+
+   const i = {
+     feeder: h.findIndex(x => x.includes("FEEDER")),
+     sd:     h.findIndex(x => x.includes("SHUTDOWN")),
+     rs:     h.findIndex(x => x.includes("RESUME")),
+     type:   h.findIndex(x => x.includes("TYPE")),
+     inst:   h.findIndex(x => x.includes("INSTALL")),
+     hrs:    h.findIndex(x => x.includes("HRS")),
+     loss:   h.findIndex(x => x.includes("LOSS")),
+     tpd: h.findIndex(x =>
+    x.includes("TON PER DAY") ||
+    x.includes("TPD")
+),
+     uniqueId: h.findIndex(
+  x => x.includes("UNIQUE")
+  
+)
+   };
+
+  let filterEl = document.getElementById("historyFilter");
+
+let filter = "ALL";
+
+if(CURRENT_USER.admin){
+  filter = filterEl ? filterEl.value : "ALL";   // ✅ SAFE ACCESS
+}else{
+  filter = CURRENT_USER.i;
+}
+
+   let data = [];
+
+   let now = new Date();
+
+   // ✅ CURRENT MONTH 1st
+   let startCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+   // ✅ PREVIOUS MONTH 1st
+   let startPrevMonth = new Date(now.getFullYear(), now.getMonth()-1, 1);
+
+   let startDate;
+
+// Default = Today's History
+if(!SHOW_ALL_HISTORY){
+
+    startDate = new Date();
+    startDate.setHours(0,0,0,0);
+
+}else{
+
+    // Last 2 Months
+    startDate = startPrevMonth;
+
+}
+
+   rows.forEach(r => {
+
+     const feeder = r[i.feeder];
+     const sd     = r[i.sd];
+     const rs     = r[i.rs];
+     const type   = r[i.type];
+     const inst   = r[i.inst];
+    const hrs = r[i.hrs]; // direct string lo
+     const loss   = parseFloat(r[i.loss]) || 0;
+
+     if(!feeder || !sd) return;
+
+    let sdDate = parseDateManual(sd);
+if(!sdDate) return;
+
+if(startDate && sdDate < startDate) return;
+
+  // ✅ NON ADMIN → only own installation
+if(!CURRENT_USER.admin){
+  if(inst.trim().toUpperCase() !== CURRENT_USER.i.trim().toUpperCase()) return;
+}
+
+// ✅ ADMIN → apply dropdown filter
+if(CURRENT_USER.admin){
+  if(filter !== "ALL" && inst.trim().toUpperCase() !== filter.trim().toUpperCase()) return;
+}
+
+    data.push({
+
+    feeder,
+    sdDate,
+    sd,
+    rs,
+    type,
+    inst,
+    hrs,
+    loss,
+
+    remarks : r[8],
+    dg      : r[11],
+    resumeBy: r[7],
+
+    tpd : parseFloat(r[i.tpd]) || 0,
+shutdown : sd,
+    uniqueId : r[i.uniqueId]
+
+});
+
+   });
+
+   // ✅ SORT LATEST FIRST (IMPORTANT FIX)
+   data.sort((a,b)=> b.sdDate - a.sdDate);
+
+   let html = "";
+   data.forEach(d=>{
+let actionBtn = "";
+
+// Active Shutdown → Delete
+if(!d.rs || d.rs === "NA"){
+
+  actionBtn = `
+  <button
+    style="
+    background:#e74c3c;
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+font-size:18px;
+font-weight:700;
+border-radius:10px;
+    border-radius:6px;
+    cursor:pointer"
+    onclick="deleteShutdownHistory(
+'${d.uniqueId}'
+)">
+    Delete
+  </button>`;
+
+}
+// Resume Done → Edit
+else if(canEditResume(d.rs)){
+
+  actionBtn = `
+  <button
+    style="
+    background:#f39c12;
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+font-size:18px;
+font-weight:700;
+border-radius:10px;
+    border-radius:6px;
+    cursor:pointer"
+    onclick='openResumeEdit(
+      ${JSON.stringify(d)}
+    )'>
+    Edit
+  </button>`;
+}
+
+// ✅ Active Shutdown = Light Red
+// ✅ Resume Done = Light Green
+let rowColor = (!d.rs || d.rs === "NA")
+  ? "#ffe5e5"
+  : "#e8fbe8";
+
+html += `
+<tr style="border-bottom:1px solid #ddd;background:${rowColor};">
+ <td>${d.feeder}</td>
+ <td>${formatDateTime(d.sd)}</td>
+ <td>${formatDateTime(d.rs)}</td>
+ <td>${d.type}</td>
+ <td>${formatHrs(d.hrs)}</td>
+ <td>${d.loss}</td>
+ <td>${d.inst}</td>
+ <td>${actionBtn}</td>
+</tr>`;
+       });
+
+   document.querySelector("#historyTable tbody").innerHTML =
+     html || `<tr><td colspan="7">No Data (Last 2 Months)</td></tr>`;
+
+ });
+}
+// ✅ AUTO REFRESH
+setInterval(()=>{
+ loadActiveShutdowns();
+ loadHistory();
+},30000);
+function toggleHistory(){
+
+    SHOW_ALL_HISTORY = !SHOW_ALL_HISTORY;
+
+    let title = document.getElementById("historyTitle");
+    let btn = document.getElementById("historyToggleBtn");
+
+    if(SHOW_ALL_HISTORY){
+
+        title.innerHTML = "📜 Last 2 Months History";
+        btn.innerHTML = "📜 Show Last 2 Months History";
+
+    }else{
+         title.innerHTML ="📅 Today's History"; 
+        btn.innerHTML = "📅 Show Today's History";
+        
+
+    }
+
+    loadHistory();
+
+}
+
+// ================= DELETE SHUTDOWN =================
+function deleteShutdownHistory(uniqueId){
+
+    if(!confirm("Delete Shutdown Entry?")){
+        return;
+    }
+
+    showLoader();
+
+    showLoading(
+        "Deleting Shutdown...",
+        "Please wait..."
+    );
+
+    speak(
+        "Deleting shutdown entry."
+    );
+
+    fetch(
+
+        WEBAPP_URL + "?" + new URLSearchParams({
+
+            action:"deleteshutdown",
+
+            uniqueId:uniqueId
+
+        })
+
+    )
+
+    .then(res=>res.text())
+
+    .then(result=>{
+
+        hideLoading();
+
+        // Another User Busy
+        if(result.indexOf("Another user")>-1){
+
+            speak(
+                "Another user is deleting shutdown entry. Please wait."
+            );
+
+            showToast(
+                "⚠ Another user is processing. Please wait...",
+                "error"
+            );
+
+            return;
+        }
+
+        // Success
+        if(result.indexOf("Deleted")>-1){
+
+            speak(
+                "Shutdown deleted successfully."
+            );
+
+           showResult(
+    "Success",
+    result
+);
+
+            loadHistory();
+
+            loadActiveShutdowns();
+
+            return;
+        }
+
+        // Resume Already Done
+        if(result.indexOf("Cannot Delete")>-1){
+
+            speak(
+                "Cannot delete. Resume already done."
+            );
+
+            showToast(
+                result,
+                "error"
+            );
+
+            return;
+        }
+
+        // Other Messages
+        speak(result);
+
+        showToast(
+            result,
+            "error"
+        );
+
+    })
+
+    .catch(err=>{
+
+        console.error(err);
+
+        hideLoading();
+
+        speak(
+            "Delete failed."
+        );
+
+        showToast(
+            "❌ Delete Failed",
+            "error"
+        );
+
+    })
+
+    .finally(()=>{
+
+        hideLoader();
+
+    });
+
+}
+
+function exportPDF(){ 
+ 
+  let from = document.getElementById("fromDateTime").value; 
+  let to   = document.getElementById("toDateTime").value; 
+ 
+  if(!from || !to){ 
+    showMsg("Select From & To Date Time"); 
+    return; 
+  } 
+ 
+  let fromD = parseDateManual(from.replace("T"," ")); 
+  let toD   = parseDateManual(to.replace("T"," ")); 
+ 
+  if(!fromD || !toD){ 
+    showMsg("Invalid From / To Date Time"); 
+    return; 
+  } 
+ 
+  fetch(CSV_URL + "&t=" + Date.now()) 
+  .then(r => r.text()) 
+  .then(t => { 
+ 
+    const rows = t.split("\n")
+      .map(r => r.split(",").map(x => x.replace(/"/g,"").trim())); 
+ 
+    const h = rows.shift().map(x => x.toUpperCase()); 
+ 
+    const i = { 
+      feeder: h.findIndex(x => x.includes("FEEDER")), 
+      sd:     h.findIndex(x => x.includes("SHUTDOWN")), 
+      rs:     h.findIndex(x => x.includes("RESUME")), 
+      type:   h.findIndex(x => x.includes("TYPE")), 
+      inst:   h.findIndex(x => x.includes("INSTALL")), 
+      hrs:    h.findIndex(x => x.includes("HRS")), 
+      loss:   h.findIndex(x => x.includes("LOSS")), 
+      dg:     h.findIndex(x => x.includes("DG")), 
+      uniqueId: h.findIndex(x => x.includes("UNIQUE")), 
+ 
+      // TPD column detect
+      tpd: h.findIndex(x =>
+        x.includes("TON PER DAY") ||
+        x.includes("TON/DAY") ||
+        x.includes("TONS PER DAY") ||
+        x.includes("TPD")
+      )
+    }; 
+ 
+ 
+    // =====================================================
+    // INSTALLATION FILTER
+    // =====================================================
+ 
+    let filter = "ALL"; 
+ 
+    if(CURRENT_USER.admin){ 
+      filter = document.getElementById("historyFilter").value; 
+    }else{ 
+      filter = CURRENT_USER.i; 
+    } 
+ 
+ 
+    // =====================================================
+    // FEEDER SUMMARY OBJECT
+    // =====================================================
+ 
+    let summary = {}; 
+ 
+ 
+    // =====================================================
+    // GRAND TOTAL
+    // =====================================================
+ 
+    let grand = {
+      min: 0,
+      loss: 0,
+      dg: 0
+    }; 
+ 
+ 
+    // =====================================================
+    // REPORT TOTAL DAYS
+    // 
+    // Power Availability:
+    // Total Days × 24 Hours
+    //
+    // Example:
+    // 3 Days = 72 Hours
+    // 2 Hrs Shutdown
+    // (72 - 2) / 72 × 100
+    // = 97.22%
+    // =====================================================
+ 
+    let reportDays = Math.ceil(
+      (toD - fromD) / (24 * 60 * 60 * 1000)
+    ); 
+ 
+    if(!isFinite(reportDays) || reportDays < 1){
+      reportDays = 1;
+    } 
+ 
+    let totalReportHours = reportDays * 24; 
+ 
+ 
+    // =====================================================
+    // MAIN REPORT TABLE
+    // =====================================================
+ 
+    let html = ` 
+    <h2 style="text-align:center;">POWER SHUTDOWN REPORT</h2> 
+ 
+    <p style="text-align:center;"> 
+      From ${formatDateTime(from.replace("T"," "))}  
+      To ${formatDateTime(to.replace("T"," "))}<br> 
+      Installation: ${filter} 
+    </p> 
+ 
+    <table border="1" cellspacing="0" cellpadding="6" width="100%" style="text-align:center;"> 
+ 
+    <tr> 
+      <th>Feeder</th> 
+      <th>Shutdown</th> 
+      <th>Resume</th> 
+      <th>Type</th> 
+      <th>Hrs and Min</th> 
+      <th>Loss - Ton</th> 
+      <th>DG Deployed</th> 
+      <th>Installation</th> 
+    </tr>`; 
+ 
+ 
+    // =====================================================
+    // READ EACH ROW
+    // =====================================================
+ 
+    rows.forEach(r => { 
+ 
+      const feeder = r[i.feeder]; 
+      const sd     = r[i.sd]; 
+      const rs     = r[i.rs]; 
+      const type   = r[i.type] || ""; 
+      const inst   = r[i.inst]; 
+      const hrsStr = r[i.hrs]; 
+ 
+      const loss = parseFloat(r[i.loss]) || 0; 
+      const dg   = parseFloat(r[i.dg]) || 0; 
+ 
+      // TPD
+      let tpd = 0;
+ 
+      if(i.tpd >= 0){
+        tpd = parseFloat(r[i.tpd]) || 0;
+      }
+ 
+ 
+      if(!feeder || !sd) return; 
+ 
+ 
+      // =====================================================
+      // SHUTDOWN DATE
+      // =====================================================
+ 
+      let sdDate = parseDateManual(sd); 
+ 
+      if(!sdDate) return; 
+ 
+ 
+      // =====================================================
+      // INSTALLATION FILTER
+      // =====================================================
+ 
+      if(!CURRENT_USER.admin && inst !== CURRENT_USER.i) return; 
+ 
+      if(CURRENT_USER.admin && filter !== "ALL" && inst !== filter) return; 
+ 
+ 
+      // =====================================================
+      // DATE FILTER
+      // =====================================================
+ 
+      if(sdDate < fromD || sdDate > toD) return; 
+ 
+ 
+      // =====================================================
+      // HOURS TO MINUTES
+      // =====================================================
+ 
+      let totalMin = 0; 
+ 
+      if(hrsStr && hrsStr !== "NA"){ 
+ 
+        let match = hrsStr.match(
+          /(\d+)\s*Hrs\s*(?:and)?\s*(\d+)\s*Min/i
+        ); 
+ 
+        if(match){ 
+ 
+          let h = parseInt(match[1]) || 0; 
+          let m = parseInt(match[2]) || 0; 
+ 
+          totalMin = (h * 60) + m; 
+        } 
+      } 
+ 
+ 
+      // =====================================================
+      // CREATE FEEDER SUMMARY
+      // =====================================================
+ 
+      if(!summary[feeder]){ 
+ 
+        summary[feeder] = { 
+          min: 0, 
+          loss: 0, 
+          dg: 0, 
+          tpd: 0, 
+ 
+          // Partial shutdown flag
+          hasPartial: false
+        }; 
+      } 
+ 
+ 
+      // =====================================================
+      // TPD
+      // =====================================================
+ 
+      if(tpd > 0){
+        summary[feeder].tpd = tpd;
+      } 
+ 
+ 
+      // =====================================================
+      // TOTAL SHUTDOWN MINUTES
+      // =====================================================
+ 
+      summary[feeder].min += totalMin; 
+ 
+ 
+      // =====================================================
+      // TOTAL PRODUCTION LOSS
+      // =====================================================
+ 
+      summary[feeder].loss += loss; 
+ 
+ 
+      // =====================================================
+      // TOTAL DG
+      // =====================================================
+ 
+      summary[feeder].dg += dg; 
+ 
+ 
+      // =====================================================
+      // PARTIAL SHUTDOWN CHECK
+      // =====================================================
+ 
+      let typeUpper = String(type).toUpperCase(); 
+ 
+      if(
+        typeUpper.includes("PARTIAL") ||
+        typeUpper.includes("PART")
+      ){ 
+        summary[feeder].hasPartial = true; 
+      } 
+ 
+ 
+      // =====================================================
+      // GRAND TOTAL
+      // =====================================================
+ 
+      grand.min += totalMin; 
+      grand.loss += loss; 
+      grand.dg += dg; 
+ 
+ 
+      // =====================================================
+      // MAIN REPORT ROW
+      // =====================================================
+ 
+      html += ` 
+      <tr> 
+        <td>${feeder}</td> 
+        <td>${formatDateTime(sd)}</td> 
+        <td>${formatDateTime(rs)}</td> 
+        <td>${type}</td> 
+        <td>${formatHrs(hrsStr)}</td> 
+        <td>${loss}</td> 
+        <td>${dg}</td> 
+        <td>${inst}</td> 
+      </tr>`; 
+ 
+    }); 
+ 
+ 
+    html += "</table>"; 
+ 
+ 
+    // =====================================================
+// PLAN / UNPLAN FEEDER WISE SUMMARY
+// =====================================================
+
+let unplanSummary = {};
+let planSummary = {};
+
+
+// =====================================================
+// READ FILTERED ROWS AGAIN FOR PLAN / UNPLAN SUMMARY
+// =====================================================
+
+rows.forEach(r => {
+
+  const feeder = r[i.feeder];
+  const sd     = r[i.sd];
+  const type   = r[i.type] || "";
+  const inst   = r[i.inst];
+  const hrsStr = r[i.hrs];
+
+  const loss = parseFloat(r[i.loss]) || 0;
+  const dg   = parseFloat(r[i.dg]) || 0;
+
+  // -----------------------------------------------------
+  // TPD
+  // -----------------------------------------------------
+
+  let tpd = 0;
+
+  if(i.tpd >= 0){
+    tpd = parseFloat(r[i.tpd]) || 0;
+  }
+
+  if(!feeder || !sd) return;
+
+
+  // -----------------------------------------------------
+  // SHUTDOWN DATE
+  // -----------------------------------------------------
+
+  let sdDate = parseDateManual(sd);
+
+  if(!sdDate) return;
+
+
+  // -----------------------------------------------------
+  // INSTALLATION FILTER
+  // -----------------------------------------------------
+
+  if(!CURRENT_USER.admin && inst !== CURRENT_USER.i) return;
+
+  if(CURRENT_USER.admin && filter !== "ALL" && inst !== filter) return;
+
+
+  // -----------------------------------------------------
+  // DATE FILTER
+  // -----------------------------------------------------
+
+  if(sdDate < fromD || sdDate > toD) return;
+
+
+  // -----------------------------------------------------
+  // HOURS TO MINUTES
+  // -----------------------------------------------------
+
+  let totalMin = 0;
+
+  if(hrsStr && hrsStr !== "NA"){
+
+    let match = hrsStr.match(
+      /(\d+)\s*Hrs\s*(?:and)?\s*(\d+)\s*Min/i
+    );
+
+    if(match){
+
+      let h = parseInt(match[1]) || 0;
+      let m = parseInt(match[2]) || 0;
+
+      totalMin = (h * 60) + m;
+    }
+  }
+
+
+  // -----------------------------------------------------
+  // TYPE DETECTION
+  // IMPORTANT:
+  // UNPLAN FIRST BECAUSE "UNPLAN" CONTAINS "PLAN"
+  // -----------------------------------------------------
+
+  let typeUpper = String(type).toUpperCase();
+
+  let target = null;
+
+  if(typeUpper.includes("UNPLAN")){
+
+    target = unplanSummary;
+
+  }
+  else if(typeUpper.includes("PLAN")){
+
+    target = planSummary;
+
+  }
+  else{
+
+    return;
+  }
+
+
+  // -----------------------------------------------------
+  // CREATE FEEDER OBJECT
+  // -----------------------------------------------------
+
+  if(!target[feeder]){
+
+    target[feeder] = {
+
+      min: 0,
+
+      loss: 0,
+
+      dg: 0,
+
+      tpd: 0,
+
+      hasPartial: false
+
+    };
+
+  }
+
+
+  // -----------------------------------------------------
+  // TPD
+  // -----------------------------------------------------
+
+  if(tpd > 0){
+
+    target[feeder].tpd = tpd;
+
+  }
+
+
+  // -----------------------------------------------------
+  // TOTAL SHUTDOWN MINUTES
+  // -----------------------------------------------------
+
+  target[feeder].min += totalMin;
+
+
+  // -----------------------------------------------------
+  // TOTAL LOSS
+  // -----------------------------------------------------
+
+  target[feeder].loss += loss;
+
+
+  // -----------------------------------------------------
+  // DG COUNTING
+  // -----------------------------------------------------
+  // Only add DG for this particular PLAN/UNPLAN type.
+  //
+  // Example:
+  // UNPLAN DG = 2
+  // PLAN DG   = 1
+  //
+  // They will remain separate.
+  // -----------------------------------------------------
+
+  if(dg > 0){
+
+    target[feeder].dg += dg;
+
+  }
+
+
+  // -----------------------------------------------------
+  // PARTIAL SHUTDOWN
+  // -----------------------------------------------------
+
+  if(
+    typeUpper.includes("PARTIAL") ||
+    typeUpper.includes("PART")
+  ){
+
+    target[feeder].hasPartial = true;
+
+  }
+
+});
+
+
+// =====================================================
+// FUNCTION TO CREATE PLAN / UNPLAN SUMMARY
+// =====================================================
+
+function createPowerShutdownSummary(title, summaryObj){
+
+  let sectionGrandMin = 0;
+
+  let sectionGrandLoss = 0;
+
+  let sectionGrandDG = 0;
+
+  let sectionGrandProductionSave = 0;
+
+
+  // ===================================================
+  // SECTION TITLE
+  // ===================================================
+
+  let sectionHtml = `
+
+  <h3 style="
+    text-align:center;
+    margin-top:20px;
+    margin-bottom:10px;
+  ">
+    ${title}
+  </h3>
+
+
+  <table
+    border="1"
+    cellspacing="0"
+    cellpadding="6"
+    width="100%"
+    style="text-align:center;"
+  >
+
+  <tr>
+
+    <th>Feeder</th>
+
+    <th>Ton Per Day</th>
+
+    <th>Total Shutdown Hrs</th>
+
+    <th>Total Loss (Ton)</th>
+
+    <th>DG Deployed</th>
+
+    <th>Production Save</th>
+
+    <th>Power Availability</th>
+
+  </tr>
+  `;
+
+
+  // ===================================================
+  // FEEDER ROWS
+  // ===================================================
+
+  Object.keys(summaryObj).forEach(f => {
+
+    let s = summaryObj[f];
+
+
+    // -------------------------------------------------
+    // TOTAL SHUTDOWN TIME
+    // -------------------------------------------------
+
+    let totalMin = s.min || 0;
+
+    let hrs = Math.floor(totalMin / 60);
+
+    let min = totalMin % 60;
+
+
+    // -------------------------------------------------
+    // PRODUCTION SAVE
+    // -------------------------------------------------
+
+    let productionSave = "NA";
+
+
+    if(
+      s.dg > 0 &&
+      s.tpd > 0 &&
+      !s.hasPartial
+    ){
+
+      let save = s.tpd - s.loss;
+
+      if(save < 0){
+
+        save = 0;
+
+      }
+
+      productionSave = save.toFixed(2);
+
+      sectionGrandProductionSave += save;
+
+    }
+
+
+    // -------------------------------------------------
+    // POWER AVAILABILITY
+    // -------------------------------------------------
+
+    let shutdownHours = totalMin / 60;
+
+    let powerAvailability =
+
+      (
+        (totalReportHours - shutdownHours) /
+        totalReportHours
+      ) * 100;
+
+
+    // -------------------------------------------------
+    // SAFETY
+    // -------------------------------------------------
+
+    if(!isFinite(powerAvailability)){
+
+      powerAvailability = 100;
+
+    }
+
+    if(powerAvailability < 0){
+
+      powerAvailability = 0;
+
+    }
+
+    if(powerAvailability > 100){
+
+      powerAvailability = 100;
+
+    }
+
+
+    powerAvailability =
+      powerAvailability.toFixed(2) + "%";
+
+
+    // -------------------------------------------------
+    // TPD DISPLAY
+    // -------------------------------------------------
+
+    let tpdDisplay = "NA";
+
+    if(s.tpd > 0){
+
+      tpdDisplay = s.tpd.toFixed(2);
+
+    }
+
+
+    // -------------------------------------------------
+    // SECTION TOTALS
+    // -------------------------------------------------
+
+    sectionGrandMin += totalMin;
+
+    sectionGrandLoss += s.loss;
+
+    sectionGrandDG += s.dg;
+
+
+    // -------------------------------------------------
+    // FEEDER ROW
+    // -------------------------------------------------
+
+    sectionHtml += `
+
+    <tr>
+
+      <td>${f}</td>
+
+      <td>${tpdDisplay}</td>
+
+      <td>
+        ${hrs} Hrs ${min} Min
+      </td>
+
+      <td>
+        ${s.loss.toFixed(2)}
+      </td>
+
+      <td>
+        ${s.dg}
+      </td>
+
+      <td>
+        ${productionSave}
+      </td>
+
+      <td>
+        ${powerAvailability}
+      </td>
+
+    </tr>
+
+    `;
+
+  });
+
+
+  // ===================================================
+  // SECTION GRAND TOTAL TIME
+  // ===================================================
+
+  let grandHrs =
+    Math.floor(sectionGrandMin / 60);
+
+  let grandMin =
+    sectionGrandMin % 60;
+
+
+  // ===================================================
+  // SECTION GRAND TOTAL
+  // ===================================================
+
+  sectionHtml += `
+
+  <tr style="font-weight:bold;">
+
+    <td>GRAND TOTAL</td>
+
+    <td>—</td>
+
+    <td>
+      ${grandHrs} Hrs ${grandMin} Min
+    </td>
+
+    <td>
+      ${sectionGrandLoss.toFixed(2)}
+    </td>
+
+    <td>
+      ${sectionGrandDG}
+    </td>
+
+    <td>
+      ${sectionGrandProductionSave.toFixed(2)}
+    </td>
+
+    <td>—</td>
+
+  </tr>
+
+  </table>
+
+  `;
+
+
+  return {
+
+    html: sectionHtml,
+
+    min: sectionGrandMin,
+
+    loss: sectionGrandLoss,
+
+    dg: sectionGrandDG,
+
+    productionSave: sectionGrandProductionSave
+
+  };
+
+}
+
+
+// =====================================================
+// UNPLAN SUMMARY
+// =====================================================
+
+let unplanResult = createPowerShutdownSummary(
+
+  "UNPLAN FEEDER WISE POWER SHUTDOWN SUMMARY",
+
+  unplanSummary
+
+);
+
+html += unplanResult.html;
+
+
+// =====================================================
+// PLAN SUMMARY
+// =====================================================
+
+let planResult = createPowerShutdownSummary(
+
+  "PLAN FEEDER WISE POWER SHUTDOWN SUMMARY",
+
+  planSummary
+
+);
+
+html += planResult.html;
+
+
+// =====================================================
+// OVERALL GRAND TOTAL
+// PLAN + UNPLAN
+// =====================================================
+
+let overallGrandMin =
+
+  unplanResult.min +
+
+  planResult.min;
+
+
+let overallGrandLoss =
+
+  unplanResult.loss +
+
+  planResult.loss;
+
+
+let overallGrandDG =
+
+  unplanResult.dg +
+
+  planResult.dg;
+
+
+let overallGrandProductionSave =
+
+  unplanResult.productionSave +
+
+  planResult.productionSave;
+
+
+// =====================================================
+// OVERALL GRAND TOTAL TIME
+// =====================================================
+
+let overallGHrs =
+
+  Math.floor(overallGrandMin / 60);
+
+
+let overallGMin =
+
+  overallGrandMin % 60;
+
+
+// =====================================================
+// OVERALL GRAND TOTAL TABLE
+// =====================================================
+
+html += `
+
+<h3 style="
+  text-align:center;
+  margin-top:20px;
+">
+  GRAND TOTAL - PLAN + UNPLAN
+</h3>
+
+
+<table
+  border="1"
+  cellspacing="0"
+  cellpadding="6"
+  width="100%"
+  style="text-align:center;"
+>
+
+<tr>
+
+  <th>Total Shutdown</th>
+
+  <th>Total Loss (Ton)</th>
+
+  <th>Total DG</th>
+
+  <th>Total Production Save (Ton)</th>
+
+</tr>
+
+
+<tr>
+
+  <td>
+    ${overallGHrs} Hrs ${overallGMin} Min
+  </td>
+
+  <td>
+    ${overallGrandLoss.toFixed(2)}
+  </td>
+
+  <td>
+    ${overallGrandDG}
+  </td>
+
+  <td>
+    ${overallGrandProductionSave.toFixed(2)}
+  </td>
+
+</tr>
+
+</table>
+
+`;
+ 
+ 
+   let win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+    win.print();
+
+  });
+}
+
+function lockButton(id){
+
+    const btn=document.getElementById(id);
+
+    if(!btn) return;
+
+    btn.disabled=true;
+
+    btn.style.opacity=".6";
+
+    btn.style.cursor="not-allowed";
+
+}
+
+
+function unlockButton(id){
+
+    const btn=document.getElementById(id);
+
+    if(!btn) return;
+
+    btn.disabled=false;
+
+    btn.style.opacity="1";
+
+    btn.style.cursor="pointer";
+
+}
+function showResult(title,message){
+
+    document.getElementById("resultTitle").innerText=title;
+
+    document.getElementById("resultMessage").innerText=message;
+
+    document.getElementById("resultBox").classList.remove("hidden");
+
+}
+
+function closeResultBox(){
+
+    document.getElementById("resultBox").classList.add("hidden");
+
+}
+
+/*************************************************
+VOICE + LOADING
+*************************************************/
+
+function speak(text){
+
+    if(!window.speechSynthesis)
+        return;
+
+    speechSynthesis.cancel();
+
+    let msg = new SpeechSynthesisUtterance(text);
+
+    msg.lang="en-IN";
+
+    msg.rate=1;
+
+    msg.pitch=1;
+
+    msg.volume=1;
+
+    speechSynthesis.speak(msg);
+
+}
+
+
+function showLoading(title,sub){
+
+    document.getElementById("loadingTitle").innerHTML=
+        title || "Please Wait...";
+
+    document.getElementById("loadingSub").innerHTML=
+        sub || "";
+
+    document.getElementById("loadingScreen").style.display=
+        "flex";
+
+}
+
+
+function hideLoading(){
+
+    document.getElementById("loadingScreen").style.display=
+        "none";
+
+}
+function logout(){
+  localStorage.removeItem("CURRENT_USER");
+  window.location.href = "index.html";
+}
+// =====================================================
+// LOGOUT BUTTON
+// SHORT PRESS  = LOGOUT
+// 5 SECOND HOLD = SHOW TPD UPDATE BUTTON
+// =====================================================
+
+let logoutPressTimer = null;
+let logoutLongPress = false;
+
+
+// -----------------------------------------------------
+// START PRESS
+// -----------------------------------------------------
+
+function startLogoutHold(){
+
+    logoutLongPress = false;
+
+    logoutPressTimer = setTimeout(function(){
+
+        logoutLongPress = true;
+
+        const tpdBtn =
+            document.getElementById("tpdUpdateBtn");
+
+        if(tpdBtn){
+
+            tpdBtn.style.display = "block";
+
+        }
+
+
+        showToast(
+            "⚙️ TPD Update unlocked",
+            "success"
+        );
+
+        speak(
+            "TPD update unlocked."
+        );
+
+
+    }, 3000);
+
+}
+
+
+// -----------------------------------------------------
+// CANCEL / RELEASE
+// -----------------------------------------------------
+
+function endLogoutHold(){
+
+    if(logoutPressTimer){
+
+        clearTimeout(logoutPressTimer);
+
+        logoutPressTimer = null;
+
+    }
+
+}
+
+
+// -----------------------------------------------------
+// LOGOUT CLICK
+// -----------------------------------------------------
+
+function logoutButtonClick(){
+
+    /*
+      If button was held for 5 seconds,
+      don't logout.
+      Only reveal TPD Update button.
+    */
+
+    if(logoutLongPress){
+
+        logoutLongPress = false;
+
+        return;
+    }
+
+
+    // Normal short press
+    logout();
+
+}
+
+
+// -----------------------------------------------------
+// EVENTS
+// -----------------------------------------------------
+
+// =====================================================
+// LOGOUT BUTTON EVENTS - FIXED
+// SHORT PRESS  = LOGOUT
+// 5 SECOND HOLD = SHOW TPD UPDATE BUTTON
+// =====================================================
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+if(logoutBtn){
+
+    // =========================
+    // MOUSE
+    // =========================
+
+    logoutBtn.addEventListener("mousedown", function(){
+        startLogoutHold();
+    });
+
+    logoutBtn.addEventListener("mouseup", function(){
+        endLogoutHold();
+    });
+
+    logoutBtn.addEventListener("mouseleave", function(){
+        endLogoutHold();
+    });
+
+
+    // =========================
+    // MOBILE TOUCH
+    // =========================
+
+    logoutBtn.addEventListener("touchstart", function(){
+        startLogoutHold();
+    }, {passive:true});
+
+    logoutBtn.addEventListener("touchend", function(){
+        endLogoutHold();
+    }, {passive:true});
+
+    logoutBtn.addEventListener("touchcancel", function(){
+        endLogoutHold();
+    }, {passive:true});
+
+
+    // =========================
+    // NORMAL CLICK
+    // =========================
+
+    logoutBtn.addEventListener("click", function(){
+
+        if(logoutLongPress){
+
+            // 5 sec hold ke baad logout nahi hoga
+            logoutLongPress = false;
+            return;
+        }
+
+        // Normal one click = logout
+        logout();
+
+    });
+
+}
+function showTPDRequiredMessage(){
+
+  var modal =
+    document.getElementById("tpdRequiredModal");
+
+  if(modal){
+
+    modal.style.display = "flex";
+
+  }
+
+}
+
+
+function closeTPDRequiredMessage(){
+
+    var modal =
+        document.getElementById(
+            "tpdRequiredModal"
+        );
+
+    if(modal){
+
+        modal.style.display = "none";
+
+    }
+
+
+    // =====================================================
+    // TPD WARNING KE BAAD RESUME CONTINUE
+    // =====================================================
+
+    if(resumeAfterTPDWarning){
+
+        setTimeout(function(){
+
+            submitResume();
+
+        },100);
+
+    }
+
+}
+function checkExportButton(){
+  let from = document.getElementById("fromDateTime").value;
+  let to   = document.getElementById("toDateTime").value;
+
+  document.getElementById("exportBtn").disabled = !(from && to);
+}
+
+// ✅ Event listeners
+const fromDateTimeEl = document.getElementById("fromDateTime");
+const toDateTimeEl   = document.getElementById("toDateTime");
+
+if(fromDateTimeEl){
+  fromDateTimeEl.addEventListener("change", checkExportButton);
+}
+
+if(toDateTimeEl){
+  toDateTimeEl.addEventListener("change", checkExportButton);
+}
+
+// =====================================================
+// CHANGE PASSWORD
+// =====================================================
+
+function openChangePassword() {
+
+  // Menu close
+  var menu = document.getElementById("appMenu");
+
+  if (menu) {
+    menu.classList.remove("show");
+  }
+
+  var modal = document.getElementById("changePasswordModal");
+
+  if (!modal) {
+    alert("Change Password window not found");
+    return;
+  }
+
+  // Get logged-in user
+  var currentUser = null;
+
+  try {
+    currentUser = JSON.parse(
+      localStorage.getItem("CURRENT_USER") || "null"
+    );
+  } catch (err) {
+    currentUser = null;
+  }
+
+  if (!currentUser) {
+    alert("Please login again");
+    return;
+  }
+
+  // Username / Name show
+  var displayName =
+  currentUser.n ||
+  currentUser.username ||
+  "";
+
+  document.getElementById("cpUserName").textContent =
+    displayName + " (" + currentUser.username + ")";
+
+  // Clear old fields
+  document.getElementById("oldPassword").value = "";
+  document.getElementById("newPassword").value = "";
+  document.getElementById("confirmPassword").value = "";
+
+  document.getElementById("changePasswordMessage").textContent = "";
+
+  // Open popup
+  modal.style.display = "flex";
+}
+
+
+// =====================================================
+// CLOSE CHANGE PASSWORD
+// =====================================================
+
+function closeChangePassword() {
+
+  var modal = document.getElementById("changePasswordModal");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+
+// =====================================================
+// SUBMIT CHANGE PASSWORD
+// =====================================================
+
+function submitChangePassword() {
+
+  var oldPassword =
+    document.getElementById("oldPassword").value.trim();
+
+  var newPassword =
+    document.getElementById("newPassword").value.trim();
+
+  var confirmPassword =
+    document.getElementById("confirmPassword").value.trim();
+
+  var message =
+    document.getElementById("changePasswordMessage");
+
+
+  // Get logged-in user
+  var currentUser = null;
+
+  try {
+    currentUser = JSON.parse(
+      localStorage.getItem("CURRENT_USER") || "null"
+    );
+  } catch (err) {
+    currentUser = null;
+  }
+
+
+  if (!currentUser || !currentUser.username) {
+
+    message.textContent = "Login session not found.";
+
+    return;
+  }
+
+
+  // Validation
+
+  if (!oldPassword) {
+
+    message.textContent =
+      "Please enter old password.";
+
+    return;
+  }
+
+
+  if (!newPassword) {
+
+    message.textContent =
+      "Please enter new password.";
+
+    return;
+  }
+
+
+  if (newPassword.length < 4) {
+
+    message.textContent =
+      "New password must be at least 4 characters.";
+
+    return;
+  }
+
+
+  if (newPassword !== confirmPassword) {
+
+    message.textContent =
+      "New password and confirm password do not match.";
+
+    return;
+  }
+
+
+  if (oldPassword === newPassword) {
+
+    message.textContent =
+      "New password must be different from old password.";
+
+    return;
+  }
+
+
+  // Apps Script URL
+  var url = "https://script.google.com/macros/s/AKfycbxOab-F4NRpKAnewVWXH1XQNdSHnfd2x5X2pKKp5FlcXB1DvhGvgQz6MXL7MwX9A2Rk/exec";
+
+
+  // Loading message
+  message.textContent = "Changing password...";
+
+
+  var params =
+    "?action=changePassword" +
+    "&username=" + encodeURIComponent(currentUser.username) +
+    "&oldPassword=" + encodeURIComponent(oldPassword) +
+    "&newPassword=" + encodeURIComponent(newPassword);
+
+
+  fetch(url + params)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(result) {
+
+      if (result.status === "success") {
+
+        message.textContent =
+          "✅ Password changed successfully.";
+
+        // Clear fields
+        document.getElementById("oldPassword").value = "";
+        document.getElementById("newPassword").value = "";
+        document.getElementById("confirmPassword").value = "";
+
+
+        // Close after 1.5 seconds
+        setTimeout(function() {
+
+          closeChangePassword();
+
+        }, 1500);
+
+
+      } else {
+
+        message.textContent =
+          "❌ " + (result.message || "Password change failed.");
+
+      }
+
+    })
+    .catch(function(error) {
+
+      console.error(error);
+
+      message.textContent =
+        "❌ Server error. Please try again.";
+
+    });
+}
+</script>
+<!-- ================= LOADING SCREEN ================= -->
+
+<div id="loadingScreen">
+
+    <div class="fireLoader"></div>
+
+    <div id="loadingTitle">
+        Please Wait...
+    </div>
+
+    <div id="loadingSub">
+        Processing...
+    </div>
+
+</div>
+<div id="resultBox" class="resultBox hidden">
+    <div class="resultContent">
+        <div id="resultTitle">Success</div>
+        <div id="resultMessage"></div>
+
+        <button onclick="closeResultBox()">
+            OK
+        </button>
+    </div>
+</div>
+<!-- =====================================================
+     TON PER DAY UPDATE POPUP
+===================================================== -->
+
+<div id="tpdUpdateBox"
+     style="
+       display:none;
+       position:fixed;
+       inset:0;
+       background:rgba(0,0,0,0.55);
+       z-index:9999;
+       overflow-y:auto;
+       padding:20px;
+     ">
+
+  <div style="
+       max-width:480px;
+       margin:30px auto;
+       background:white;
+       border-radius:15px;
+       padding:18px;
+       box-shadow:0 5px 25px rgba(0,0,0,.3);
+       ">
+
+    <div style="
+         display:flex;
+         justify-content:space-between;
+         align-items:center;
+         margin-bottom:15px;
+         ">
+
+      <div style="
+           font-size:20px;
+           font-weight:800;
+           color:#17365d;
+           ">
+        ⚙️ Ton Per Day Update
+      </div>
+
+      <button
+        onclick="closeTPDUpdate()"
+        style="
+          width:35px;
+          height:35px;
+          padding:0;
+          border:none;
+          border-radius:50%;
+          background:#e53935;
+          color:white;
+          font-size:20px;
+          font-weight:bold;
+          cursor:pointer;
+        ">
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- =====================================================
+     INSTALLATION SELECT
+===================================================== -->
+
+<div style="
+     background:#f1f4f8;
+     padding:10px;
+     border-radius:8px;
+     margin-bottom:15px;
+     ">
+
+  <div style="
+       font-size:12px;
+       color:#666;
+       margin-bottom:6px;
+       ">
+    INSTALLATION
+  </div>
+
+
+  <!-- ===============================================
+       ADMIN INSTALLATION DROPDOWN
+  ================================================ -->
+
+  <select
+    id="tpdInstallationSelect"
+    onchange="changeTPDInstallation()"
+    style="
+      display:none;
+      width:100%;
+      height:48px;
+      padding:8px 12px;
+      border:1px solid #cbd5e1;
+      border-radius:8px;
+      font-size:15px;
+      font-weight:700;
+      color:#17365d;
+      background:#fff;
+      margin:0;
+    ">
+
+    <option value="">
+      Select Installation
+    </option>
+
+    <option value="LIMBODARA-GGS-1">
+      LIMBODARA-GGS-1
+    </option>
+
+    <option value="LIMBODARA-GGS-2">
+      LIMBODARA-GGS-2
+    </option>
+
+    <option value="GAMIJ-GGS-1">
+      GAMIJ-GGS-1
+    </option>
+
+    <option value="GAMIJ-GGS-2">
+      GAMIJ-GGS-2
+    </option>
+
+    <option value="GAMIJ-GGS-3">
+      GAMIJ-GGS-3
+    </option>
+
+    <option value="MOTERA-GGS">
+      MOTERA-GGS
+    </option>
+
+  </select>
+
+
+  <!-- ===============================================
+       NORMAL USER INSTALLATION TEXT
+  ================================================ -->
+
+  <div
+    id="tpdInstallation"
+    style="
+      display:block;
+      font-size:16px;
+      font-weight:800;
+      color:#17365d;
+    ">
+
+    -
+
+  </div>
+
+</div>
+
+
+    <!-- FEEDER LIST -->
+
+    <div id="tpdFeederList">
+
+      <div style="
+           text-align:center;
+           padding:20px;
+           color:#777;
+           ">
+        Loading...
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+/* =====================================================
+   OPEN TPD UPDATE
+===================================================== */
+
+function openTPDUpdate(){
+
+  const tpdUpdateBox =
+    document.getElementById(
+      "tpdUpdateBox"
+    );
+
+
+  const installationText =
+    document.getElementById(
+      "tpdInstallation"
+    );
+
+
+  const installationSelect =
+    document.getElementById(
+      "tpdInstallationSelect"
+    );
+
+
+  const feederBox =
+    document.getElementById(
+      "tpdFeederList"
+    );
+
+
+  /* ===============================================
+     OPEN POPUP
+  ================================================ */
+
+  tpdUpdateBox.style.display =
+    "block";
+
+
+  /* ===============================================
+     ADMIN LOGIN
+  ================================================ */
+
+  if(CURRENT_USER.admin){
+
+    /*
+      Admin ke liye
+      Installation dropdown show hoga
+    */
+
+    installationText.style.display =
+      "none";
+
+
+    installationSelect.style.display =
+      "block";
+
+
+    /*
+      Pehle installation select nahi hoga
+    */
+
+    installationSelect.value =
+      "";
+
+
+    /*
+      Feeder list empty rahegi
+    */
+
+    feederBox.innerHTML = `
+
+      <div style="
+        text-align:center;
+        padding:25px 15px;
+        color:#64748b;
+        font-size:14px;
+        font-weight:600;
+      ">
+
+        👆 Please Select Installation<br>
+
+        <span style="
+          font-size:12px;
+          font-weight:400;
+          color:#94a3b8;
+        ">
+
+          Installation select karne ke baad
+          Feeder wise TPD details open hongi.
+
+        </span>
+
+      </div>
+
+    `;
+
+
+  }
+
+
+  /* ===============================================
+     NORMAL INSTALLATION USER
+  ================================================ */
+
+  else{
+
+    /*
+      Normal user ke liye
+      Dropdown hide rahega
+    */
+
+    installationSelect.style.display =
+      "none";
+
+
+    /*
+      User ki installation show hogi
+    */
+
+    installationText.style.display =
+      "block";
+
+
+    installationText.innerText =
+      CURRENT_USER.i;
+
+
+    /*
+      Sirf us installation ke feeders load honge
+    */
+
+    loadTPDUpdateList(
+      CURRENT_USER.i
+    );
+
+  }
+
+}
+
+/* =====================================================
+   CHANGE TPD INSTALLATION
+===================================================== */
+
+function changeTPDInstallation(){
+
+  const installation =
+    document.getElementById(
+      "tpdInstallationSelect"
+    ).value;
+
+
+  const feederBox =
+    document.getElementById(
+      "tpdFeederList"
+    );
+
+
+  /* ===============================================
+     INSTALLATION SELECT NAHI HAI
+  ================================================ */
+
+  if(!installation){
+
+    feederBox.innerHTML = `
+
+      <div style="
+        text-align:center;
+        padding:25px 15px;
+        color:#64748b;
+        font-size:14px;
+        font-weight:600;
+      ">
+
+        👆 Please Select Installation
+
+      </div>
+
+    `;
+
+
+    return;
+
+  }
+
+
+  /* ===============================================
+     SELECTED INSTALLATION KE FEEDERS LOAD
+  ================================================ */
+
+  loadTPDUpdateList(
+    installation
+  );
+
+}
+
+/* =====================================================
+   CLOSE TPD UPDATE
+===================================================== */
+
+function closeTPDUpdate(){
+
+  document.getElementById(
+    "tpdUpdateBox"
+  ).style.display = "none";
+
+}
+
+
+/* =====================================================
+   LOAD TPD FEEDERS
+===================================================== */
+
+function loadTPDUpdateList(selectedInstallation){
+
+  const box =
+    document.getElementById(
+      "tpdFeederList"
+    );
+
+
+  /* ===============================================
+     SELECTED INSTALLATION DETERMINE
+  ================================================ */
+
+  let installation = "";
+
+
+  /*
+    Admin ke liye:
+    Dropdown se selected installation
+
+    Normal user ke liye:
+    CURRENT_USER.i
+  */
+
+  if(CURRENT_USER.admin){
+
+    installation =
+      selectedInstallation ||
+      document.getElementById(
+        "tpdInstallationSelect"
+      ).value;
+
+  }
+
+  else{
+
+    installation =
+      CURRENT_USER.i;
+
+  }
+
+
+  /* ===============================================
+     INSTALLATION REQUIRED
+  ================================================ */
+
+  if(!installation){
+
+    box.innerHTML = `
+
+      <div style="
+        text-align:center;
+        padding:25px;
+        color:#64748b;
+        font-size:14px;
+        font-weight:600;
+      ">
+
+        👆 Please Select Installation
+
+      </div>
+
+    `;
+
+
+    return;
+
+  }
+
+
+  /* ===============================================
+     LOADING MESSAGE
+  ================================================ */
+
+  box.innerHTML = `
+
+    <div style="
+      text-align:center;
+      padding:20px;
+      color:#777;
+      font-weight:600;
+    ">
+
+      ⏳ Loading Feeders...
+
+    </div>
+
+  `;
+
+
+  /* ===============================================
+     GET TPD DATA
+  ================================================ */
+
+  fetch(
+
+    WEBAPP_URL +
+
+    "?" +
+
+    new URLSearchParams({
+
+      action:
+        "gettpd",
+
+
+      username:
+        CURRENT_USER.n,
+
+
+      /*
+        Selected installation backend ko bhejenge
+      */
+
+      installation:
+        installation,
+
+
+      admin:
+        CURRENT_USER.admin
+          ? "true"
+          : "false"
+
+    })
+
+  )
+
+
+  .then(function(res){
+
+    return res.json();
+
+  })
+
+
+  .then(function(data){
+
+    if(!data.success){
+
+      box.innerHTML = `
+
+        <div style="
+          padding:15px;
+          background:#ffebee;
+          color:#c62828;
+          border-radius:8px;
+          text-align:center;
+          font-weight:bold;
+        ">
+
+          ❌ ${data.message || "Unable to load TPD"}
+
+        </div>
+
+      `;
+
+
+      return;
+
+    }
+
+
+    /* ===============================================
+       DISPLAY SELECTED INSTALLATION FEEDERS
+    ================================================ */
+
+    displayTPDFeeders(
+      data.data
+    );
+
+  })
+
+
+  .catch(function(error){
+
+    console.error(error);
+
+
+    box.innerHTML = `
+
+      <div style="
+        padding:15px;
+        background:#ffebee;
+        color:#c62828;
+        border-radius:8px;
+        text-align:center;
+        font-weight:bold;
+      ">
+
+        ❌ Server connection failed
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+/* =====================================================
+   DISPLAY FEEDERS
+===================================================== */
+
+function displayTPDFeeders(data){
+
+  const box =
+    document.getElementById(
+      "tpdFeederList"
+    );
+
+
+  box.innerHTML = "";
+
+
+  if(!data || data.length === 0){
+
+    box.innerHTML = `
+      <div style="
+        padding:20px;
+        text-align:center;
+        color:#777;
+        ">
+        No feeder found.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  data.forEach(function(item,index){
+
+    const card =
+      document.createElement("div");
+
+
+    card.style.cssText = `
+      background:#f8f9fb;
+      border:1px solid #ddd;
+      border-radius:12px;
+      padding:14px;
+      margin-bottom:12px;
+    `;
+
+
+    card.innerHTML = `
+
+      <div style="
+        font-size:12px;
+        color:#777;
+        margin-bottom:4px;
+      ">
+        FEEDER
+      </div>
+
+
+      <div style="
+        font-size:17px;
+        font-weight:800;
+        color:#17365d;
+        margin-bottom:12px;
+      ">
+        ${escapeTPDHtml(item.feeder)}
+      </div>
+
+
+      <div style="
+        font-size:12px;
+        color:#777;
+        margin-bottom:5px;
+      ">
+        TON PER DAY
+      </div>
+
+
+      <div style="
+        display:flex;
+        gap:8px;
+      ">
+
+        <input
+          id="tpdInput_${index}"
+          type="number"
+          step="0.01"
+          min="0"
+          value="${item.tonPerDay ?? ''}"
+          style="
+            flex:1;
+            box-sizing:border-box;
+            padding:11px;
+            border:1px solid #bbb;
+            border-radius:8px;
+            font-size:16px;
+            font-weight:bold;
+          "
+        >
+
+
+        <button
+          id="tpdBtn_${index}"
+          onclick="
+            saveTPD(
+              ${index},
+              '${escapeTPDJs(item.installation)}',
+              '${escapeTPDJs(item.feeder)}'
+            )
+          "
+          style="
+            width:105px;
+            border:none;
+            border-radius:8px;
+            background:#2e7d32;
+            color:white;
+            font-size:13px;
+            font-weight:bold;
+            cursor:pointer;
+          "
+        >
+          UPDATE
+        </button>
+
+      </div>
+
+
+      <div style="
+        margin-top:8px;
+        font-size:11px;
+        color:#777;
+      ">
+
+        Last Updated:
+        ${escapeTPDHtml(item.lastUpdated || "Not Updated")}
+
+        <br>
+
+        Updated By:
+        ${escapeTPDHtml(item.updatedBy || "Not Updated")}
+
+      </div>
+
+    `;
+
+
+    box.appendChild(card);
+
+  });
+
+}
+
+
+/* =====================================================
+   SAVE TPD
+===================================================== */
+
+function saveTPD(
+  index,
+  installation,
+  feeder
+){
+
+  const input =
+    document.getElementById(
+      "tpdInput_" + index
+    );
+
+
+  const btn =
+    document.getElementById(
+      "tpdBtn_" + index
+    );
+
+
+  const ton =
+    input.value.trim();
+
+
+  if(ton === ""){
+
+    showToast(
+      "❌ Ton per Day enter karein",
+      "error"
+    );
+
+    input.focus();
+
+    return;
+
+  }
+
+
+  if(
+    isNaN(Number(ton)) ||
+    Number(ton) < 0
+  ){
+
+    showToast(
+      "❌ Invalid Ton per Day",
+      "error"
+    );
+
+    input.focus();
+
+    return;
+
+  }
+
+
+  btn.disabled = true;
+
+  btn.innerText = "UPDATING...";
+
+
+  fetch(
+    WEBAPP_URL +
+    "?" +
+    new URLSearchParams({
+
+      action:
+        "updatetpd",
+
+      username:
+  CURRENT_USER.n,
+
+installation:
+  installation,
+
+admin:
+  CURRENT_USER.admin ? "true" : "false",
+
+feeder:
+  feeder,
+
+tonPerDay:
+  ton
+
+    })
+  )
+
+  .then(function(res){
+
+    return res.json();
+
+  })
+
+  .then(function(data){
+
+    if(data.success){
+
+      showToast(
+        "✅ " +
+        feeder +
+        " TPD updated successfully",
+        "success"
+      );
+
+
+      /*
+        Active shutdown list me bhi
+        latest TPD update kar dein.
+      */
+
+      LAST_TPD[feeder] =
+        Number(ton);
+
+
+      /*
+        Production Loss calculation ke liye
+        latest TPD immediately available rahega.
+      */
+
+      loadActiveShutdowns();
+
+
+      /*
+        Updated time/user refresh karne ke liye
+        popup list reload.
+      */
+
+      loadTPDUpdateList(
+  installation
+);
+
+    }
+    else{
+
+      showToast(
+        "❌ " +
+        (data.message || "Update failed"),
+        "error"
+      );
+
+    }
+
+  })
+
+  .catch(function(error){
+
+    console.error(error);
+
+    showToast(
+      "❌ Server connection failed",
+      "error"
+    );
+
+  })
+
+  .finally(function(){
+
+    btn.disabled = false;
+
+    btn.innerText = "UPDATE";
+
+  });
+
+}
+
+
+/* =====================================================
+   SAFE HTML
+===================================================== */
+
+function escapeTPDHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   SAFE JAVASCRIPT STRING
+===================================================== */
+
+function escapeTPDJs(value){
+
+  return String(value ?? "")
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'");
+
+}
+
+
+/* =====================================================
+   CLOSE WHEN CLICK OUTSIDE
+===================================================== */
+
+document.getElementById(
+  "tpdUpdateBox"
+).addEventListener(
+  "click",
+  function(e){
+
+    if(e.target === this){
+
+      closeTPDUpdate();
+
+    }
+
+  }
+);
+/* =====================================================
+   APP MENU - SETTINGS
+   ===================================================== */
+
+function openSettingsMenu(){
+
+  // Menu close
+  const menu = document.getElementById("appMenu");
+
+  if(menu){
+
+    menu.classList.remove("show");
+
+  }
+
+
+  // Existing TPD Update Function
+  if(typeof openTPDUpdate === "function"){
+
+    openTPDUpdate();
+
+  }
+  else{
+
+    console.warn("openTPDUpdate() function not found");
+
+  }
+
+}
+
+
+/* =====================================================
+   ABOUT THIS APP
+   ===================================================== */
+
+function showAboutApp(){
+
+  // Menu close
+  const menu = document.getElementById("appMenu");
+
+  if(menu){
+
+    menu.classList.remove("show");
+
+  }
+
+
+  // About Dialog Open
+  const dialog = document.getElementById("aboutAppDialog");
+
+  if(dialog){
+
+    dialog.classList.add("show");
+
+  }
+
+}
+
+
+/* =====================================================
+   CLOSE ABOUT
+   ===================================================== */
+
+function closeAboutApp(){
+
+  const dialog = document.getElementById("aboutAppDialog");
+
+  if(dialog){
+
+    dialog.classList.remove("show");
+
+  }
+
+}
+
+
+/* =====================================================
+   LOGOUT FROM 3 DOT MENU
+   ===================================================== */
+
+function menuLogout(){
+
+  // Menu close
+  const menu = document.getElementById("appMenu");
+
+  if(menu){
+
+    menu.classList.remove("show");
+
+  }
+
+
+  // Existing Logout Button
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if(logoutBtn){
+
+    logoutBtn.click();
+
+  }
+  else{
+
+    console.warn("logoutBtn not found");
+
+  }
+
+}
+
+
+/* =====================================================
+   CLICK OUTSIDE MENU = CLOSE
+   ===================================================== */
+
+document.addEventListener("click",function(event){
+
+  const menu = document.getElementById("appMenu");
+
+  const menuBtn = document.getElementById("menuBtn");
+
+
+  if(
+    menu &&
+    menuBtn &&
+    !menu.contains(event.target) &&
+    !menuBtn.contains(event.target)
+  ){
+
+    menu.classList.remove("show");
+
+  }
+
+});
+
+</script>
+
+
+<!-- TPD REQUIRED PROFESSIONAL POPUP -->
+<div id="tpdRequiredModal" class="tpd-required-modal">
+
+  <div class="tpd-required-box">
+
+    <div class="tpd-required-icon">
+      ⚠️
+    </div>
+
+    <div class="tpd-required-title">
+    TPD Required
+</div>
+
+<div class="tpd-required-message">
+    Please update the <b>Ton Per Day (TPD)</b> value for this feeder
+    before submitting the Resume entry.
+</div>
+
+    <button
+      type="button"
+      class="tpd-required-ok"
+      onclick="closeTPDRequiredMessage()">
+      OK
+    </button>
+
+  </div>
+
+</div>
+<!-- =====================================================
+     ABOUT THIS APP DIALOG
+     ===================================================== -->
+
+<div
+  id="aboutAppDialog"
+  class="about-dialog">
+
+
+  <div class="about-dialog-box">
+
+    <div class="about-icon">
+      ⚡
+    </div>
+
+
+    <div class="about-title">
+      POWER SHUTDOWN MANAGEMENT APP
+    </div>
+
+
+    <div class="about-line"></div>
+
+
+    <div class="about-text">
+
+      <div class="about-developed">
+        App Developed by
+      </div>
+
+
+      <div class="about-name">
+        Bhavesh Parmar
+      </div>
+
+
+      <div class="about-ongc">
+        ONGC Ahmedabad
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="about-close-btn"
+      onclick="closeAboutApp()">
+
+      OK
+
+    </button>
+
+  </div>
+
+</div>
+<!-- ================= CHANGE PASSWORD MODAL ================= -->
+
+<div id="changePasswordModal" class="change-password-overlay">
+
+  <div class="change-password-box">
+
+```
+<div class="change-password-header">
+
+  <div>
+    <div class="change-password-title">
+      🔑 Change Password
+    </div>
+
+    <div class="change-password-subtitle">
+      Update your login password
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="change-password-close"
+    onclick="closeChangePassword()">
+    ×
+  </button>
+
+</div>
+
+
+<div class="change-password-body">
+
+  <label>Current Password</label>
+
+  <input
+    type="password"
+    id="currentPassword"
+    placeholder="Enter current password"
+    autocomplete="current-password">
+
+
+  <label>New Password</label>
+
+  <input
+    type="password"
+    id="newPassword"
+    placeholder="Enter new password"
+    autocomplete="new-password">
+
+
+  <label>Confirm New Password</label>
+
+  <input
+    type="password"
+    id="confirmPassword"
+    placeholder="Confirm new password"
+    autocomplete="new-password">
+
+
+  <button
+    type="button"
+    class="change-password-submit"
+    onclick="changeUserPassword()">
+
+    🔐 Change Password
+
+  </button>
+
+</div>
+```
+
+  </div>
+
+</div>
+
+</body>
+</html>
